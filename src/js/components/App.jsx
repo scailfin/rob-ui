@@ -1,25 +1,49 @@
-import React from "react";
-import List from "./List.jsx";
-import Form from "./Form.jsx";
-import Post from "./Posts.jsx";
+import React, { Component } from "react";
+import { connect } from 'react-redux';
+import ErrorMessage from './ErrorMessage.jsx';
+import Footer from './Footer.jsx';
+import Logo from './Logo.jsx';
 import SignIn from './SignIn.jsx';
+import Topbar from '../layout/Topbar';
+import { fetchApi } from "../actions/Api";
 
-const App = () => (
-    <SignIn />
-  /*<div className="row mt-5">
-    <div className="col-md-4 offset-md-1">
-      <h2>Articles</h2>
-      <List />
-    </div>
-    <div className="col-md-4 offset-md-1">
-      <h2>Add a new article</h2>
-      <Form />
-    </div>
-    <div className="col-md-4 offset-md-1">
-      <h2>API posts</h2>
-      <Post />
-    </div>
-  </div>*/
-);
 
-export default App;
+
+const mapStateToProps = state => {
+  return { app: state.app };
+};
+
+function mapDispatchToProps(dispatch) {
+  return {
+    fetchApi: () => dispatch(fetchApi())
+  };
+}
+
+
+class App extends Component {
+    componentDidMount() {
+        this.props.fetchApi();
+    }
+    render() {
+        const { app } = this.props;
+        const { fetching, username, accessToken } = app;
+        let content = null;
+        if (fetching) {
+            content = (<Logo />);
+        } else if ((username == null) || (accessToken == null)) {
+            content = (<SignIn />);
+        } else {
+
+        }
+        return (
+            <div>
+                <Topbar />
+                {content}
+                <ErrorMessage />
+                <Footer />
+            </div>
+        );
+    }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
