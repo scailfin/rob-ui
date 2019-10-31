@@ -1,10 +1,13 @@
 import {getUrl} from './Api';
+import {fetchStart, fetchSuccess} from './App';
+
 
 export const FETCH_BENCHMARKS_SUCCESS = 'FETCH_BENCHMARKS_SUCCESS';
 
 
 export function fetchBenchmarks(url) {
-    return getUrl(url, fetchBenchmarksSuccess);
+    const startSignal = () => (fetchStart('BL'));
+    return getUrl(url, startSignal, fetchSuccess, fetchBenchmarksSuccess);
 }
 
 

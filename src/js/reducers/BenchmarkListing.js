@@ -1,18 +1,19 @@
 import { FETCH_BENCHMARKS_SUCCESS } from '../actions/Benchmark';
-import { Urls } from '../resources/Urls';
+import { FETCH_SUBMISSIONS_SUCCESS } from '../actions/Submission';
 
 
 const INITIAL_STATE = {
     benchmarks: null,
-    urls: null
+    submissions: null
 }
 
 
 const benchmarkListing = (state = INITIAL_STATE, action) => {
     switch (action.type) {
         case FETCH_BENCHMARKS_SUCCESS:
-            const { benchmarks, links } = action.payload;
-            return {...state, benchmarks: benchmarks, urls: new Urls(links)};
+            return {...state, benchmarks: action.payload.benchmarks};
+        case FETCH_SUBMISSIONS_SUCCESS:
+            return {...state, submissions: action.payload.submissions};
         default:
             return state
     }

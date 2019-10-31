@@ -6,7 +6,6 @@ import {CLEAR_ERROR} from '../actions/Error';
 
 
 const INITIAL_STATE = {
-    accessToken: null,
     component: null,
     error: null,
     fetching: false,
@@ -17,7 +16,7 @@ const INITIAL_STATE = {
 const app = (state = INITIAL_STATE, action) => {
     switch (action.type) {
         case FETCH_START:
-            return {...state, fetching: true};
+            return {...state, fetching: true, component: action.payload.component};
         case FETCH_SUCCESS:
             return {...state, fetching: false};
         case CLEAR_ERROR:
@@ -26,13 +25,10 @@ const app = (state = INITIAL_STATE, action) => {
             return {...state, fetching: false, error: action.payload.error};
         case LOGIN_SUCCESS:
             const {username, token} = action.payload.response;
-            return {
-                ...state,
-                username: username,
-                accessToken: token,
-                component: action.payload.component
-            };
+            localStorage.setItem('accessToken', token);
+            return {...state, username: username, accessToken: token};
         case LOGOUT_SUCCESS:
+            localStorage.removeItem('accessToken');
             return {
                 ...state,
                 username: null,

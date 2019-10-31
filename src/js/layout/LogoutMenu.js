@@ -67,9 +67,8 @@ function LogoutMenu(props) {
     };
     const handleLogout = () => {
         handleClose();
-        const accessToken = props.app.accessToken;
         const urls = props.api.urls;
-        props.submitLogout(urls.get('logout'), accessToken)
+        props.submitLogout(urls.get('logout'))
     };
     const { username} = props.app;
     if (username != null) {
