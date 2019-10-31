@@ -25,7 +25,6 @@ export function getUrl(url, handler, accessToken) {
 
 
 export function postUrl(url, data, handler, accessToken) {
-    console.log(data)
     return dispatch => {
         dispatch(fetchStart());
         return fetch(
@@ -43,8 +42,8 @@ export function postUrl(url, data, handler, accessToken) {
                     });
                 } else {
                     response.json().then(json => {
-                        dispatch(fetchSuccess());
                         dispatch(handler(json));
+                        dispatch(fetchSuccess());
                     })
                 }
             })

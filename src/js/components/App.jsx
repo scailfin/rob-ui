@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { connect } from 'react-redux';
+import BenchmarkListing from './benchmark/BenchmarkListing';
 import ErrorMessage from './ErrorMessage.jsx';
 import Footer from './Footer.jsx';
 import Logo from './Logo.jsx';
@@ -26,14 +27,14 @@ class App extends Component {
     }
     render() {
         const { app } = this.props;
-        const { fetching, username, accessToken } = app;
+        const { component, fetching, username, accessToken } = app;
         let content = null;
         if (fetching) {
             content = (<Logo />);
         } else if ((username == null) || (accessToken == null)) {
             content = (<SignIn />);
-        } else {
-
+        } else if (component === 'BL') {
+            content = (<BenchmarkListing />);
         }
         return (
             <div>

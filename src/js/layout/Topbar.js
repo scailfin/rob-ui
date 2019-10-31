@@ -29,12 +29,6 @@ const mapStateToProps = state => {
   return { app: state.app };
 };
 
-function mapDispatchToProps(dispatch) {
-  return {
-
-  };
-}
-
 
 class Topbar extends Component {
     static propTypes = {
@@ -65,4 +59,4 @@ class Topbar extends Component {
     }
 }
 
-export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(Topbar));
+export default withStyles(styles)(connect(mapStateToProps)(Topbar));

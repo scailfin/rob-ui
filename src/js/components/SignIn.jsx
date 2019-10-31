@@ -43,7 +43,7 @@ const mapStateToProps = state => {
 
 function mapDispatchToProps(dispatch) {
   return {
-    submitLogin: (url, username, password) => dispatch(submitLogin(url, username, password))
+    submitLogin: (api, username, password) => dispatch(submitLogin(api, username, password))
   };
 }
 
@@ -144,7 +144,7 @@ class SignIn extends Component {
         } else if (password === '') {
             alert('No password given');
         } else {
-            this.props.submitLogin(api.urls.get('login'), username, password);
+            this.props.submitLogin(api, username, password);
         }
     }
 }

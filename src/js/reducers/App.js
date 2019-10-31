@@ -1,4 +1,6 @@
-import {FETCH_START, FETCH_SUCCESS, FETCH_ERROR} from '../actions/App';
+import {
+    FETCH_START, FETCH_SUCCESS, FETCH_ERROR, SET_COMPONENT
+} from '../actions/App';
 import {LOGIN_SUCCESS, LOGOUT_SUCCESS} from '../actions/Auth';
 import {CLEAR_ERROR} from '../actions/Error';
 
@@ -23,10 +25,22 @@ const app = (state = INITIAL_STATE, action) => {
         case FETCH_ERROR:
             return {...state, fetching: false, error: action.payload.error};
         case LOGIN_SUCCESS:
-            const {username, token} = action.payload
-            return {...state, username: username, accessToken: token};
+            const {username, token} = action.payload.response;
+            return {
+                ...state,
+                username: username,
+                accessToken: token,
+                component: action.payload.component
+            };
         case LOGOUT_SUCCESS:
-            return {...state, username: null, accessToken: null};
+            return {
+                ...state,
+                username: null,
+                accessToken: null,
+                component: null
+            };
+        case SET_COMPONENT:
+            return {...state, component: action.payload};
         default:
             return state;
     }

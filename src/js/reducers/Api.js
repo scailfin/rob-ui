@@ -1,5 +1,5 @@
 import {FETCH_API_SUCCESS} from '../actions/Api';
-import {Urls} from '../resources/Urls';
+import { Urls } from '../resources/Urls';
 
 const INITIAL_STATE = {
     name: null,

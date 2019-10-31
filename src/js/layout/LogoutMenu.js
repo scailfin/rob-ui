@@ -9,41 +9,51 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import { submitLogout } from "../actions/Auth";
 
 
 const mapStateToProps = state => {
-  return { app: state.app };
+    return { app: state.app, api: state.api };
 };
 
+
+function mapDispatchToProps(dispatch) {
+  return {
+      submitLogout: (url, token) => dispatch(submitLogout(url, token))
+  };
+}
+
+
 const StyledMenu = withStyles({
-  paper: {
-    border: '1px solid #d3d4d5',
-  },
+    paper: {
+        border: '1px solid #d3d4d5',
+    },
 })(props => (
-  <Menu
-    elevation={0}
-    getContentAnchorEl={null}
-    anchorOrigin={{
-      vertical: 'bottom',
-      horizontal: 'center',
-    }}
-    transformOrigin={{
-      vertical: 'top',
-      horizontal: 'center',
-    }}
-    {...props}
-  />
+    <Menu
+        elevation={0}
+        getContentAnchorEl={null}
+        anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center',
+        }}
+        transformOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+        }}
+        {...props}
+    />
 ));
 
+
 const StyledMenuItem = withStyles(theme => ({
-  root: {
-    '&:focus': {
-      backgroundColor: theme.palette.primary.main,
-      '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
-        color: theme.palette.common.white,
-      },
+    root: {
+        '&:focus': {
+            backgroundColor: theme.palette.primary.main,
+            '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
+                color: theme.palette.common.white,
+            },
+        },
     },
-  },
 }))(MenuItem);
 
 
@@ -54,6 +64,12 @@ function LogoutMenu(props) {
     };
     const handleClose = () => {
         setAnchorEl(null);
+    };
+    const handleLogout = () => {
+        handleClose();
+        const accessToken = props.app.accessToken;
+        const urls = props.api.urls;
+        props.submitLogout(urls.get('logout'), accessToken)
     };
     const { username} = props.app;
     if (username != null) {
@@ -78,7 +94,7 @@ function LogoutMenu(props) {
                 <ListSubheader component="div" id="nested-list-subheader">
                   Logged in as {username}
                 </ListSubheader>
-                    <StyledMenuItem onClick={handleClose}>
+                    <StyledMenuItem onClick={handleLogout}>
                         <ListItemIcon>
                             <ExitToApp fontSize="small" />
                         </ListItemIcon>
@@ -92,4 +108,4 @@ function LogoutMenu(props) {
     }
 }
 
-export default connect(mapStateToProps)(LogoutMenu);
+export default connect(mapStateToProps, mapDispatchToProps)(LogoutMenu);
