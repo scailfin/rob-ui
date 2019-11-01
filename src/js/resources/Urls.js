@@ -14,4 +14,10 @@ export class Urls {
             return null;
         }
     }
+    /**
+     * Shortcut to get the self reference link.
+     */
+    self() {
+        return this.get('self');
+    }
 }

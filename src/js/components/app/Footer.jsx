@@ -17,7 +17,7 @@ const APIFooter = ({api}) => {
         apiInfo = (
             <span>
                 {'Connected to '}
-                <Link color="inherit" href={urls.get('self')}>
+                <Link color="inherit" href={urls.self()}>
                   {name}
                 </Link>
                 {' (Version ' + version + ').'}

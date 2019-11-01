@@ -8,8 +8,8 @@ import ErrorIcon from '@material-ui/icons/Error';
 import IconButton from '@material-ui/core/IconButton';
 import Snackbar from '@material-ui/core/Snackbar';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
-import { clearError } from "../actions/Error";
-import theme from '../../theme';
+import { clearError } from "../../actions/Error";
+import theme from '../../../theme';
 
 
 // Use higher-order component API to create styles for the logo

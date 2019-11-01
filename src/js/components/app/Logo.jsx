@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import Container from '@material-ui/core/Container';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import Typography from '@material-ui/core/Typography';
-import theme from '../../theme';
+import theme from '../../../theme';
 
 
 // Use higher-order component API to create styles for the logo
@@ -36,12 +36,15 @@ class Logo extends Component {
         return (
             <Container component="main" maxWidth="xs">
                 <div className={classes.paper}>
-                    <Typography component="h1" variant="h5">
+                    <Typography component="h1" variant="h1">
                         ROB
                     </Typography>
-                    <div className={classes.spinner}>
-                        <CircularProgress color='secondary'/>
-                    </div>
+                    <Typography variant="caption">
+                        Reproducible Open Benchmarks
+                    </Typography>
+                </div>
+                <div className={classes.spinner}>
+                    <LinearProgress color='secondary'/>
                 </div>
             </Container>
         );

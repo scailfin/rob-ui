@@ -1,5 +1,5 @@
-import {getUrl} from './Api';
-import {fetchStart, fetchSuccess} from './App';
+import { getUrl } from './Requests';
+import { Urls } from '../resources/Urls';
 
 
 export const FETCH_BENCHMARKS_SUCCESS = 'FETCH_BENCHMARKS_SUCCESS';
@@ -7,8 +7,7 @@ export const SELECT_BENCHMARK = 'SELECT_BENCHMARK';
 
 
 export function fetchBenchmarks(url) {
-    const startSignal = () => (fetchStart('BL'));
-    return getUrl(url, startSignal, fetchSuccess, fetchBenchmarksSuccess);
+    return getUrl(url, fetchBenchmarksSuccess);
 }
 
 
@@ -20,7 +19,14 @@ function fetchBenchmarksSuccess(json) {
 
 
 export function selectBenchmark(benchmark) {
+    const { id, name, description, instructions, links } = benchmark;
     return {
-        type: SELECT_BENCHMARK, payload: benchmark
+        type: SELECT_BENCHMARK, payload: {
+            id,
+            name,
+            description,
+            instructions,
+            urls: new Urls(links)
+        }
     }
 }

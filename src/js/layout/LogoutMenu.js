@@ -13,7 +13,7 @@ import { submitLogout } from "../actions/Auth";
 
 
 const mapStateToProps = state => {
-    return { app: state.app, api: state.api };
+    return { api: state.api, app: state.app };
 };
 
 
@@ -70,7 +70,7 @@ function LogoutMenu(props) {
         const urls = props.api.urls;
         props.submitLogout(urls.get('logout'))
     };
-    const { username} = props.app;
+    const username = props.app.username;
     if (username != null) {
         return (
             <div>

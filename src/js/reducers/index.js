@@ -1,13 +1,13 @@
 import { combineReducers } from 'redux';
 import api from './Api';
 import app from './App';
-import benchmarkListing from './BenchmarkListing';
+import mainPanel from './MainPanel';
 
 
 const rootReducer = combineReducers({
     api,
     app,
-    benchmarkListing
+    mainPanel
 })
 
 export default rootReducer;

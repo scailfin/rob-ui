@@ -10,8 +10,8 @@ import Link from '@material-ui/core/Link';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
-import { submitLogin } from "../actions/Auth";
-import theme from '../../theme';
+import { submitLogin } from "../../actions/Auth";
+import theme from '../../../theme';
 
 
 // Use higher-order component API to create styles for the sign in form

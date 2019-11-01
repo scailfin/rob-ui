@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import Assessment from '@material-ui/icons/Assessment';
 import Avatar from '@material-ui/core/Avatar';
+import Benchmark from './Benchmark.jsx'
+import Code from '@material-ui/icons/Code';
 import Divider from '@material-ui/core/Divider';
 import Grid from '@material-ui/core/Grid';
 import List from '@material-ui/core/List';
@@ -10,10 +12,11 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
+import ListSubheader from '@material-ui/core/ListSubheader';
+import Submission from './Submission.jsx';
 import Typography from '@material-ui/core/Typography';
 import { selectBenchmark } from '../../actions/Benchmark';
-import Benchmark from './Benchmark.jsx'
+import { selectSubmission } from '../../actions/Submission';
 
 
 const useStyles = makeStyles(theme => ({
@@ -41,42 +44,51 @@ const useStyles = makeStyles(theme => ({
 
 const mapStateToProps = state => {
     return {
-        benchmarkListing: state.benchmarkListing
+        mainPanel: state.mainPanel
     };
 };
 
 
 function mapDispatchToProps(dispatch) {
   return {
-      selectBenchmark: (benchmark) => dispatch(selectBenchmark(benchmark))
+      selectBenchmark: (benchmark) => dispatch(selectBenchmark(benchmark)),
+      selectSubmission: (submission) => dispatch(selectSubmission(submission))
   };
 }
 
 
-function BenchmarkListing(props) {
+function MainPanel(props) {
     const classes = useStyles();
     const handleBenchmarkSelect = (key) => {
-        const benchmarks = props.benchmarkListing.benchmarks;
+        const benchmarks = props.mainPanel.benchmarks;
         const benchmark = benchmarks.find((b) => (b.id === key));
         props.selectBenchmark(benchmark);
     }
     const handleSubmissionSelect = (key) => {
-        console.log(key);
+        const submissions = props.mainPanel.submissions;
+        const submission = submissions.find((s) => (s.id === key));
+        props.selectSubmission(submission);
     }
     const {
         benchmarks,
         selectedBenchmark,
+        selectedSubmission,
         submissions
-    } = props.benchmarkListing;
+    } = props.mainPanel;
     // Start by creating the side menu that lists the available benchmarks and
     // submissions.
     let sideMenu = null;
+    let selId = null;
+    if (selectedBenchmark != null) {
+        selId = selectedBenchmark.id;
+    } else if (selectedSubmission != null) {
+        selId = selectedSubmission.id;
+    }
     if ((benchmarks != null) && (submissions != null)) {
-        let selId = null;
-        if (selectedBenchmark != null) {
-            selId = selectedBenchmark.id;
-        }
         const benchmarklistItems = [];
+        // Group submissions by benchmarks
+        benchmarks.sort((a, b) => ((a.name).localeCompare(b.name)));
+        const benchmarkGroups = {};
         for (let i = 0; i < benchmarks.length; i++) {
             const bm = benchmarks[i];
             benchmarklistItems.push(
@@ -94,28 +106,46 @@ function BenchmarkListing(props) {
                     <ListItemText primary={bm.name} secondary={bm.description} />
                 </ListItem>
             );
+            benchmarkGroups[bm.id] = [];
         }
         // Create the listing of user submissions
         let submissionList = null;
         if (submissions.length > 0) {
+            submissions.sort((a, b) => ((a.name).localeCompare(b.name)));
             const submissionListItems = [];
             for (let i = 0; i < submissions.length; i++) {
                 const sm = submissions[i];
                 const bm = benchmarks.find((b) => (b.id === sm.benchmark));
-                submissionListItems.push(
-                    <ListItem
-                        key={sm.id}
-                        button
-                        onClick={() => (handleSubmissionSelect(sm.id))}
-                    >
-                        <ListItemAvatar>
-                            <Avatar className={classes.avatarSubmission}>
-                                <SupervisedUserCircleIcon />
-                            </Avatar>
-                        </ListItemAvatar>
-                        <ListItemText primary={sm.name} secondary={bm.name} />
-                    </ListItem>
-                );
+                benchmarkGroups[bm.id].push({submission: sm, benchmark:bm});
+            }
+            for (let i = 0; i < benchmarks.length; i++) {
+                const group = benchmarkGroups[benchmarks[i].id];
+                if (group.length > 0) {
+                    const benchmark = group[0].benchmark;
+                    submissionListItems.push(
+                        <ListSubheader key={benchmark.id}>
+                            <ListItemText primary={benchmark.name} />
+                        </ListSubheader>
+                    );
+                    for (let s = 0; s < group.length; s++) {
+                        const { submission, benchmark } = group[s];
+                        submissionListItems.push(
+                            <ListItem
+                                key={submission.id}
+                                button
+                                selected={submission.id === selId}
+                                onClick={() => (handleSubmissionSelect(submission.id))}
+                            >
+                                <ListItemAvatar>
+                                    <Avatar className={classes.avatarSubmission}>
+                                        <Code />
+                                    </Avatar>
+                                </ListItemAvatar>
+                                <ListItemText primary={submission.name} secondary={benchmark.name} />
+                            </ListItem>
+                        );
+                    }
+                }
             }
             submissionList = (
                 <List component="nav" className={classes.root}>
@@ -158,6 +188,8 @@ function BenchmarkListing(props) {
     let mainContent = null;
     if (selectedBenchmark != null) {
         mainContent = (<Benchmark key={selectedBenchmark.id}/>);
+    } else if (selectedSubmission != null) {
+        mainContent = (<Submission key={selectedSubmission.id}/>);
     }
     return (
             <Grid container spacing={3}>
@@ -171,4 +203,4 @@ function BenchmarkListing(props) {
     );
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(BenchmarkListing);
+export default connect(mapStateToProps, mapDispatchToProps)(MainPanel);
