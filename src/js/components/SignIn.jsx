@@ -17,7 +17,6 @@ import theme from '../../theme';
 // Use higher-order component API to create styles for the sign in form
 const styles = {
     paper: {
-        marginTop: theme.spacing(8),
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',

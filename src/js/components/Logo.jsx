@@ -11,7 +11,7 @@ import theme from '../../theme';
 // Use higher-order component API to create styles for the logo
 const styles = {
     paper: {
-        marginTop: theme.spacing(8),
+        marginTop: theme.spacing(12),
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
