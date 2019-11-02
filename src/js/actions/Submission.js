@@ -1,10 +1,9 @@
-import { getUrl, postUrl } from './Requests';
+import { getFile, getUrl, postUrl } from './Requests';
 import { Urls } from '../resources/Urls';
 
 
 export const CREATE_SUBMISSIONS_SUCCESS = 'CREATE_SUBMISSIONS_SUCCESS';
 export const FETCH_SUBMISSIONS_SUCCESS = 'FETCH_SUBMISSIONS_SUCCESS';
-export const FILE_UPLOAD_SUCCESS = 'FILE_UPLOAD_SUCCESS';
 export const SELECT_SUBMISSION = 'SELECT_SUBMISSION';
 
 
@@ -17,6 +16,42 @@ function createSubmissionSuccess(response) {
     return {
         type: CREATE_SUBMISSIONS_SUCCESS,
         payload: response
+    }
+}
+
+
+export function downloadResource(url, submission, resourceDescriptor) {
+    const desc = submission.resourceDescriptor
+    if (desc != null) {
+        const { id, type } = desc;
+        if ((resourceDescriptor.id === id) && (resourceDescriptor.type === type)) {
+            return {
+                type: SELECT_SUBMISSION,
+                payload: {
+                    ...submission,
+                    displayContent: null,
+                    resourceDescriptor: null
+                }
+            }
+        }
+    };
+    return getFile(
+        url,
+        (content) => (
+            fetchResourceSuccess(submission, resourceDescriptor, content)
+        )
+    );
+}
+
+
+function fetchResourceSuccess(submission, resourceDescriptor, content) {
+    return {
+        type: SELECT_SUBMISSION,
+        payload: {
+            ...submission,
+            displayContent: content,
+            resourceDescriptor
+        }
     }
 }
 
@@ -76,6 +111,7 @@ export function selectSubmission(submission) {
  */
 export function uploadFile(url, submission, file) {
     const body = new FormData();
+    body.append('file', file);
     return dispatch => (
         dispatch(
             postUrl(
@@ -91,8 +127,13 @@ export function uploadFile(url, submission, file) {
 function uploadFileSuccess(submission, response) {
     console.log(submission);
     console.log(response);
+
     return {
-        type: FILE_UPLOAD_SUCCESS,
-        payload: {submission, file: response}
+        type: SELECT_SUBMISSION,
+        payload: {
+            ...submission,
+            files: submission.files.concat([response]),
+            resourceDescriptor: {type: 2}
+        }
     }
 }

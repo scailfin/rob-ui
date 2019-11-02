@@ -2,19 +2,20 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import CloudUpload from '@material-ui/icons/CloudUpload';
+import FileListing from './FileListing';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Dropzone from 'react-dropzone';
 import Typography from '@material-ui/core/Typography';
-import { uploadFile } from '../../actions/Submission';
+import { downloadResource, uploadFile } from '../../actions/Submission';
+import { Urls } from '../../resources/Urls';
 
 
 const useStyles = makeStyles(theme => ({
     emptyTabMsg: {
         marginTop: theme.spacing(4),
-        color:  theme.palette.secondary.main
     },
     instructions: {
         marginTop: theme.spacing(4),
@@ -50,18 +51,29 @@ function mapDispatchToProps(dispatch) {
           dispatch(
               uploadFile(submission.urls.get('self:upload'), submission, file)
           )
+      ),
+      downloadResource: (url, submission, type) => (
+          dispatch(
+              downloadResource(url, submission, type)
+          )
       )
   };
 }
 
 
 function Submission(props) {
-    const [values, setValues] = useState({selectedTab: 0});
-    const { selectedTab } = values;
-    const classes = useStyles();
     const { benchmarks, selectedSubmission } = props.mainPanel;
     const benchmark = benchmarks.find((b) => (b.id === selectedSubmission.benchmark));
-    const { fetching } = selectedSubmission;
+    const { fetching, displayContent, resourceDescriptor } = selectedSubmission;
+    // Set the state (especially the shown tab based on whether we are
+    // displaying any content)
+    let contentTab = 0;
+    if (resourceDescriptor != null) {
+        contentTab = resourceDescriptor.type;
+    }
+    const [values, setValues] = useState({selectedTab: contentTab});
+    const { selectedTab } = values;
+    const classes = useStyles();
     /**
      * Handler to upload a file that was selected using the drop zone
      */
@@ -69,6 +81,13 @@ function Submission(props) {
         if (files.length === 1) {
             props.uploadFile(selectedSubmission, files[0]);
         }
+    }
+    /**
+     * Handler for downloads of previously uploaded files.
+     */
+    const handleFileDownload = (fh) => {
+        const url = new Urls(fh.links).get('self:download');
+        props.downloadResource(url, selectedSubmission, {id: fh.id, type: 2});
     }
     /**
      * Handler for tab selections.
@@ -99,25 +118,40 @@ function Submission(props) {
                 );
             }
         } else if (selectedTab === 2) {
+            let contentId = null;
+            if (resourceDescriptor != null) {
+                const { id, type } = resourceDescriptor;
+                if (type === 2) {
+                    contentId = id;
+                }
+            }
             tabContent = (
-                <Dropzone
-                    onDrop={acceptedFiles => handleFileDrop(acceptedFiles)}
-                    multiple={false}
-                >
-                  {({getRootProps, getInputProps}) => (
-                    <section>
-                      <div {...getRootProps()}>
-                        <input {...getInputProps()} />
-                        <Paper className={classes.uploadForm}>
-                        <CloudUpload fontSize='large'/>
-                        <Typography variant='body2'>
-                            Drag files here, or click to select
-                        </Typography>
-                        </Paper>
-                      </div>
-                    </section>
-                  )}
-                </Dropzone>
+                <div>
+                    <FileListing
+                        files={selectedSubmission.files}
+                        onDownload={handleFileDownload}
+                        contentId={contentId}
+                        content={displayContent}
+                    />
+                    <Dropzone
+                        onDrop={acceptedFiles => handleFileDrop(acceptedFiles)}
+                        multiple={false}
+                    >
+                      {({getRootProps, getInputProps}) => (
+                        <section>
+                          <div {...getRootProps()}>
+                            <input {...getInputProps()} />
+                            <Paper className={classes.uploadForm}>
+                            <CloudUpload fontSize='large'/>
+                            <Typography variant='body2'>
+                                Drag files here, or click to select
+                            </Typography>
+                            </Paper>
+                          </div>
+                        </section>
+                      )}
+                    </Dropzone>
+                </div>
             );
         } else if (selectedTab === 3) {
             tabContent = (

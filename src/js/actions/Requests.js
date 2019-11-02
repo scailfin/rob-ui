@@ -1,6 +1,39 @@
 import {fetchStart, fetchSuccess, fetchError} from './App';
 
 
+export function getFile(url, successHandler) {
+    const accessToken = localStorage.getItem('accessToken');
+    return dispatch => {
+        // Set API key in header
+        const headers = new Headers();
+        headers.append('api_key', accessToken);
+        return fetch(url, {headers: headers})
+            .then(response => {
+                if (!response.ok) {
+                    response.json().then(json => {
+                        dispatch(fetchError(json.message));
+                    });
+                } else {
+                    response.blob().then(blob => {
+                        // Based on https://blog.logrocket.com/programmatic-file-downloads-in-the-browser-9a5186298d5c/
+                        // Create a new FileReader innstance
+                        const reader = new FileReader();
+                        // Add a listener to handle successful reading of the blob
+                        reader.addEventListener('load', () => {
+                            dispatch(successHandler(reader.result));
+                        });
+
+                        // Start reading the content of the blob
+                        // The result should be a base64 data URL
+                        reader.readAsText(blob);
+                    })
+                }
+            })
+            .catch(error => dispatch(fetchError(error.message)));
+    };
+}
+
+
 /**
  * Generic function to send asyncronous get requests. This function takes
  * care of the error handling and the setting of the progress indicator. The
@@ -79,24 +112,18 @@ export function postUrl(
     return dispatch => {
         const accessToken = localStorage.getItem('accessToken');
         dispatch(fetchStart());
+        const headers = {
+            'api_key': accessToken
+        };
         let body = null;
-        let contentType = null;
         if (data instanceof FormData) {
             body = data;
-            contentType = 'multipart/form-data';
         } else {
             body = JSON.stringify(data);
-            contentType = 'application/json';
+            headers['Content-Type'] = 'application/json';
         }
-        return fetch(
-            url, {
-                method: method,
-                headers: {
-                  'Content-Type': contentType,
-                  'api_key': accessToken
-              },
-              body
-            }).then(response => {
+        return fetch(url, {method, headers, body})
+            .then(response => {
                 if (!response.ok) {
                     response.json().then(json => {
                         dispatch(fetchError(json.message));
