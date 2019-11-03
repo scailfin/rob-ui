@@ -9,7 +9,7 @@ import ListItemIcon from '@material-ui/core/ListItemAvatar';
 import { utc2LocalTime } from '../../resources/Timestamps';
 
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { okaidia } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const useStyles = makeStyles(theme => ({
 }));
@@ -37,8 +37,14 @@ function FileListing(props) {
             </ListItem>
         );
         if (fh.id === contentId) {
+            let lang = 'javascript';
+            if (fh.name.endsWith('.json')) {
+                lang = 'json';
+            } else if (fh.name.endsWith('.py')) {
+                lang = 'python'
+            }
             items.push(
-                <SyntaxHighlighter key={'content'} language="javascript" style={dark}>
+                <SyntaxHighlighter key={'content'} language={lang} style={okaidia}>
                   {content}
                 </SyntaxHighlighter>
             );
