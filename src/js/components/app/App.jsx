@@ -7,7 +7,7 @@ import Footer from './Footer.jsx';
 import Logo from './Logo.jsx';
 import MainPanel from '../content/MainPanel';
 import SignIn from './SignIn.jsx';
-import Topbar from '../../layout/Topbar';
+import Topbar from '../layout/Topbar';
 import { fetchApi } from "../../actions/Api";
 import theme from '../../../theme';
 

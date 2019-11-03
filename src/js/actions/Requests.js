@@ -103,8 +103,8 @@ export function postUrl(
     url,
     data,
     successHandler,
-    method,
-    sendSignals
+    sendSignals,
+    method
 ) {
     // Ensure that the method os set
     if (method == null) {

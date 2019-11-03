@@ -76,8 +76,6 @@ function Benchmark(props) {
     };
     let content = null;
     if (selectedTab === 0) {
-        content = (<Leaderboard leaderboard={selectedBenchmark.leaderboard}/>);
-    } else {
         let form = null;
         if (open) {
             form = (
@@ -97,22 +95,22 @@ function Benchmark(props) {
                         />
                     </div>
                     <div>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        className={classes.button}
-                        onClick={handleSubmissionSubmit}
-                    >
-                        Submit
-                    </Button>
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        className={classes.button}
-                        onClick={() => (setValues({...values, open: false}))}
-                    >
-                        Cancel
-                    </Button>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            className={classes.button}
+                            onClick={handleSubmissionSubmit}
+                        >
+                            Submit
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            className={classes.button}
+                            onClick={() => (setValues({...values, open: false}))}
+                        >
+                            Cancel
+                        </Button>
                     </div>
                 </Paper>
             );
@@ -138,6 +136,8 @@ function Benchmark(props) {
                 { form }
             </div>
         );
+    } else {
+        content = (<Leaderboard leaderboard={selectedBenchmark.leaderboard}/>);
     }
     return (
         <div className={classes.paper}>
@@ -153,8 +153,8 @@ function Benchmark(props) {
                 textColor="primary"
                 onChange={handleTabChange}
             >
-                <Tab label="Results" />
                 <Tab label="Instructions" />
+                <Tab label="Results" />
             </Tabs>
             { content }
         </div>

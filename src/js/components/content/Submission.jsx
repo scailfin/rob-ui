@@ -9,6 +9,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Dropzone from 'react-dropzone';
 import RunListing from './RunListing.jsx';
+import SubmitForm from '../form/SubmitForm';
 import Typography from '@material-ui/core/Typography';
 import { cancelRun, getRun, submitRun } from '../../actions/Run';
 import { downloadResource, uploadFile } from '../../actions/Submission';
@@ -61,7 +62,7 @@ function mapDispatchToProps(dispatch) {
       ),
       cancelRun: (url, submission) => (dispatch(cancelRun(url, submission))),
       getRun: (url, submission) => (dispatch(getRun(url, submission))),
-      submitRun: (url, submission) => (dispatch(submitRun(url, submission)))
+      submitRun: (url, data, submission) => (dispatch(submitRun(url, data, submission)))
   };
 }
 
@@ -112,6 +113,27 @@ function Submission(props) {
         props.cancelRun(url, selectedSubmission);
     }
     /**
+     * Handle submission of new run for given ser of arguments
+     */
+    const handleSubmit = (args) => {
+        // Convert argument list to (key, value) pair list.
+        const runArgs = [];
+        selectedSubmission.parameters.forEach((p) => {
+            let val = args[p.id];
+            if ((val != null) && (val !== '')) {
+                if (p.datatype === 'int') {
+                    val = parseInt(val, 10);
+                } else if (p.datatype === 'decimal') {
+                    val = parseFloat(val);
+                }
+                runArgs.push({id: p.id, value: val});
+            }
+        });
+        const url = new Urls(selectedSubmission.links).get('self:submit');
+        props.submitRun(url, {arguments: runArgs}, selectedSubmission);
+        setValues({selectedTab: 0});
+    }
+    /**
      * Handler for tab selections.
      */
     const handleTabChange = (event, newValue) => {
@@ -155,6 +177,13 @@ function Submission(props) {
                     </Typography>
                 );
             }
+        } else if (selectedTab === 1) {
+            tabContent = (
+                <SubmitForm
+                    onSubmit={handleSubmit}
+                    submission={selectedSubmission}
+                />
+            )
         } else if (selectedTab === 2) {
             tabContent = (
                 <div>

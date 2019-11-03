@@ -9,7 +9,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import { submitLogout } from "../actions/Auth";
+import { submitLogout } from "../../actions/Auth";
 
 
 const mapStateToProps = state => {

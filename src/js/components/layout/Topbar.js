@@ -8,7 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import LogoutMenu from './LogoutMenu';
-import theme from '../../theme';
+import theme from '../../../theme';
 
 
 // Use higher-order component API to create styles for the logo
@@ -16,7 +16,7 @@ const styles = {
     root: {
       flexGrow: 1,
     },
-    menuButton: {
+    logoDiv: {
       marginRight: theme.spacing(2),
     },
     title: {
@@ -40,16 +40,8 @@ class Topbar extends Component {
             <div className={classes.root}>
                 <AppBar position="fixed">
                     <Toolbar>
-                        <IconButton
-                            edge="start"
-                            className={classes.menuButton}
-                            color="inherit"
-                            aria-label="menu"
-                        >
-                            <MenuIcon />
-                        </IconButton>
                         <Typography variant="h6" className={classes.title}>
-                            ROB
+                            Reproducible Open Benchmarks
                         </Typography>
                         <LogoutMenu />
                     </Toolbar>
