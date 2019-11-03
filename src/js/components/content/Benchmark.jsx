@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import Leaderboard from './Leaderboard.jsx';
 import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
@@ -47,7 +48,7 @@ function Benchmark(props) {
     const classes = useStyles();
     const [values, setValues] = useState({
         open: false,
-        selectedTab: 1,
+        selectedTab: 0,
         submissionName: ''
     });
     const selectedBenchmark = props.mainPanel.selectedBenchmark;
@@ -73,67 +74,71 @@ function Benchmark(props) {
     const handleTabChange = (event, newValue) => {
         setValues({...values, selectedTab: newValue});
     };
-
-    let form = null;
-    if (open) {
-        form = (
-            <Paper className={classes.paperForm}>
-                <div className={classes.form} noValidate>
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="submissionName"
-                        label="Submission Name"
-                        name="submissionName"
-                        value={submissionName}
-                        onChange={handleSubmissionChanges}
-                        autoFocus
-                    />
-                </div>
-                <div>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    className={classes.button}
-                    onClick={handleSubmissionSubmit}
-                >
-                    Submit
-                </Button>
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    className={classes.button}
-                    onClick={() => (setValues({...values, open: false}))}
-                >
-                    Cancel
-                </Button>
-                </div>
-            </Paper>
-        );
+    let content = null;
+    if (selectedTab === 0) {
+        content = (<Leaderboard leaderboard={selectedBenchmark.leaderboard}/>);
     } else {
-        form = (
+        let form = null;
+        if (open) {
+            form = (
+                <Paper className={classes.paperForm}>
+                    <div className={classes.form} noValidate>
+                        <TextField
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="submissionName"
+                            label="Submission Name"
+                            name="submissionName"
+                            value={submissionName}
+                            onChange={handleSubmissionChanges}
+                            autoFocus
+                        />
+                    </div>
+                    <div>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        className={classes.button}
+                        onClick={handleSubmissionSubmit}
+                    >
+                        Submit
+                    </Button>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        className={classes.button}
+                        onClick={() => (setValues({...values, open: false}))}
+                    >
+                        Cancel
+                    </Button>
+                    </div>
+                </Paper>
+            );
+        } else {
+            form = (
+                <div>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        className={classes.button}
+                        onClick={() => (setValues({...values, open: true}))}
+                    >
+                        Create a Submission
+                    </Button>
+                </div>
+            );
+        }
+        content = (
             <div>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    className={classes.button}
-                    onClick={() => (setValues({...values, open: true}))}
-                >
-                    Create a Submission
-                </Button>
+                <Typography variant='body1' className={classes.instructions}>
+                    {selectedBenchmark.instructions}
+                </Typography>
+                { form }
             </div>
         );
     }
-    const content = (
-        <div>
-            <Typography variant='body1' className={classes.instructions}>
-                {selectedBenchmark.instructions}
-            </Typography>
-            { form }
-        </div>
-    );
     return (
         <div className={classes.paper}>
             <Typography variant='h2'>

@@ -215,7 +215,7 @@ function MainPanel(props) {
     }
     return (
         <Grid container spacing={3}>
-            <Grid item xs={3} style={{background: '#f2f2f2'}}>
+            <Grid item xs={3} style={{background: '#fff'}}>
                 {sideMenu}
             </Grid>
             <Grid item xs={9}>

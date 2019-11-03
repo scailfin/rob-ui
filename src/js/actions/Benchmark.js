@@ -19,13 +19,21 @@ function fetchBenchmarksSuccess(json) {
 
 
 export function selectBenchmark(benchmark) {
+    const url = new Urls(benchmark.links).get('leaderboard');
+    return getUrl(url, (json) => (fetchLeaderboardSuccess(benchmark, json)), false);
+}
+
+
+function fetchLeaderboardSuccess(benchmark, leaderboard) {
     const { id, name, description, instructions, links } = benchmark;
     return {
-        type: SELECT_BENCHMARK, payload: {
+        type: SELECT_BENCHMARK,
+        payload: {
             id,
             name,
             description,
             instructions,
+            leaderboard,
             urls: new Urls(links)
         }
     }

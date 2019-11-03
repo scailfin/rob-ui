@@ -8,7 +8,9 @@ import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Dropzone from 'react-dropzone';
+import RunListing from './RunListing.jsx';
 import Typography from '@material-ui/core/Typography';
+import { cancelRun, getRun, submitRun } from '../../actions/Run';
 import { downloadResource, uploadFile } from '../../actions/Submission';
 import { Urls } from '../../resources/Urls';
 
@@ -56,7 +58,10 @@ function mapDispatchToProps(dispatch) {
           dispatch(
               downloadResource(url, submission, type)
           )
-      )
+      ),
+      cancelRun: (url, submission) => (dispatch(cancelRun(url, submission))),
+      getRun: (url, submission) => (dispatch(getRun(url, submission))),
+      submitRun: (url, submission) => (dispatch(submitRun(url, submission)))
   };
 }
 
@@ -64,12 +69,12 @@ function mapDispatchToProps(dispatch) {
 function Submission(props) {
     const { benchmarks, selectedSubmission } = props.mainPanel;
     const benchmark = benchmarks.find((b) => (b.id === selectedSubmission.benchmark));
-    const { fetching, displayContent, resourceDescriptor } = selectedSubmission;
+    const { fetching, displayContent, contentId, tabId } = selectedSubmission;
     // Set the state (especially the shown tab based on whether we are
     // displaying any content)
     let contentTab = 0;
-    if (resourceDescriptor != null) {
-        contentTab = resourceDescriptor.type;
+    if (tabId != null) {
+        contentTab = tabId;
     }
     const [values, setValues] = useState({selectedTab: contentTab});
     const { selectedTab } = values;
@@ -83,11 +88,28 @@ function Submission(props) {
         }
     }
     /**
-     * Handler for downloads of previously uploaded files.
+     * Handler for downloads of previously uploaded files. The tab index is used
+     * to keep track of whether a run result resource is being downloaded or a
+     * file that has previously been uploaded.
      */
-    const handleFileDownload = (fh) => {
-        const url = new Urls(fh.links).get('self:download');
-        props.downloadResource(url, selectedSubmission, {id: fh.id, type: 2});
+    const handleFileDownload = (url, resourceId, tabId) => {
+        props.downloadResource(
+            url,
+            selectedSubmission,
+            resourceId,
+            tabId
+        );
+    }
+    const handleGetRunState = (run) => {
+        const url = new Urls(run.links).self();
+        props.getRun(url, selectedSubmission);
+    }
+    /**
+     * Click handler for cancel button.
+     */
+    const handleRunCancel = (run) => {
+        const url = new Urls(run.links).get('self:cancel');
+        props.cancelRun(url, selectedSubmission);
     }
     /**
      * Handler for tab selections.
@@ -109,7 +131,23 @@ function Submission(props) {
         if (selectedTab === 0) {
             const { runs } = selectedSubmission;
             if (runs.length > 0) {
-
+                tabContent = (
+                    <RunListing
+                        contentId={contentId}
+                        content={displayContent}
+                        onCancel={handleRunCancel}
+                        onDownload={(fh) => (
+                            handleFileDownload(
+                                new Urls(fh.links).get('self'),
+                                fh.id,
+                                selectedTab
+                            )
+                        )}
+                        onPoll={handleGetRunState}
+                        runs={runs}
+                        submission={selectedSubmission}
+                    />
+                );
             } else {
                 tabContent = (
                     <Typography variant='body1' className={classes.emptyTabMsg}>
@@ -118,18 +156,17 @@ function Submission(props) {
                 );
             }
         } else if (selectedTab === 2) {
-            let contentId = null;
-            if (resourceDescriptor != null) {
-                const { id, type } = resourceDescriptor;
-                if (type === 2) {
-                    contentId = id;
-                }
-            }
             tabContent = (
                 <div>
                     <FileListing
                         files={selectedSubmission.files}
-                        onDownload={handleFileDownload}
+                        onDownload={(fh) => (
+                            handleFileDownload(
+                                new Urls(fh.links).get('self:download'),
+                                fh.id,
+                                selectedTab
+                            )
+                        )}
                         contentId={contentId}
                         content={displayContent}
                     />

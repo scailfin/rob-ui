@@ -1,3 +1,4 @@
+import { LOGOUT_SUCCESS } from '../actions/Auth';
 import { FETCH_BENCHMARKS_SUCCESS, SELECT_BENCHMARK } from '../actions/Benchmark';
 import {
     CREATE_SUBMISSIONS_SUCCESS, FETCH_SUBMISSIONS_SUCCESS, SELECT_SUBMISSION
@@ -26,6 +27,13 @@ const mainPanel = (state = INITIAL_STATE, action) => {
             return {...state, benchmarks: action.payload.benchmarks};
         case FETCH_SUBMISSIONS_SUCCESS:
             return {...state, submissions: action.payload.submissions};
+        case LOGOUT_SUCCESS:
+            return {
+                ...state,
+                selectedBenchmark: null,
+                selectedSubmission: null,
+                submissions: null
+            };
         case SELECT_BENCHMARK:
             return {
                 ...state,

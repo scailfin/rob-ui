@@ -20,37 +20,35 @@ function createSubmissionSuccess(response) {
 }
 
 
-export function downloadResource(url, submission, resourceDescriptor) {
-    const desc = submission.resourceDescriptor
-    if (desc != null) {
-        const { id, type } = desc;
-        if ((resourceDescriptor.id === id) && (resourceDescriptor.type === type)) {
-            return {
-                type: SELECT_SUBMISSION,
-                payload: {
-                    ...submission,
-                    displayContent: null,
-                    resourceDescriptor: null
-                }
+export function downloadResource(url, submission, resourceId, tabId) {
+    if (submission.contentId === resourceId) {
+        return {
+            type: SELECT_SUBMISSION,
+            payload: {
+                ...submission,
+                displayContent: null,
+                contentId: null,
+                tabId: tabId
             }
         }
-    };
+    }
     return getFile(
         url,
         (content) => (
-            fetchResourceSuccess(submission, resourceDescriptor, content)
+            fetchResourceSuccess(submission, resourceId, content, tabId)
         )
     );
 }
 
 
-function fetchResourceSuccess(submission, resourceDescriptor, content) {
+function fetchResourceSuccess(submission, resourceId, content, tabId) {
     return {
         type: SELECT_SUBMISSION,
         payload: {
             ...submission,
             displayContent: content,
-            resourceDescriptor
+            contentId: resourceId,
+            tabId
         }
     }
 }
@@ -125,15 +123,13 @@ export function uploadFile(url, submission, file) {
 
 
 function uploadFileSuccess(submission, response) {
-    console.log(submission);
-    console.log(response);
-
     return {
         type: SELECT_SUBMISSION,
         payload: {
             ...submission,
             files: submission.files.concat([response]),
-            resourceDescriptor: {type: 2}
+            contentId: null,
+            tabId: 2
         }
     }
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-import Description from '@material-ui/icons/Description';
+import DescriptionOutlined from '@material-ui/icons/DescriptionOutlined';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -18,6 +18,9 @@ const useStyles = makeStyles(theme => ({
 function FileListing(props) {
     const classes = useStyles();
     const { contentId, content, files, onDownload } = props;
+    if (files.length === 0) {
+        return null;
+    }
     const items = [];
     for (let i = 0; i < files.length; i++) {
         const fh = files[i];
@@ -28,9 +31,9 @@ function FileListing(props) {
                 onClick={() => (onDownload(fh))}
             >
                 <ListItemIcon>
-                    <Description />
+                    <DescriptionOutlined />
                 </ListItemIcon>
-                <ListItemText primary={fh.name} secondary={utc2LocalTime(fh.createdAt)} className={classes.fileitem}/>
+                <ListItemText primary={fh.name + ' (' + utc2LocalTime(fh.createdAt) + ')'} />
             </ListItem>
         );
         if (fh.id === contentId) {

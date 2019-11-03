@@ -103,7 +103,8 @@ export function postUrl(
     url,
     data,
     successHandler,
-    method
+    method,
+    sendSignals
 ) {
     // Ensure that the method os set
     if (method == null) {
@@ -111,7 +112,9 @@ export function postUrl(
     }
     return dispatch => {
         const accessToken = localStorage.getItem('accessToken');
-        dispatch(fetchStart());
+        if (sendSignals !== false) {
+            dispatch(fetchStart());
+        }
         const headers = {
             'api_key': accessToken
         };
@@ -131,7 +134,9 @@ export function postUrl(
                 } else {
                     response.json().then(json => {
                         dispatch(successHandler(json));
-                        dispatch(fetchSuccess());
+                        if (sendSignals !== false) {
+                            dispatch(fetchSuccess());
+                        }
                     })
                 }
             })
