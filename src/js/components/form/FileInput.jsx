@@ -5,6 +5,7 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
+import TextField from '@material-ui/core/TextField';
 
 
 const useStyles = makeStyles(theme => ({
@@ -21,13 +22,20 @@ const useStyles = makeStyles(theme => ({
 function FileInput(props) {
     const classes = useStyles();
     const { files, para, onChange, value} = props;
-    const handleChange = (event) => {
-        onChange(para.id, event.target.value);
-    }
     // Get the selected file value. If the value is null we use '' instead
     let selectedValue = value;
     if (selectedValue == null) {
-        selectedValue = '';
+        selectedValue = {file: '', as: ''};
+    }
+    /**
+     * Change handler. The component value is an object with 'file' and 'as'
+     * properties.
+     */
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+        const modValue = {...selectedValue};
+        modValue[name] = value;
+        onChange(para.id, modValue);
     }
     // Create list of select items from file list
     const listItems = [];
@@ -35,22 +43,42 @@ function FileInput(props) {
     files.forEach((f) => (
         listItems.push(<MenuItem key={f.id} value={f.id}>{f.name}</MenuItem>)
     ));
-    return (
-        <FormControl className={classes.formControl}>
-            <InputLabel id={para.id + '-label'}>
-                {para.name}
-            </InputLabel>
-            <Select
-                labelId={para.id + '-label'}
-                id={para.id}
-                value={selectedValue}
+    let textControl = null;
+    if (para.as === '$input') {
+        textControl = (
+            <TextField
+                variant="outlined"
+                margin="normal"
+                required={para.defaultValue != null}
+                fullWidth
+                id={para.id + '-as'}
+                label={'Upload as ...'}
+                name={'as'}
+                value={selectedValue.as}
                 onChange={handleChange}
-                autoWidth
-                required={para.required}
-            >
-                {listItems}
-            </Select>
-        </FormControl>
+            />
+        );
+    }
+    return (
+        <div>
+            <FormControl className={classes.formControl}>
+                <InputLabel id={para.id + '-label'}>
+                    {para.name}
+                </InputLabel>
+                <Select
+                    labelId={para.id + '-label'}
+                    id={para.id}
+                    name={'file'}
+                    value={selectedValue.file}
+                    onChange={handleChange}
+                    autoWidth
+                    required={para.required}
+                >
+                    {listItems}
+                </Select>
+            </FormControl>
+            { textControl }
+        </div>
     );
 }
 
@@ -58,7 +86,7 @@ FileInput.propTypes = {
     files: PropTypes.array.isRequired,
     para: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
-    value: PropTypes.string
+    value: PropTypes.object
 }
 
 export default FileInput;

@@ -34,7 +34,13 @@ function SubmitForm(props) {
     parameters.forEach((p) => {
         let val = null;
         if (p.defaultValue != null) {
-            val = p.defaultValue;
+            if (p.datatype !== 'file') {
+                val = p.defaultValue;
+            } else if (p.as !== '$input') {
+                val = {file: p.defaultValue, as: ''}
+            } else {
+                val = {file: '', as: p.defaultValue}
+            }
         }
         defaultArgs[p.id] = val;
     });

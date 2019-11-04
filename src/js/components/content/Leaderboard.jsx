@@ -54,9 +54,15 @@ function Leaderboard(props) {
             if (col.type === 'string') {
                 align = 'left'
             }
+            let val = run.results[j].value;
+            if (col.type === 'decimal') {
+                try{
+                    val = val.toFixed(6);
+                } catch (err) {}
+            }
             cells.push(
                 <TableCell key={'col-' + col.id} align={align}>
-                    {run.results[j].value}
+                    {val}
                 </TableCell>
             );
         }

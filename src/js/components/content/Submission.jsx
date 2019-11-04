@@ -119,14 +119,22 @@ function Submission(props) {
         // Convert argument list to (key, value) pair list.
         const runArgs = [];
         selectedSubmission.parameters.forEach((p) => {
-            let val = args[p.id];
+            const val = args[p.id];
             if ((val != null) && (val !== '')) {
+                const arg = {id: p.id};
                 if (p.datatype === 'int') {
-                    val = parseInt(val, 10);
+                    arg['value'] = parseInt(val, 10);
                 } else if (p.datatype === 'decimal') {
-                    val = parseFloat(val);
+                    arg['value'] = parseFloat(val);
+                } else if (p.datatype === 'file') {
+                    arg['value'] = val.file;
+                    if (val.as !== '') {
+                        arg['as'] = val.as
+                    }
+                } else {
+                    arg['value'] = val;
                 }
-                runArgs.push({id: p.id, value: val});
+                runArgs.push(arg);
             }
         });
         const url = new Urls(selectedSubmission.links).get('self:submit');
