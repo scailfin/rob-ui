@@ -50,9 +50,9 @@ const mapStateToProps = state => {
 
 function mapDispatchToProps(dispatch) {
   return {
-      uploadFile: (submission, file) => (
+      uploadFile: (url, submission, file) => (
           dispatch(
-              uploadFile(submission.urls.get('self:upload'), submission, file)
+              uploadFile(url, submission, file)
           )
       ),
       downloadResource: (url, submission, type) => (
@@ -85,7 +85,13 @@ function Submission(props) {
      */
     const handleFileDrop = (files) => {
         if (files.length === 1) {
-            props.uploadFile(selectedSubmission, files[0]);
+            let url = null;
+            if (selectedSubmission.urls != null) {
+                url = selectedSubmission.urls.get('self:upload');
+            } else {
+                url = new Urls(selectedSubmission.links).get('self:upload');
+            }
+            props.uploadFile(url, selectedSubmission, files[0]);
         }
     }
     /**

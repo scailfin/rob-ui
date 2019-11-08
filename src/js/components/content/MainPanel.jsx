@@ -146,29 +146,37 @@ function MainPanel(props) {
             );
         }
         // Create the listing of user submissions
-        let submissionList = null;
+        const submissionListItems = [];
         if (submissions.length > 0) {
+            let selectedBmId = null;
+            if (selectedBenchmark != null) {
+                selectedBmId = selectedBenchmark.id;
+            }
             submissions.sort((a, b) => ((a.name).localeCompare(b.name)));
-            const submissionListItems = [];
             for (let i = 0; i < submissions.length; i++) {
                 const sm = submissions[i];
                 const bm = benchmarks.find((b) => (b.id === sm.benchmark));
-                submissionListItems.push(
-                    <StyledSubmission
-                        key={sm.id}
-                        button
-                        selected={sm.id === selId}
-                        onClick={() => (handleSubmissionSelect(sm.id))}
-                    >
-                        <ListItemAvatar>
-                            <Avatar className={classes.avatarSubmission}>
-                                <Code />
-                            </Avatar>
-                        </ListItemAvatar>
-                        <ListItemText primary={sm.name} secondary={bm.name} />
-                    </StyledSubmission>
-                );
+                if ((selectedBmId === null) || (bm.id === selectedBmId)) {
+                    submissionListItems.push(
+                        <StyledSubmission
+                            key={sm.id}
+                            button
+                            selected={sm.id === selId}
+                            onClick={() => (handleSubmissionSelect(sm.id))}
+                        >
+                            <ListItemAvatar>
+                                <Avatar className={classes.avatarSubmission}>
+                                    <Code />
+                                </Avatar>
+                            </ListItemAvatar>
+                            <ListItemText primary={sm.name} secondary={bm.name} />
+                        </StyledSubmission>
+                    );
+                }
             }
+        }
+        let submissionList = null;
+        if (submissionListItems.length > 0) {
             submissionList = (
                 <List component="nav" className={classes.root}>
                     {submissionListItems}
