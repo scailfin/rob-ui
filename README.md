@@ -1,68 +1,40 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Reproducible Open Benchmarks - User Interface
 
-## Available Scripts
+[![LICENSE](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/scailfin/benchmark-templates/blob/master/LICENSE)
 
-In the project directory, you can run:
+## About
 
-### `yarn start`
+The is the Web-based user interface for the *Reproducible Open Benchmarks for Data Analysis Platform (ROB)*.
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). You can find more information about the available scripts on our copy of the [Create React App README](https://github.com/heikomuller/rob-ui/docs/development.md).
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
 
-### `yarn test`
+## Getting Started
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+The Web application requires an instance of the [ROB Web Service](https://github.com/scailfin/rob-webapi-flask/). You can follow the instructions on the [Flask Web API - Demo Setup site](https://github.com/scailfin/rob-webapi-flask/blob/master/docs/demo-setup.rst) to setup and run the Web API.
 
-### `yarn build`
+To start the development server use `yarn start`. Note that this is a very preliminary version of the user interface. The application currently assumes that the ROB Web Services is accessible at the local URL `http://localhost:5000/rob/api/v1`.
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+## User Interface Features
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Below are screen shots that show some of the main activities that are currently supported by the user interface.
 
-### `yarn eject`
+### Create Submissions and View Overall Benchmark Results
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+![Create Submission](./docs/graphics/screen-submission.jpg)
+![View Overall Benchmark Results](./docs/graphics/screen-leaders.jpg)
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Upload Files and View their Content
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+![Upload Files and View their Content](./docs/graphics/screen-upload.jpg)
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### Submit Benchmark Runs
 
-## Learn More
+![Submit Benchmark Runs](./docs/graphics/screen-run-start.jpg)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### View Benchmark Runs and their Results
 
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+![View Benchmark Runs](./docs/graphics/screen-runs.jpg)
+![View Benchmark Run Results](./docs/graphics/screen-run-results.jpg)
