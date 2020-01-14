@@ -15,18 +15,14 @@ import { withStyles } from '@material-ui/core';
 import Assessment from '@material-ui/icons/Assessment';
 import Avatar from '@material-ui/core/Avatar';
 import Benchmark from './Benchmark.jsx'
-import Code from '@material-ui/icons/Code';
 import Divider from '@material-ui/core/Divider';
-import Grid from '@material-ui/core/Grid';
 import List from '@material-ui/core/List';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import Submission from './Submission.jsx';
 import Typography from '@material-ui/core/Typography';
 import { selectBenchmark } from '../../actions/Benchmark';
-import { selectSubmission } from '../../actions/Submission';
 
 
 const useStyles = makeStyles(theme => ({
@@ -34,12 +30,15 @@ const useStyles = makeStyles(theme => ({
         margin: theme.spacing(1),
         backgroundColor: '#3f51b5',
     },
-    avatarSubmission: {
-        margin: theme.spacing(1),
-        backgroundColor: '#009688',
+    contentPanel: {
+        marginTop: theme.spacing(2),
+        marginBottom: theme.spacing(2)
+    },
+    highlight: {
+        fontWeight: "bold",
     },
     secondHeader: {
-            marginTop: theme.spacing(2),
+        marginTop: theme.spacing(2),
     },
     spinner: {
         marginTop: theme.spacing(12)
@@ -49,7 +48,8 @@ const useStyles = makeStyles(theme => ({
         color:  'textSecondary'
     },
     mainContent: {
-        marginLeft: theme.spacing(4)
+        marginLeft: theme.spacing(4),
+        marginRight: theme.spacing(4)
     }
 }));
 
@@ -64,26 +64,9 @@ const StyledBenchmark = withStyles({
             backgroundColor: "#e8eaf6"
         },
         '&:hover': {
-            backgroundColor: "#e8eaf6",
+            backgroundColor: "#c5cae9",
             "&$selected": {
                 backgroundColor: "#c5cae9"
-            }
-        }
-    },
-    selected: {}
-})(ListItem);
-
-
-const StyledSubmission = withStyles({
-    root: {
-        backgroundColor: "inherit",
-        "&$selected": {
-            backgroundColor: "#e0f2f1"
-        },
-        '&:hover': {
-            backgroundColor: "#e0f2f1",
-            "&$selected": {
-                backgroundColor: "#b2dfdb"
             }
         }
     },
@@ -100,42 +83,52 @@ const mapStateToProps = state => {
 
 function mapDispatchToProps(dispatch) {
   return {
-      selectBenchmark: (benchmark) => dispatch(selectBenchmark(benchmark)),
-      selectSubmission: (submission) => dispatch(selectSubmission(submission))
+      selectBenchmark: (benchmark) => dispatch(selectBenchmark(benchmark))
   };
 }
 
 
+/**
+ * Main application panel. the content of the panel depends on whether a
+ * benchmark is currently being selected or not. If no benchmark is selected
+ * a list of available benchmarks is shown. If a benchmark is selected, the
+ * benchmark panel is being rendered, instead.
+ */
 function MainPanel(props) {
     const classes = useStyles();
+    /**
+     * Event handler to set the selected benchmark.
+     */
     const handleBenchmarkSelect = (key) => {
         const benchmarks = props.mainPanel.benchmarks;
         const benchmark = benchmarks.find((b) => (b.id === key));
         props.selectBenchmark(benchmark);
     }
-    const handleSubmissionSelect = (key) => {
-        const submissions = props.mainPanel.submissions;
-        const submission = submissions.find((s) => (s.id === key));
-        props.selectSubmission(submission);
-    }
     const {
         benchmarks,
         selectedBenchmark,
-        selectedSubmission,
         submissions
     } = props.mainPanel;
-    // Start by creating the side menu that lists the available benchmarks and
-    // submissions.
-    let sideMenu = null;
-    let selId = null;
-    if (selectedBenchmark != null) {
-        selId = selectedBenchmark.id;
-    } else if (selectedSubmission != null) {
-        selId = selectedSubmission.id;
-    }
-    if ((benchmarks != null) && (submissions != null)) {
+    // The main content depends on whether the benchmark and submission data
+    // has already been loaded and on whether there is a benchmark that has
+    // been selected by the user as the current benchmark.
+    let content = null;
+    if ((benchmarks == null) || (submissions == null)) {
+        // If the data has not been loaded yet completely, a spinner is shown.
+        content = (
+            <div className={classes.spinner}>
+                <Typography variant="overline">
+                    Loading Benchmarks and Submissions ...
+                </Typography>
+                <LinearProgress color='secondary'/>
+            </div>
+        );
+    } else if (selectedBenchmark != null) {
+        content = (<Benchmark key={selectedBenchmark.id}/>);
+    } else {
+        // If no benchmark is selected, a brief overview of ROB is shown
+        // together with a list of available benchmarks.
         const benchmarklistItems = [];
-        // Group submissions by benchmarks
         benchmarks.sort((a, b) => ((a.name).localeCompare(b.name)));
         for (let i = 0; i < benchmarks.length; i++) {
             const bm = benchmarks[i];
@@ -143,7 +136,6 @@ function MainPanel(props) {
                 <StyledBenchmark
                     key={bm.id}
                     button
-                    selected={bm.id === selId}
                     onClick={() => (handleBenchmarkSelect(bm.id))}
                 >
                     <ListItemAvatar>
@@ -155,94 +147,22 @@ function MainPanel(props) {
                 </StyledBenchmark>
             );
         }
-        // Create the listing of user submissions
-        const submissionListItems = [];
-        if (submissions.length > 0) {
-            let selectedBmId = null;
-            if (selectedBenchmark != null) {
-                selectedBmId = selectedBenchmark.id;
-            }
-            submissions.sort((a, b) => ((a.name).localeCompare(b.name)));
-            for (let i = 0; i < submissions.length; i++) {
-                const sm = submissions[i];
-                const bm = benchmarks.find((b) => (b.id === sm.benchmark));
-                if ((selectedBmId === null) || (bm.id === selectedBmId)) {
-                    submissionListItems.push(
-                        <StyledSubmission
-                            key={sm.id}
-                            button
-                            selected={sm.id === selId}
-                            onClick={() => (handleSubmissionSelect(sm.id))}
-                        >
-                            <ListItemAvatar>
-                                <Avatar className={classes.avatarSubmission}>
-                                    <Code />
-                                </Avatar>
-                            </ListItemAvatar>
-                            <ListItemText primary={sm.name} secondary={bm.name} />
-                        </StyledSubmission>
-                    );
-                }
-            }
-        }
-        let submissionList = null;
-        if (submissionListItems.length > 0) {
-            submissionList = (
-                <List component="nav" className={classes.root}>
-                    {submissionListItems}
-                </List>
-            );
-        } else {
-            submissionList = (
-                <List component="nav" className={classes.root}>
-                    <ListItemText primary={'No Submissions Found'} />
-                </List>
-            );
-        }
-        sideMenu = (
+        content = (
             <div>
-                <Typography variant="h6">
-                    Benchmarks
+                <Typography className={classes.contentPanel} variant='body1'>
+                    The <span className={classes.highlight}>Reproducible Open Benchmarks for Data Analysis Platform (ROB)</span> is an experimental prototype for enabling community benchmarks of data analysis algorithms. The goal of ROB is to allow user communities to evaluate the performance of their different data analysis algorithms in a controlled competition-style format.
+                </Typography>
+                <Divider />
+                <Typography className={classes.contentPanel} variant="h4">
+                    Participate in Community Benchmarks
                 </Typography>
                 <List component="nav" className={classes.root}>
                     {benchmarklistItems}
                 </List>
-                <Divider />
-                <Typography className={classes.secondHeader} variant='h6'>
-                    My Submissions
-                </Typography>
-                {submissionList}
-            </div>
-        );
-    } else {
-        sideMenu = (
-            <div className={classes.spinner}>
-                <Typography variant="overline">
-                    Loading Benchmarks and Submissions ...
-                </Typography>
-                <LinearProgress color='secondary'/>
             </div>
         );
     }
-    // The main content either shows the selected benchmark or submission
-    let mainContent = null;
-    if (selectedBenchmark != null) {
-        mainContent = (<Benchmark key={selectedBenchmark.id}/>);
-    } else if (selectedSubmission != null) {
-        mainContent = (<Submission key={selectedSubmission.id}/>);
-    }
-    return (
-        <Grid container spacing={3}>
-            <Grid item xs={3} style={{background: '#fff'}}>
-                {sideMenu}
-            </Grid>
-            <Grid item xs={9}>
-                <div  className={classes.mainContent}>
-                    {mainContent}
-                </div>
-            </Grid>
-        </Grid>
-    );
+    return (<div  className={classes.mainContent}>{ content }</div>);
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(MainPanel);

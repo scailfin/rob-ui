@@ -11,14 +11,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
-import AccountCircle from '@material-ui/icons/AccountCircle';
 import ExitToApp from '@material-ui/icons/ExitToApp';
+import Home from '@material-ui/icons/Home';
 import IconButton from '@material-ui/core/IconButton';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import Menu from '@material-ui/core/Menu';
+import MenuIcon from '@material-ui/icons/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import { deselectBenchmark } from '../../actions/Benchmark';
 import { submitLogout } from "../../actions/Auth";
 
 
@@ -29,6 +31,7 @@ const mapStateToProps = state => {
 
 function mapDispatchToProps(dispatch) {
   return {
+      deselectBenchmark: () => dispatch(deselectBenchmark()),
       submitLogout: (url, token) => dispatch(submitLogout(url, token))
   };
 }
@@ -75,6 +78,10 @@ function LogoutMenu(props) {
     const handleClose = () => {
         setAnchorEl(null);
     };
+    const handleGoHome = () => {
+        handleClose();
+        props.deselectBenchmark()
+    };
     const handleLogout = () => {
         handleClose();
         const urls = props.api.urls;
@@ -91,7 +98,7 @@ function LogoutMenu(props) {
                     color="inherit"
                     aria-label="menu"
                 >
-                    <AccountCircle />
+                    <MenuIcon />
                 </IconButton>
                 <StyledMenu
                   id="customized-menu"
@@ -100,16 +107,22 @@ function LogoutMenu(props) {
                   open={Boolean(anchorEl)}
                   onClose={handleClose}
                 >
-                <ListSubheader component="div" id="nested-list-subheader">
-                  Logged in as {username}
-                </ListSubheader>
+                    <ListSubheader component="div" id="nested-list-subheader">
+                      Logged in as {username}
+                    </ListSubheader>
+                    <StyledMenuItem onClick={handleGoHome}>
+                        <ListItemIcon>
+                            <Home fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText primary='Home' />
+                    </StyledMenuItem>
                     <StyledMenuItem onClick={handleLogout}>
                         <ListItemIcon>
                             <ExitToApp fontSize="small" />
                         </ListItemIcon>
                         <ListItemText primary='Logout' />
                     </StyledMenuItem>
-                    </StyledMenu>
+                </StyledMenu>
             </div>
         );
     } else {

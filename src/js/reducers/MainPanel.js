@@ -9,16 +9,21 @@
  */
 
 import { LOGOUT_SUCCESS } from '../actions/Auth';
-import { FETCH_BENCHMARKS_SUCCESS, SELECT_BENCHMARK } from '../actions/Benchmark';
 import {
-    CREATE_SUBMISSIONS_SUCCESS, FETCH_SUBMISSIONS_SUCCESS, SELECT_SUBMISSION
+    DESELECT_BENCHMARK, FETCH_BENCHMARKS_SUCCESS, SELECT_BENCHMARK
+} from '../actions/Benchmark';
+import {
+    CREATE_SUBMISSIONS_SUCCESS, FETCH_SUBMISSIONS_SUCCESS, SELECT_DIALOG,
+    SELECT_SUBMISSION
 } from '../actions/Submission';
+import { SHOW_RUNS } from '../resources/Dialog';
 
 
 const INITIAL_STATE = {
     benchmarks: null,
     selectedBenchmark: null,
     selectedSubmission: null,
+    submissionDialog: SHOW_RUNS,
     submissions: null
 }
 
@@ -32,6 +37,12 @@ const mainPanel = (state = INITIAL_STATE, action) => {
                 submissions: state.submissions.concat([createdSubmission]),
                 selectedBenchmark: null,
                 selectedSubmission: createdSubmission
+            };
+        case DESELECT_BENCHMARK:
+            return {
+                ...state,
+                selectedBenchmark: null,
+                selectedSubmission: null
             };
         case FETCH_BENCHMARKS_SUCCESS:
             return {...state, benchmarks: action.payload.benchmarks};
@@ -50,6 +61,11 @@ const mainPanel = (state = INITIAL_STATE, action) => {
                 selectedBenchmark: action.payload,
                 selectedSubmission: null
             };
+        case SELECT_DIALOG:
+            return {
+                ...state,
+                submissionDialog: action.payload
+            };
         case SELECT_SUBMISSION:
             // Need to replace the selected item in the submission array in case
             // it is a submission handle that was requested from the server.
@@ -64,8 +80,8 @@ const mainPanel = (state = INITIAL_STATE, action) => {
             });
             return {
                 ...state,
-                selectedBenchmark: null,
                 selectedSubmission: selectedSubmission,
+                submissionDialog: SHOW_RUNS,
                 submissions: updatedSubmissions
             };
         default:

@@ -14,6 +14,7 @@ import { Urls } from '../resources/Urls';
 
 export const CREATE_SUBMISSIONS_SUCCESS = 'CREATE_SUBMISSIONS_SUCCESS';
 export const FETCH_SUBMISSIONS_SUCCESS = 'FETCH_SUBMISSIONS_SUCCESS';
+export const SELECT_DIALOG = 'SELECT_DIALOG';
 export const SELECT_SUBMISSION = 'SELECT_SUBMISSION';
 
 
@@ -73,6 +74,11 @@ function fetchSubmissionsSuccess(json) {
     return {
         type: FETCH_SUBMISSIONS_SUCCESS, payload: json
     }
+}
+
+
+export function selectDialog(dialogId) {
+    return {type: SELECT_DIALOG, payload: dialogId}
 }
 
 

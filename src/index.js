@@ -27,7 +27,7 @@ render(
         <CssBaseline />
         <Provider store={store}>
             <App />
-        </Provider>,
-  </ThemeProvider>,
-  document.querySelector('#root'),
+        </Provider>
+    </ThemeProvider>,
+    document.querySelector('#root')
 );

@@ -11,12 +11,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
+import Divider from '@material-ui/core/Divider';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+import { Urls} from '../../resources/Urls';
 
 
 const useStyles = makeStyles(theme => ({
@@ -28,15 +30,18 @@ const useStyles = makeStyles(theme => ({
     table: {
       minWidth: 700,
     },
+    plots: {
+        marginTop: theme.spacing(4),
+    }
 }));
 
 
 function Leaderboard(props) {
     const classes = useStyles();
-    const { leaderboard } = props;
-    const { schema, ranking } = leaderboard;
+    const { schema, ranking, resources } = props.leaderboard;
+    // -- Result table --------------------------------------------------------
     const headline = [];
-    headline.push(<TableCell key={'col'}>Submission</TableCell>);
+    headline.push(<TableCell key={'col'}></TableCell>);
     for (let i = 0; i < schema.length; i++) {
         const col = schema[i];
         let align = 'right';
@@ -78,8 +83,29 @@ function Leaderboard(props) {
         }
         rows.push(<TableRow key={i}>{cells}</TableRow>);
     }
+    // -- Plot listing --------------------------------------------------------
+    const plots = [];
+    for (let i = 0; i < resources.length; i++) {
+        const res = resources[i];
+        plots.push(
+            <div key={res.id} className={classes.plots}>
+                <Typography variant='h6' >
+                    {res.name}
+                </Typography>
+                <div align='center'>
+                    <div>
+                        <img src={new Urls(res.links).self()} alt={res.name} />
+                    </div>
+                    <Typography variant='caption' >
+                        {res.caption}
+                    </Typography>
+                </div>
+            </div>
+        );
+    }
+    // -- Assemble content ----------------------------------------------------
     return (
-        <Paper className={classes.root}>
+        <div className={classes.root}>
             <Table className={classes.table}>
                 <TableHead>
                     <TableRow>
@@ -90,7 +116,9 @@ function Leaderboard(props) {
                     { rows }
                 </TableBody>
             </Table>
-        </Paper>
+            <Divider />
+            { plots }
+        </div>
   );
 }
 

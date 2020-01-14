@@ -8,21 +8,24 @@
  * terms of the MIT License; see LICENSE file for more details.
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import CloudUpload from '@material-ui/icons/CloudUpload';
+import CreateSubmissionForm from './CreateSubmissionForm';
+import DialogHeader from './DialogHeader.jsx';
 import FileListing from './FileListing';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Paper from '@material-ui/core/Paper';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
 import Dropzone from 'react-dropzone';
 import RunListing from './RunListing.jsx';
 import SubmitForm from '../form/SubmitForm';
 import Typography from '@material-ui/core/Typography';
 import { cancelRun, getRun, submitRun } from '../../actions/Run';
 import { downloadResource, uploadFile } from '../../actions/Submission';
+import {
+    CREATE_SUBMISSION, SHOW_RUNS, SUBMIT_RUN, UPLOAD_FILES
+} from '../../resources/Dialog';
 import { Urls } from '../../resources/Urls';
 
 
@@ -78,17 +81,7 @@ function mapDispatchToProps(dispatch) {
 
 
 function Submission(props) {
-    const { benchmarks, selectedSubmission } = props.mainPanel;
-    const benchmark = benchmarks.find((b) => (b.id === selectedSubmission.benchmark));
-    const { fetching, displayContent, contentId, tabId } = selectedSubmission;
-    // Set the state (especially the shown tab based on whether we are
-    // displaying any content)
-    let contentTab = 0;
-    if (tabId != null) {
-        contentTab = tabId;
-    }
-    const [values, setValues] = useState({selectedTab: contentTab});
-    const { selectedTab } = values;
+    const { selectedSubmission, submissionDialog } = props.mainPanel;
     const classes = useStyles();
     /**
      * Handler to upload a file that was selected using the drop zone
@@ -155,26 +148,23 @@ function Submission(props) {
         });
         const url = new Urls(selectedSubmission.links).get('self:submit');
         props.submitRun(url, {arguments: runArgs}, selectedSubmission);
-        setValues({selectedTab: 0});
+        //setValues({selectedTab: 0});
     }
-    /**
-     * Handler for tab selections.
-     */
-    const handleTabChange = (event, newValue) => {
-      setValues({...values, selectedTab: newValue});
-    };
     let tabContent = null;
-    if (fetching === true) {
-        tabContent = (
-            <div className={classes.spinner}>
-                <Typography variant="overline">
-                    Loading Submission Details ...
-                </Typography>
-                <LinearProgress color='secondary'/>
-            </div>
-        );
-    } else {
-        if (selectedTab === 0) {
+    if (submissionDialog === CREATE_SUBMISSION) {
+        tabContent = (<CreateSubmissionForm />);
+    } else if (selectedSubmission != null) {
+        const { fetching, displayContent, contentId } = selectedSubmission;
+        if (fetching === true) {
+            tabContent = (
+                <div className={classes.spinner}>
+                    <Typography variant="overline">
+                        Loading Submission Details ...
+                    </Typography>
+                    <LinearProgress color='secondary'/>
+                </div>
+            );
+        } else if (submissionDialog === SHOW_RUNS) {
             const { runs } = selectedSubmission;
             if (runs.length > 0) {
                 tabContent = (
@@ -186,7 +176,7 @@ function Submission(props) {
                             handleFileDownload(
                                 new Urls(fh.links).get('self'),
                                 fh.id,
-                                selectedTab
+                                submissionDialog
                             )
                         )}
                         onPoll={handleGetRunState}
@@ -201,14 +191,14 @@ function Submission(props) {
                     </Typography>
                 );
             }
-        } else if (selectedTab === 1) {
+        } else if (submissionDialog === SUBMIT_RUN) {
             tabContent = (
                 <SubmitForm
                     onSubmit={handleSubmit}
                     submission={selectedSubmission}
                 />
             )
-        } else if (selectedTab === 2) {
+        } else if (submissionDialog === UPLOAD_FILES) {
             tabContent = (
                 <div>
                     <FileListing
@@ -217,7 +207,7 @@ function Submission(props) {
                             handleFileDownload(
                                 new Urls(fh.links).get('self:download'),
                                 fh.id,
-                                selectedTab
+                                submissionDialog
                             )
                         )}
                         contentId={contentId}
@@ -243,35 +233,11 @@ function Submission(props) {
                     </Dropzone>
                 </div>
             );
-        } else if (selectedTab === 3) {
-            tabContent = (
-                <Typography variant='body1' className={classes.instructions}>
-                    {benchmark.instructions}
-                </Typography>
-            );
         }
     }
-    // The tab content is either a list of previous runs, the input form for
-    // new runs, the list of uploaded resources, or the benchmark instructions
     return (
         <div className={classes.paper}>
-            <Typography variant='h2'>
-                {selectedSubmission.name}
-            </Typography>
-            <Typography variant='h6'>
-                {benchmark.name}
-            </Typography>
-            <Tabs
-                value={selectedTab}
-                indicatorColor="primary"
-                textColor="primary"
-                onChange={handleTabChange}
-            >
-                <Tab label="Runs" />
-                <Tab label="Submit Run" />
-                <Tab label="Uploaded Files" />
-                <Tab label="Instructions" />
-            </Tabs>
+            <DialogHeader />
             { tabContent }
         </div>
     );

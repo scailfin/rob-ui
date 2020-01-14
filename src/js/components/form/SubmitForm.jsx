@@ -106,6 +106,14 @@ function SubmitForm(props) {
                 >
                     Submit
                 </Button>
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    className={classes.button}
+                    onClick={() => (alert('Cancel'))}
+                >
+                    Cancel
+                </Button>
             </div>
         </Paper>
     );

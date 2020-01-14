@@ -11,21 +11,18 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
 import Leaderboard from './Leaderboard.jsx';
-import Paper from '@material-ui/core/Paper';
+import Submission from './Submission.jsx';
+import SubmissionList from './SubmissionList.jsx';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { createSubmission } from '../../actions/Submission';
 
 
+
 const useStyles = makeStyles(theme => ({
-    button: {
-      marginTop: theme.spacing(2),
-      marginRight: theme.spacing(2)
-    },
     paperForm: {
         marginTop: theme.spacing(2),
         padding: theme.spacing(2),
@@ -35,7 +32,7 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: '#ebebeb'
     },
     instructions: {
-        marginTop: theme.spacing(4),
+        marginTop: theme.spacing(4)
     }
 }));
 
@@ -57,27 +54,10 @@ function mapDispatchToProps(dispatch) {
 function Benchmark(props) {
     const classes = useStyles();
     const [values, setValues] = useState({
-        open: false,
-        selectedTab: 0,
-        submissionName: ''
+        selectedTab: 0
     });
     const selectedBenchmark = props.mainPanel.selectedBenchmark;
-    const {open, selectedTab, submissionName} = values;
-    /**
-     * Handle changes in the submision name input field.
-     */
-    const handleSubmissionChanges = (event) => {
-        setValues({...values, submissionName: event.target.value});
-    }
-    /**
-     * Event handler for the submit button that creates a new submission for
-     * the benchmark.
-     */
-    const handleSubmissionSubmit = () => {
-        const url = selectedBenchmark.urls.get('submissions:create')
-        props.createSubmission(url, submissionName);
-        setValues({open: false, submissionName: ''});
-    }
+    const selectedTab = values.selectedTab;
     /**
      * Change handler to display a different tab.
      */
@@ -86,75 +66,38 @@ function Benchmark(props) {
     };
     let content = null;
     if (selectedTab === 0) {
-        let form = null;
-        if (open) {
-            form = (
-                <Paper className={classes.paperForm}>
-                    <div className={classes.form} noValidate>
-                        <TextField
-                            variant="outlined"
-                            margin="normal"
-                            required
-                            fullWidth
-                            id="submissionName"
-                            label="Submission Name"
-                            name="submissionName"
-                            value={submissionName}
-                            onChange={handleSubmissionChanges}
-                            autoFocus
-                        />
-                    </div>
-                    <div>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            className={classes.button}
-                            onClick={handleSubmissionSubmit}
-                        >
-                            Submit
-                        </Button>
-                        <Button
-                            variant="contained"
-                            color="secondary"
-                            className={classes.button}
-                            onClick={() => (setValues({...values, open: false}))}
-                        >
-                            Cancel
-                        </Button>
-                    </div>
-                </Paper>
-            );
-        } else {
-            form = (
-                <div>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        className={classes.button}
-                        onClick={() => (setValues({...values, open: true}))}
-                    >
-                        Create a Submission
-                    </Button>
-                </div>
-            );
-        }
+        // -- Overview --------------------------------------------------------
+        const instructions = {__html: selectedBenchmark.instructions}
         content = (
             <div>
-                <Typography variant='body1' className={classes.instructions}>
-                    {selectedBenchmark.instructions}
-                </Typography>
-                { form }
+                <div
+                    className={classes.instructions}
+                    dangerouslySetInnerHTML={instructions}
+                />
             </div>
         );
-    } else {
+    } else if (selectedTab === 1) {
+        // -- Current Results -------------------------------------------------
         content = (<Leaderboard leaderboard={selectedBenchmark.leaderboard}/>);
+    } else if (selectedTab === 2) {
+        // -- My Submissions --------------------------------------------------
+        content = (
+            <Grid container spacing={2}>
+                <Grid item xs={3}>
+                    <SubmissionList />
+                </Grid>
+                <Grid item xs={9}>
+                    <div  className={classes.mainContent}>
+                        <Submission />
+                    </div>
+                </Grid>
+            </Grid>
+        );
+
     }
     return (
         <div className={classes.paper}>
-            <Typography variant='h2'>
-                {selectedBenchmark.name}
-            </Typography>
-            <Typography variant='h6'>
+            <Typography variant='h4'>
                 {selectedBenchmark.description}
             </Typography>
             <Tabs
@@ -163,8 +106,9 @@ function Benchmark(props) {
                 textColor="primary"
                 onChange={handleTabChange}
             >
-                <Tab label="Instructions" />
-                <Tab label="Results" />
+                <Tab label="Overview" />
+                <Tab label="Current Results" />
+                <Tab label="My Submissions" />
             </Tabs>
             { content }
         </div>

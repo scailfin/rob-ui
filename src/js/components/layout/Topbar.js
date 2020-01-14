@@ -34,7 +34,9 @@ const styles = {
 
 
 const mapStateToProps = state => {
-  return { app: state.app };
+    return {
+        mainPanel: state.mainPanel
+    };
 };
 
 
@@ -43,13 +45,19 @@ class Topbar extends Component {
         classes: PropTypes.object.isRequired
     }
     render() {
-        const {classes} = this.props;
+        const { classes, mainPanel } = this.props;
+        let title;
+        if (mainPanel.selectedBenchmark != null) {
+            title = mainPanel.selectedBenchmark.name;
+        } else {
+            title = 'Reproducible Open Benchmarks';
+        }
         return (
             <div className={classes.root}>
                 <AppBar position="fixed">
                     <Toolbar>
                         <Typography variant="h6" className={classes.title}>
-                            Reproducible Open Benchmarks
+                            { title }
                         </Typography>
                         <LogoutMenu />
                     </Toolbar>
