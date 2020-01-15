@@ -10,11 +10,12 @@
 
 import { LOGOUT_SUCCESS } from '../actions/Auth';
 import {
-    DESELECT_BENCHMARK, FETCH_BENCHMARKS_SUCCESS, SELECT_BENCHMARK
+    DESELECT_BENCHMARK, FETCH_BENCHMARKS_SUCCESS, SELECT_BENCHMARK, SELECT_TAB,
+    UPDATE_BENCHMARK
 } from '../actions/Benchmark';
 import {
     CREATE_SUBMISSIONS_SUCCESS, FETCH_SUBMISSIONS_SUCCESS, SELECT_DIALOG,
-    SELECT_SUBMISSION
+    SELECT_SUBMISSION, UPDATE_SUBMISSION
 } from '../actions/Submission';
 import { SHOW_RUNS } from '../resources/Dialog';
 
@@ -23,6 +24,7 @@ const INITIAL_STATE = {
     benchmarks: null,
     selectedBenchmark: null,
     selectedSubmission: null,
+    selectedTab: 0,
     submissionDialog: SHOW_RUNS,
     submissions: null
 }
@@ -35,14 +37,15 @@ const mainPanel = (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 submissions: state.submissions.concat([createdSubmission]),
-                selectedBenchmark: null,
-                selectedSubmission: createdSubmission
+                selectedSubmission: createdSubmission,
+                submissionDialog: SHOW_RUNS
             };
         case DESELECT_BENCHMARK:
             return {
                 ...state,
                 selectedBenchmark: null,
-                selectedSubmission: null
+                selectedSubmission: null,
+                selectedTab: 0
             };
         case FETCH_BENCHMARKS_SUCCESS:
             return {...state, benchmarks: action.payload.benchmarks};
@@ -59,7 +62,8 @@ const mainPanel = (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 selectedBenchmark: action.payload,
-                selectedSubmission: null
+                selectedSubmission: null,
+                selectedTab: 0
             };
         case SELECT_DIALOG:
             return {
@@ -83,6 +87,33 @@ const mainPanel = (state = INITIAL_STATE, action) => {
                 selectedSubmission: selectedSubmission,
                 submissionDialog: SHOW_RUNS,
                 submissions: updatedSubmissions
+            };
+        case SELECT_TAB:
+            return {
+                ...state,
+                selectedTab: action.payload
+            };
+        case UPDATE_BENCHMARK:
+            return {
+                ...state,
+                selectedBenchmark: action.payload
+            };
+        case UPDATE_SUBMISSION:
+            // Need to replace the selected item in the submission array in case
+            // it is a submission handle that was requested from the server.
+            const updSubmission = action.payload;
+            const updSubmissionList = [];
+            state.submissions.forEach((s) => {
+                if (s.id === updSubmission.id) {
+                    updSubmissionList.push(updSubmission);
+                } else {
+                    updSubmissionList.push(s);
+                }
+            });
+            return {
+                ...state,
+                selectedSubmission: updSubmission,
+                submissions: updSubmissionList
             };
         default:
             return state

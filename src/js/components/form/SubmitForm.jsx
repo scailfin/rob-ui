@@ -18,8 +18,12 @@ import ScalarInput from './ScalarInput';
 
 
 const useStyles = makeStyles(theme => ({
+    button: {
+      marginTop: theme.spacing(2),
+      marginRight: theme.spacing(2)
+    },
     paperForm: {
-        marginTop: theme.spacing(2),
+        marginTop: theme.spacing(0),
         padding: theme.spacing(2),
         display: 'flex',
         flexDirection: 'column',
@@ -31,7 +35,7 @@ const useStyles = makeStyles(theme => ({
 
 function SubmitForm(props) {
     const classes = useStyles();
-    const { onSubmit, submission } = props;
+    const { onCancel, onSubmit, submission } = props;
     // Create object with default arguments
     const defaultArgs = {};
     const { files, parameters } = submission;
@@ -100,6 +104,7 @@ function SubmitForm(props) {
                     { controls }
                 </div>
                 <Button
+                    className={classes.button}
                     variant="contained"
                     color="primary"
                     onClick={handleSubmit}
@@ -107,10 +112,10 @@ function SubmitForm(props) {
                     Submit
                 </Button>
                 <Button
+                    className={classes.button}
                     variant="contained"
                     color="secondary"
-                    className={classes.button}
-                    onClick={() => (alert('Cancel'))}
+                    onClick={() => (onCancel())}
                 >
                     Cancel
                 </Button>
@@ -120,6 +125,7 @@ function SubmitForm(props) {
 }
 
 SubmitForm.propTypes = {
+    onCancel: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     submission: PropTypes.object.isRequired
 }

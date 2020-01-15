@@ -9,7 +9,7 @@
  */
 
 import { NO_OP } from './App';
-import { SELECT_SUBMISSION } from './Submission.js'
+import { SELECT_SUBMISSION, UPDATE_SUBMISSION } from './Submission.js'
 import { getUrl, postUrl } from './Requests';
 
 
@@ -17,7 +17,7 @@ export function cancelRun(url, submission) {
     return postUrl(
         url,
         {reason: 'Canceled at user request'},
-        (json) => (successFetchRun(submission, json)),
+        (json) => (successFetchRun(submission, json, UPDATE_SUBMISSION)),
         false,
         'PUT'
     );
@@ -25,7 +25,7 @@ export function cancelRun(url, submission) {
 
 
 export function getRun(url, submission) {
-    return getUrl(url, (json) => (successFetchRun(submission, json)), false);
+    return getUrl(url, (json) => (successFetchRun(submission, json, UPDATE_SUBMISSION)), false);
 }
 
 
@@ -33,13 +33,13 @@ export function submitRun(url, data, submission) {
     return postUrl(
         url,
         data,
-        (json) => (successFetchRun(submission, json)),
+        (json) => (successFetchRun(submission, json, SELECT_SUBMISSION)),
         false
     );
 }
 
 
-function successFetchRun(submission, run) {
+function successFetchRun(submission, run, actionType) {
     const updatedRuns = [];
     let runFound = false;
     for (let i = 0; i < submission.runs.length; i++) {
@@ -62,7 +62,7 @@ function successFetchRun(submission, run) {
         updatedRuns.push(run);
     }
     return {
-        type: SELECT_SUBMISSION,
+        type: actionType,
         payload: {...submission, runs: updatedRuns}
     }
 }

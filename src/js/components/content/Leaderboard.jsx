@@ -12,6 +12,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import Divider from '@material-ui/core/Divider';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -27,6 +28,10 @@ const useStyles = makeStyles(theme => ({
       marginTop: theme.spacing(3),
       overflowX: 'auto',
     },
+    spinner: {
+        marginTop: theme.spacing(8),
+        marginRight: theme.spacing(24)
+    },
     table: {
       minWidth: 700,
     },
@@ -38,6 +43,16 @@ const useStyles = makeStyles(theme => ({
 
 function Leaderboard(props) {
     const classes = useStyles();
+    if (props.leaderboard == null) {
+        return (
+            <div className={classes.spinner}>
+                <Typography variant="overline">
+                    Loading Result Table ...
+                </Typography>
+                <LinearProgress color='secondary'/>
+            </div>
+        );
+    }
     const { schema, ranking, resources } = props.leaderboard;
     // -- Result table --------------------------------------------------------
     const headline = [];
@@ -124,7 +139,7 @@ function Leaderboard(props) {
 
 
 Leaderboard.propTypes = {
-  leaderboard: PropTypes.object.isRequired,
+  leaderboard: PropTypes.object,
 };
 
 

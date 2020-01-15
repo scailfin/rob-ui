@@ -16,6 +16,7 @@ export const CREATE_SUBMISSIONS_SUCCESS = 'CREATE_SUBMISSIONS_SUCCESS';
 export const FETCH_SUBMISSIONS_SUCCESS = 'FETCH_SUBMISSIONS_SUCCESS';
 export const SELECT_DIALOG = 'SELECT_DIALOG';
 export const SELECT_SUBMISSION = 'SELECT_SUBMISSION';
+export const UPDATE_SUBMISSION = 'UPDATE_SUBMISSION';
 
 
 export function createSubmission(url, name) {
@@ -31,35 +32,33 @@ function createSubmissionSuccess(response) {
 }
 
 
-export function downloadResource(url, submission, resourceId, tabId) {
+export function downloadResource(url, submission, resourceId) {
     if (submission.contentId === resourceId) {
         return {
-            type: SELECT_SUBMISSION,
+            type: UPDATE_SUBMISSION,
             payload: {
                 ...submission,
                 displayContent: null,
-                contentId: null,
-                tabId: tabId
+                contentId: null
             }
         }
     }
     return getFile(
         url,
         (content) => (
-            fetchResourceSuccess(submission, resourceId, content, tabId)
+            fetchResourceSuccess(submission, resourceId, content)
         )
     );
 }
 
 
-function fetchResourceSuccess(submission, resourceId, content, tabId) {
+function fetchResourceSuccess(submission, resourceId, content) {
     return {
-        type: SELECT_SUBMISSION,
+        type: UPDATE_SUBMISSION,
         payload: {
             ...submission,
             displayContent: content,
-            contentId: resourceId,
-            tabId
+            contentId: resourceId
         }
     }
 }
@@ -140,12 +139,11 @@ export function uploadFile(url, submission, file) {
 
 function uploadFileSuccess(submission, response) {
     return {
-        type: SELECT_SUBMISSION,
+        type: UPDATE_SUBMISSION,
         payload: {
             ...submission,
             files: submission.files.concat([response]),
-            contentId: null,
-            tabId: 2
+            contentId: null
         }
     }
 }

@@ -12,6 +12,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import CloseIcon from '@material-ui/icons/Close';
+import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import { selectDialog } from '../../actions/Submission';
@@ -21,26 +22,23 @@ import {
 
 
 const useStyles = makeStyles(theme => ({
-    emptyTabMsg: {
-        marginTop: theme.spacing(4),
+    headerTitle: {
+        paddingLeft: 10,
+        paddingTop: 10
     },
-    instructions: {
-        marginTop: theme.spacing(4),
+    headerButton: {
+        textAlign: 'right'
     },
-    spinner: {
-        marginTop: theme.spacing(8),
-        marginRight: theme.spacing(24)
+    iconButton: {
+        color: '#004b87',
+        '&:hover': {
+            backgroundColor: '#e7f4ff'
+        }
     },
-    uploadForm: {
-        width: '50%',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        marginTop: theme.spacing(8),
-        padding: theme.spacing(8),
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        backgroundColor: '#ebebeb'
+    root: {
+        marginTop: theme.spacing(1),
+        height: 50,
+        color: '#004b87'
     },
 }));
 
@@ -70,10 +68,12 @@ function DialogHeader(props) {
         showCloseButton = true;
     } else if (selectedSubmission != null) {
         title = selectedSubmission.name;
-        if (submissionDialog === SUBMIT_RUN) {
-            title += ' - Submit New Run'
+        if (submissionDialog === SHOW_RUNS) {
+            title = 'Runs (' + title + ')'
+        } else if (submissionDialog === SUBMIT_RUN) {
+            title = 'Submit New Run (' + title + ')'
         } else if (submissionDialog === UPLOAD_FILES) {
-            title += ' - Upload Files'
+            title = 'Upload Files (' + title + ')'
         }
         showCloseButton = (submissionDialog !== SHOW_RUNS);
     }
@@ -81,6 +81,7 @@ function DialogHeader(props) {
     if (showCloseButton) {
         closeButton = (
             <IconButton
+                className={classes.iconButton}
                 onClick={() => (props.selectDialog(SHOW_RUNS))}
                 aria-label="close"
             >
@@ -91,12 +92,16 @@ function DialogHeader(props) {
     let content = null;
     if (title != null) {
         content = (
-            <div>
-            <Typography>
-                {title}
-                { closeButton }
-            </Typography>
-            </div>
+            <Grid container className={classes.root}>
+                <Grid item xs={9}>
+                    <Typography variant='subtitle2' className={classes.headerTitle}>
+                        {title}
+                    </Typography>
+                </Grid>
+                <Grid item xs={3} className={classes.headerButton}>
+                    { closeButton }
+                </Grid>
+            </Grid>
         );
     }
     return content;

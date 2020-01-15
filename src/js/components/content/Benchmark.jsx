@@ -8,7 +8,7 @@
  * terms of the MIT License; see LICENSE file for more details.
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
@@ -18,8 +18,8 @@ import SubmissionList from './SubmissionList.jsx';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
+import { selectTab, updateBenchmark } from '../../actions/Benchmark';
 import { createSubmission } from '../../actions/Submission';
-
 
 
 const useStyles = makeStyles(theme => ({
@@ -46,24 +46,27 @@ const mapStateToProps = state => {
 
 function mapDispatchToProps(dispatch) {
   return {
-      createSubmission: (url, name) => dispatch(createSubmission(url, name))
+      createSubmission: (url, name) => dispatch(createSubmission(url, name)),
+      selectTab: (tabId) => dispatch(selectTab(tabId)),
+      updateBenchmark: (benchmark) => dispatch(updateBenchmark(benchmark))
   };
 }
 
 
 function Benchmark(props) {
     const classes = useStyles();
-    const [values, setValues] = useState({
-        selectedTab: 0
-    });
-    const selectedBenchmark = props.mainPanel.selectedBenchmark;
-    const selectedTab = values.selectedTab;
+    const { selectedBenchmark, selectedTab } = props.mainPanel;
     /**
      * Change handler to display a different tab.
      */
     const handleTabChange = (event, newValue) => {
-        setValues({...values, selectedTab: newValue});
+        if (newValue === 1) {
+            console.log(selectedBenchmark);
+            props.updateBenchmark(selectedBenchmark);
+        }
+        props.selectTab(newValue);
     };
+    // -- Main Content (render) -----------------------------------------------
     let content = null;
     if (selectedTab === 0) {
         // -- Overview --------------------------------------------------------

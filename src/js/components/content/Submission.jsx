@@ -22,7 +22,9 @@ import RunListing from './RunListing.jsx';
 import SubmitForm from '../form/SubmitForm';
 import Typography from '@material-ui/core/Typography';
 import { cancelRun, getRun, submitRun } from '../../actions/Run';
-import { downloadResource, uploadFile } from '../../actions/Submission';
+import {
+    downloadResource, selectDialog, uploadFile
+} from '../../actions/Submission';
 import {
     CREATE_SUBMISSION, SHOW_RUNS, SUBMIT_RUN, UPLOAD_FILES
 } from '../../resources/Dialog';
@@ -75,6 +77,7 @@ function mapDispatchToProps(dispatch) {
       ),
       cancelRun: (url, submission) => (dispatch(cancelRun(url, submission))),
       getRun: (url, submission) => (dispatch(getRun(url, submission))),
+      selectDialog: (dialogId) => dispatch(selectDialog(dialogId)),
       submitRun: (url, data, submission) => (dispatch(submitRun(url, data, submission)))
   };
 }
@@ -102,12 +105,11 @@ function Submission(props) {
      * to keep track of whether a run result resource is being downloaded or a
      * file that has previously been uploaded.
      */
-    const handleFileDownload = (url, resourceId, tabId) => {
+    const handleFileDownload = (url, resourceId) => {
         props.downloadResource(
             url,
             selectedSubmission,
-            resourceId,
-            tabId
+            resourceId
         );
     }
     const handleGetRunState = (run) => {
@@ -175,8 +177,7 @@ function Submission(props) {
                         onDownload={(fh) => (
                             handleFileDownload(
                                 new Urls(fh.links).get('self'),
-                                fh.id,
-                                submissionDialog
+                                fh.id
                             )
                         )}
                         onPoll={handleGetRunState}
@@ -186,7 +187,7 @@ function Submission(props) {
                 );
             } else {
                 tabContent = (
-                    <Typography variant='body1' className={classes.emptyTabMsg}>
+                    <Typography variant='body1' color='error' className={classes.emptyTabMsg}>
                         No Runs Found
                     </Typography>
                 );
@@ -194,6 +195,7 @@ function Submission(props) {
         } else if (submissionDialog === SUBMIT_RUN) {
             tabContent = (
                 <SubmitForm
+                    onCancel={() => (props.selectDialog(SHOW_RUNS))}
                     onSubmit={handleSubmit}
                     submission={selectedSubmission}
                 />
@@ -206,8 +208,7 @@ function Submission(props) {
                         onDownload={(fh) => (
                             handleFileDownload(
                                 new Urls(fh.links).get('self:download'),
-                                fh.id,
-                                submissionDialog
+                                fh.id
                             )
                         )}
                         contentId={contentId}
