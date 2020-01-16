@@ -95,10 +95,14 @@ function SubmissionList(props) {
             }
         }
     }
-    if (listItems.length === 0) {
-        listItems.push(
-            <ListItemText key='nosubs' primary={'No Submissions Found'} />
-        );
+    let submissionsList = null;
+    if (listItems.length > 0) {
+        submissionsList = (
+            <List component="nav" aria-label="main submissions">
+                { listItems }
+                <Divider />
+            </List>
+        )
     }
     // List of action buttons
     const actionButtons = [];
@@ -145,10 +149,7 @@ function SubmissionList(props) {
     );
     return (
         <div className={classes.root}>
-            <List component="nav" aria-label="main submissions">
-                { listItems }
-            </List>
-            <Divider />
+            { submissionsList }
             <List component="nav" aria-label="secondary actions">
                 { actionButtons }
             </List>

@@ -11,8 +11,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-import Divider from '@material-ui/core/Divider';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -32,8 +32,16 @@ const useStyles = makeStyles(theme => ({
         marginTop: theme.spacing(8),
         marginRight: theme.spacing(24)
     },
+    paper: {
+        backgroundColor: '#ebebeb',
+        padding: 10,
+        marginBottom: theme.spacing(2)
+    },
     table: {
-      minWidth: 700,
+        minWidth: 700,
+    },
+    row: {
+        backgroundColor: '#ffffff'
     },
     plots: {
         marginTop: theme.spacing(4),
@@ -96,43 +104,58 @@ function Leaderboard(props) {
                 </TableCell>
             );
         }
-        rows.push(<TableRow key={i}>{cells}</TableRow>);
+        rows.push(<TableRow key={i} className={classes.row}>{cells}</TableRow>);
     }
     // -- Plot listing --------------------------------------------------------
-    const plots = [];
-    for (let i = 0; i < resources.length; i++) {
-        const res = resources[i];
-        plots.push(
-            <div key={res.id} className={classes.plots}>
-                <Typography variant='h6' >
-                    {res.name}
-                </Typography>
-                <div align='center'>
-                    <div>
-                        <img src={new Urls(res.links).self()} alt={res.name} />
-                    </div>
-                    <Typography variant='caption' >
-                        {res.caption}
+    let plotListing = null;
+    if (resources.length > 0) {
+        const plots = [];
+        for (let i = 0; i < resources.length; i++) {
+            const res = resources[i];
+            plots.push(
+                <div key={res.id} className={classes.plots}>
+                    <Typography variant='subtitle1' >
+                        {res.name}
                     </Typography>
+                    <div align='center'>
+                        <div>
+                            <img src={new Urls(res.links).self()} alt={res.name} />
+                        </div>
+                        <Typography variant='caption' >
+                            {res.caption}
+                        </Typography>
+                    </div>
                 </div>
+            );
+        }
+        plotListing = (
+            <div>
+                <Typography variant='h6' >
+                    Plots
+                </Typography>
+                { plots }
             </div>
         );
     }
     // -- Assemble content ----------------------------------------------------
     return (
         <div className={classes.root}>
-            <Table className={classes.table}>
-                <TableHead>
-                    <TableRow>
-                        {headline}
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    { rows }
-                </TableBody>
-            </Table>
-            <Divider />
-            { plots }
+            <Typography variant='h6' >
+                Performance Metrics
+            </Typography>
+            <Paper className={classes.paper}>
+                <Table className={classes.table}>
+                    <TableHead>
+                        <TableRow>
+                            {headline}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        { rows }
+                    </TableBody>
+                </Table>
+            </Paper>
+            { plotListing }
         </div>
   );
 }

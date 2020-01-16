@@ -18,7 +18,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import Menu from '@material-ui/core/Menu';
-import MenuIcon from '@material-ui/icons/Menu';
+import AccountCircle from '@material-ui/icons/AccountCircle';
 import MenuItem from '@material-ui/core/MenuItem';
 import { deselectBenchmark } from '../../actions/Benchmark';
 import { submitLogout } from "../../actions/Auth";
@@ -94,11 +94,20 @@ function LogoutMenu(props) {
                 <IconButton
                     aria-controls="simple-menu"
                     aria-haspopup="true"
+                    onClick={handleGoHome}
+                    color="inherit"
+                    aria-label="menu"
+                >
+                    <Home />
+                </IconButton>
+                <IconButton
+                    aria-controls="simple-menu"
+                    aria-haspopup="true"
                     onClick={handleClick}
                     color="inherit"
                     aria-label="menu"
                 >
-                    <MenuIcon />
+                    <AccountCircle />
                 </IconButton>
                 <StyledMenu
                   id="customized-menu"
@@ -110,12 +119,6 @@ function LogoutMenu(props) {
                     <ListSubheader component="div" id="nested-list-subheader">
                       Logged in as {username}
                     </ListSubheader>
-                    <StyledMenuItem onClick={handleGoHome}>
-                        <ListItemIcon>
-                            <Home fontSize="small" />
-                        </ListItemIcon>
-                        <ListItemText primary='Home' />
-                    </StyledMenuItem>
                     <StyledMenuItem onClick={handleLogout}>
                         <ListItemIcon>
                             <ExitToApp fontSize="small" />

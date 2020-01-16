@@ -61,7 +61,6 @@ function Benchmark(props) {
      */
     const handleTabChange = (event, newValue) => {
         if (newValue === 1) {
-            console.log(selectedBenchmark);
             props.updateBenchmark(selectedBenchmark);
         }
         props.selectTab(newValue);
