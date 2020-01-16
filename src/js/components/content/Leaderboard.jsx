@@ -35,7 +35,8 @@ const useStyles = makeStyles(theme => ({
     paper: {
         backgroundColor: '#ebebeb',
         padding: 10,
-        marginBottom: theme.spacing(2)
+        marginTop: theme.spacing(2),
+        marginBottom: theme.spacing(4)
     },
     table: {
         minWidth: 700,
@@ -114,7 +115,7 @@ function Leaderboard(props) {
             const res = resources[i];
             plots.push(
                 <div key={res.id} className={classes.plots}>
-                    <Typography variant='subtitle1' >
+                    <Typography variant='h6' >
                         {res.name}
                     </Typography>
                     <div align='center'>
@@ -128,14 +129,7 @@ function Leaderboard(props) {
                 </div>
             );
         }
-        plotListing = (
-            <div>
-                <Typography variant='h6' >
-                    Plots
-                </Typography>
-                { plots }
-            </div>
-        );
+        plotListing = plots;
     }
     // -- Assemble content ----------------------------------------------------
     return (
