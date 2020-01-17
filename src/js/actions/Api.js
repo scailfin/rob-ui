@@ -17,8 +17,8 @@ export const FETCH_API_SUCCESS = 'FETCH_API_SUCCESS';
 
 export function fetchApi() {
     // This should move elsewhere. Note that the trailing '/' is essential!
-    //const apiUrl = 'http://localhost:5000/rob/api/v1/';
-    const apiUrl = 'http://cds-swg1.cims.nyu.edu:5000/rob/api/v1/';
+    const apiUrl = 'http://localhost:5000/rob/api/v1/';
+    //const apiUrl = 'http://cds-swg1.cims.nyu.edu:5000/rob/api/v1/';
     // Get the service descriptor from the API.
     return getUrl(apiUrl, fetchApiSuccess)
 }
