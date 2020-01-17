@@ -13,6 +13,8 @@ import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Leaderboard from './Leaderboard.jsx';
+import Paper from '@material-ui/core/Paper';
+import ReactMarkdown from 'react-markdown';
 import Submission from './Submission.jsx';
 import SubmissionList from './SubmissionList.jsx';
 import Tabs from '@material-ui/core/Tabs';
@@ -22,14 +24,11 @@ import { selectTab, updateBenchmark } from '../../actions/Benchmark';
 import { createSubmission } from '../../actions/Submission';
 
 
+
 const useStyles = makeStyles(theme => ({
-    paperForm: {
+    paperBlock: {
         marginTop: theme.spacing(2),
-        padding: theme.spacing(2),
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'left',
-        backgroundColor: '#ebebeb'
+        padding: theme.spacing(2)
     },
     instructions: {
         marginTop: theme.spacing(4)
@@ -69,14 +68,10 @@ function Benchmark(props) {
     let content = null;
     if (selectedTab === 0) {
         // -- Overview --------------------------------------------------------
-        const instructions = {__html: selectedBenchmark.instructions}
         content = (
-            <div>
-                <div
-                    className={classes.instructions}
-                    dangerouslySetInnerHTML={instructions}
-                />
-            </div>
+            <Paper className={classes.paperBlock}>
+                <ReactMarkdown source={selectedBenchmark.instructions} />
+            </Paper>
         );
     } else if (selectedTab === 1) {
         // -- Current Results -------------------------------------------------
