@@ -12,13 +12,13 @@ import React, { Component } from "react";
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import ErrorMessage from './ErrorMessage.jsx';
+import ErrorMessage from './ErrorMessage';
 import Footer from './Footer.jsx';
-import Logo from './Logo.jsx';
+import Spinner from './Spinner.jsx';
 import MainPanel from '../content/MainPanel';
 import SignIn from './SignIn.jsx';
 import Topbar from '../layout/Topbar';
-import { fetchApi } from "../../actions/Api";
+import { clearError, fetchApi } from "../../actions/App";
 import theme from '../../../theme';
 
 
@@ -38,7 +38,8 @@ const mapStateToProps = state => {
 
 function mapDispatchToProps(dispatch) {
   return {
-    fetchApi: () => dispatch(fetchApi())
+      clearError: () => dispatch(clearError()),
+      fetchApi: () => dispatch(fetchApi())
   };
 }
 
@@ -47,24 +48,38 @@ class App extends Component {
     componentDidMount() {
         this.props.fetchApi();
     }
+    clearError = () => {
+        this.props.clearError();
+    }
     render() {
         const { app, classes } = this.props;
-        const { fetching, username } = app;
+        const { apiError, isFetching, username } = app;
         let content = null;
-        if (fetching) {
-            content = (<Logo />);
-        } else if (username == null) {
+        let minorError = null;
+        if (isFetching) {
+            content = (<Spinner showLogo={true} />);
+        }
+        if (apiError != null) {
+            const { error, isCritical } = apiError;
+            if (isCritical) {
+                content = (<ErrorMessage error={error} isCritical={isCritical} />);
+            } else {
+                minorError = (
+                    <ErrorMessage error={error} isCritical={isCritical} onClose={this.clearError}/>
+                );
+            }
+        } if ((content == null) && (username == null)) {
             content = (<SignIn />);
-        } else {
+        } else if (content == null) {
             content = (<MainPanel />);
         }
         return (
             <div>
                 <Topbar />
                 <Container className={classes.paper} maxWidth="xl">
-                {content}
+                    { content }
+                    { minorError }
                 </Container>
-                <ErrorMessage />
                 <Footer />
             </div>
         );

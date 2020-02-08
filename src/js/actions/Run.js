@@ -8,13 +8,14 @@
  * terms of the MIT License; see LICENSE file for more details.
  */
 
-import { NO_OP } from './App';
-import { SELECT_SUBMISSION, UPDATE_SUBMISSION } from './Submission.js'
-import { getUrl, postUrl } from './Requests';
+import { NO_OP, criticalError } from './App';
+import { SHOW_SUBMISSION, UPDATE_SUBMISSION } from './Submission.js'
+import { fetchApiResource, postRequest } from './Requests';
+
 
 
 export function cancelRun(url, submission) {
-    return postUrl(
+    return postRequest(
         url,
         {reason: 'Canceled at user request'},
         (json) => (successFetchRun(submission, json, UPDATE_SUBMISSION)),
@@ -25,15 +26,15 @@ export function cancelRun(url, submission) {
 
 
 export function getRun(url, submission) {
-    return getUrl(url, (json) => (successFetchRun(submission, json, UPDATE_SUBMISSION)), false);
+    return fetchApiResource(url, (json) => (successFetchRun(submission, json, UPDATE_SUBMISSION)), criticalError);
 }
 
 
 export function submitRun(url, data, submission) {
-    return postUrl(
+    return postRequest(
         url,
         data,
-        (json) => (successFetchRun(submission, json, SELECT_SUBMISSION)),
+        (json) => (successFetchRun(submission, json, SHOW_SUBMISSION)),
         false
     );
 }

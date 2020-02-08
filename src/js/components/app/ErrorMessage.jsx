@@ -8,24 +8,23 @@
  * terms of the MIT License; see LICENSE file for more details.
  */
 
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { withStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import CloseIcon from '@material-ui/icons/Close';
 import ErrorIcon from '@material-ui/icons/Error';
 import IconButton from '@material-ui/core/IconButton';
 import Snackbar from '@material-ui/core/Snackbar';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
-import { clearError } from "../../actions/Error";
-import theme from '../../../theme';
+import Typography from '@material-ui/core/Typography';
 
 
 // Use higher-order component API to create styles for the logo
-const styles = {
-    error: {
-      backgroundColor: theme.palette.error.dark,
+const useStyles = makeStyles(theme => ({
+    critical: {
+        color: theme.palette.secondary.main,
+        marginTop: theme.spacing(8)
     },
     icon: {
       fontSize: 20,
@@ -37,65 +36,69 @@ const styles = {
     message: {
       display: 'flex',
       alignItems: 'center',
-    },
-};
-
-
-const mapStateToProps = state => {
-  return { app: state.app };
-};
-
-function mapDispatchToProps(dispatch) {
-  return {
-    clearError: () => dispatch(clearError())
-  };
-}
-
-
-class ErrorMessage extends Component {
-    static propTypes = {
-        classes: PropTypes.object.isRequired
     }
-    onClose = () => {
-        this.props.clearError();
+}));
+
+
+function ErrorMessage(props) {
+    const classes = useStyles();
+    /*
+     * Call the provided onClose handler if a snackbar is dismissed.
+     */
+    const onClose = () => {
+        props.onClose();
     }
-    render() {
-        const { app, classes } = this.props;
-        const { error } = app;
-        if (error != null) {
-            return (
-                <Snackbar
-                    anchorOrigin={{vertical: 'bottom', horizontal: 'right',}}
-                    open={true}
-                    autoHideDuration={6000}
-                    onClose={this.onClose}
-                >
-                    <SnackbarContent
-                        className={clsx(classes['error'], classes.margin)}
-                        aria-describedby="client-snackbar"
-                        message={
-                            <span id="client-snackbar" className={classes.message}>
-                            <ErrorIcon className={clsx(classes.icon, classes.iconVariant)} />
-                            {error}
-                            </span>
-                        }
-                        action={[
-                            <IconButton
-                                key="close"
-                                aria-label="close"
-                                color="inherit"
-                                onClick={this.onClose}
-                            >
-                                <CloseIcon className={classes.icon} />
-                            </IconButton>,
-                        ]}
-                    />
-                </Snackbar>
-            );
-        } else {
-            return null;
-        }
+    /*
+     * Render error message. The style depends on the value of the isCritical
+     * flag.
+     */
+    const { error, isCritical } = props;
+    if (!isCritical) {
+        return (
+            <Snackbar
+                anchorOrigin={{vertical: 'bottom', horizontal: 'right',}}
+                open={true}
+                autoHideDuration={6000}
+                onClose={onClose}
+            >
+                <SnackbarContent
+                    className={clsx(classes['error'], classes.margin)}
+                    aria-describedby="client-snackbar"
+                    message={
+                        <span id="client-snackbar" className={classes.message}>
+                        <ErrorIcon
+                            className={clsx(classes.icon, classes.iconVariant)}
+                        />
+                        {error}
+                        </span>
+                    }
+                    action={[
+                        <IconButton
+                            key="close"
+                            aria-label="close"
+                            color="inherit"
+                            onClick={onClose}
+                        >
+                            <CloseIcon className={classes.icon} />
+                        </IconButton>,
+                    ]}
+                />
+            </Snackbar>
+        );
+    } else {
+        return (
+            <Typography variant='h6' align='center' className={classes.critical}>
+                { error }
+            </Typography>
+        );
+
     }
 }
 
-export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(ErrorMessage));
+ErrorMessage.propTypes = {
+    error: PropTypes.string.isRequired,
+    isCritical: PropTypes.bool.isRequired,
+    onClose: PropTypes.func
+}
+
+export default ErrorMessage;

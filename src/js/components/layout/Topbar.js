@@ -17,6 +17,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import LogoutMenu from './LogoutMenu';
 import theme from '../../../theme';
+import logo from '../../../assets/rob-ui-header.png'
 
 
 // Use higher-order component API to create styles for the logo
@@ -50,7 +51,7 @@ class Topbar extends Component {
         if (mainPanel.selectedBenchmark != null) {
             title = mainPanel.selectedBenchmark.name;
         } else {
-            title = 'Reproducible Open Benchmarks';
+            title = (<img src={logo} alt={'Reproducible Open Benchmarks'}/>);
         }
         return (
             <div className={classes.root}>

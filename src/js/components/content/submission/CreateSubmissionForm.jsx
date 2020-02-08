@@ -14,8 +14,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
-import { createSubmission, selectDialog } from '../../actions/Submission';
-import { SHOW_RUNS } from '../../resources/Dialog';
+import { createSubmission, selectDialog } from '../../../actions/Submission';
+import { SHOW_RUNS } from '../../../resources/Dialog';
 
 
 const useStyles = makeStyles(theme => ({
@@ -36,6 +36,7 @@ const useStyles = makeStyles(theme => ({
 
 const mapStateToProps = state => {
     return {
+        app: state.app,
         mainPanel: state.mainPanel
     };
 };
@@ -44,7 +45,9 @@ const mapStateToProps = state => {
 function mapDispatchToProps(dispatch) {
   return {
       selectDialog: (dialogId) => dispatch(selectDialog(dialogId)),
-      createSubmission: (url, name) => dispatch(createSubmission(url, name))
+      createSubmission: (api, benchmark, name) => dispatch(
+          createSubmission(api, benchmark, name)
+      )
   };
 }
 
@@ -67,8 +70,8 @@ function CreateSubmissionForm(props) {
      * the benchmark.
      */
     const handleSubmissionSubmit = () => {
-        const url = benchmark.urls.get('submissions:create')
-        props.createSubmission(url, submissionName);
+        const app = props.app;
+        props.createSubmission(app, benchmark, submissionName);
         setValues({open: false, submissionName: ''});
     }
     return (

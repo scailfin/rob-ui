@@ -2,7 +2,7 @@
  * This file is part of the Reproducible Open Benchmarks for Data Analysis
  * Platform (ROB).
  *
- * Copyright (C) 2019 NYU.
+ * Copyright (C) [2019-2020] NYU.
  *
  * ROB is free software; you can redistribute it and/or modify it under the
  * terms of the MIT License; see LICENSE file for more details.
@@ -10,16 +10,17 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
-import LinearProgress from '@material-ui/core/LinearProgress';
+import ErrorMessage from '../app/ErrorMessage';
 import Paper from '@material-ui/core/Paper';
+import Spinner from '../app/Spinner';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
-import { Urls} from '../../resources/Urls';
 
 
 const useStyles = makeStyles(theme => ({
@@ -50,19 +51,33 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
+const mapStateToProps = state => {
+    return {
+        api: state.api,
+        leaderboard: state.leaderboard,
+        mainPanel: state.mainPanel
+    };
+};
+
 function Leaderboard(props) {
     const classes = useStyles();
-    if (props.leaderboard == null) {
+    const {
+        fetchError,
+        isFetching,
+        schema,
+        ranking
+    } = props.leaderboard;
+    if (isFetching) {
         return (
             <div className={classes.spinner}>
-                <Typography variant="overline">
-                    Loading Result Table ...
-                </Typography>
-                <LinearProgress color='secondary'/>
+                <Spinner message='Loading latest results ...' showLogo={true}/>
             </div>
         );
+    } else if (fetchError != null) {
+        return (<ErrorMessage error={fetchError} isCritical={true} />);
+    } else if ((ranking == null) || (schema == null)) {
+        return null;
     }
-    const { schema, ranking, resources } = props.leaderboard;
     // -- Result table --------------------------------------------------------
     const headline = [];
     headline.push(<TableCell key={'col'}></TableCell>);
@@ -109,7 +124,7 @@ function Leaderboard(props) {
     }
     // -- Plot listing --------------------------------------------------------
     let plotListing = null;
-    if (resources.length > 0) {
+    /*if (resources.length > 0) {
         const plots = [];
         for (let i = 0; i < resources.length; i++) {
             const res = resources[i];
@@ -130,7 +145,7 @@ function Leaderboard(props) {
             );
         }
         plotListing = plots;
-    }
+    }*/
     // -- Assemble content ----------------------------------------------------
     return (
         <div className={classes.root}>
@@ -160,4 +175,4 @@ Leaderboard.propTypes = {
 };
 
 
-export default Leaderboard;
+export default connect(mapStateToProps)(Leaderboard);

@@ -16,11 +16,12 @@ import Assessment from '@material-ui/icons/Assessment';
 import Avatar from '@material-ui/core/Avatar';
 import Benchmark from './Benchmark.jsx'
 import Divider from '@material-ui/core/Divider';
+import ErrorMessage from '../app/ErrorMessage';
 import List from '@material-ui/core/List';
-import LinearProgress from '@material-ui/core/LinearProgress';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import Spinner from '../app/Spinner.jsx';
 import Typography from '@material-ui/core/Typography';
 import { selectBenchmark } from '../../actions/Benchmark';
 
@@ -76,6 +77,7 @@ const StyledBenchmark = withStyles({
 
 const mapStateToProps = state => {
     return {
+        api: state.api,
         mainPanel: state.mainPanel
     };
 };
@@ -106,26 +108,27 @@ function MainPanel(props) {
     }
     const {
         benchmarks,
-        selectedBenchmark,
-        submissions
+        fetchError,
+        isFetching,
+        selectedBenchmark
     } = props.mainPanel;
     // The main content depends on whether the benchmark and submission data
     // has already been loaded and on whether there is a benchmark that has
     // been selected by the user as the current benchmark.
     let content = null;
-    if ((benchmarks == null) || (submissions == null)) {
+    if (isFetching) {
         // If the data has not been loaded yet completely, a spinner is shown.
-        content = (
-            <div className={classes.spinner}>
-                <Typography variant="overline">
-                    Loading Benchmarks and Submissions ...
-                </Typography>
-                <LinearProgress color='secondary'/>
+        content = (<Spinner message='Loading benchmarks ...' showLogo={true} />);
+    } else if (fetchError) {
+        content = (<ErrorMessage error={fetchError} isCritical={true} />);
+    }
+    if ((content == null) && (selectedBenchmark != null)) {
+        return (
+            <div  className={classes.mainContent}>
+                <Benchmark key={selectedBenchmark.id}/>
             </div>
         );
-    } else if (selectedBenchmark != null) {
-        content = (<Benchmark key={selectedBenchmark.id}/>);
-    } else {
+    } else if (benchmarks != null) {
         // If no benchmark is selected, a brief overview of ROB is shown
         // together with a list of available benchmarks.
         const benchmarklistItems = [];
@@ -149,10 +152,6 @@ function MainPanel(props) {
         }
         content = (
             <div>
-                <Typography className={classes.contentPanel} variant='body1'>
-                    The <span className={classes.highlight}>Reproducible Open Benchmarks for Data Analysis Platform (ROB)</span> is an experimental prototype for enabling community benchmarks of data analysis algorithms. The goal of ROB is to allow user communities to evaluate the performance of their different data analysis algorithms in a controlled competition-style format.
-                </Typography>
-                <Divider />
                 <Typography className={classes.contentPanel} variant="h4">
                     Participate in Community Benchmarks
                 </Typography>
@@ -162,7 +161,15 @@ function MainPanel(props) {
             </div>
         );
     }
-    return (<div  className={classes.mainContent}>{ content }</div>);
+    return (
+        <div  className={classes.mainContent}>
+            <Typography className={classes.contentPanel} variant='body1'>
+                The <span className={classes.highlight}>Reproducible Open Benchmarks for Data Analysis Platform (ROB)</span> is an experimental prototype for enabling community benchmarks of data analysis algorithms. The goal of ROB is to allow user communities to evaluate the performance of their different data analysis algorithms in a controlled competition-style format.
+            </Typography>
+            <Divider />
+            { content }
+        </div>
+    );
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(MainPanel);

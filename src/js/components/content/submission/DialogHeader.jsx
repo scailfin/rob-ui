@@ -15,10 +15,10 @@ import CloseIcon from '@material-ui/icons/Close';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
-import { selectDialog } from '../../actions/Submission';
+import { selectDialog } from '../../../actions/Submission';
 import {
     CREATE_SUBMISSION, SHOW_RUNS, SUBMIT_RUN, UPLOAD_FILES
-} from '../../resources/Dialog';
+} from '../../../resources/Dialog';
 
 
 const useStyles = makeStyles(theme => ({

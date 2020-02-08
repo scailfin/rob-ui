@@ -20,10 +20,10 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import SendIcon from '@material-ui/icons/Send';
-import { selectDialog, selectSubmission } from '../../actions/Submission';
+import { fetchSubmission, selectDialog } from '../../../actions/Submission';
 import {
     CREATE_SUBMISSION, SUBMIT_RUN, UPLOAD_FILES
-} from '../../resources/Dialog';
+} from '../../../resources/Dialog';
 
 
 const useStyles = makeStyles(theme => ({
@@ -37,7 +37,9 @@ const useStyles = makeStyles(theme => ({
 
 const mapStateToProps = state => {
     return {
-        mainPanel: state.mainPanel
+        app: state.app,
+        mainPanel: state.mainPanel,
+        submissions: state.submissions
     };
 };
 
@@ -45,26 +47,30 @@ const mapStateToProps = state => {
 function mapDispatchToProps(dispatch) {
   return {
       selectDialog: (dialogId) => dispatch(selectDialog(dialogId)),
-      selectSubmission: (submission) => dispatch(selectSubmission(submission))
+      selectSubmission: (api, submission) => dispatch(
+          fetchSubmission(api, submission)
+      )
   };
 }
 
 
-function SubmissionList(props) {
+function SubmissionsNavbar(props) {
     const classes = useStyles();
     const {
-        selectedBenchmark,
+        selectedBenchmark
+    } = props.mainPanel;
+    const {
         selectedSubmission,
         submissionDialog,
         submissions
-    } = props.mainPanel;
+    } = props.submissions;
     /**
      * Event handler when selecting a submission from the list.
      */
     const handleSubmissionSelect = (key) => {
-        const submissions = props.mainPanel.submissions;
+        const submissions = props.submissions.submissions;
         const submission = submissions.find((s) => (s.id === key));
-        props.selectSubmission(submission);
+        props.selectSubmission(props.app, submission);
     }
     // -- Component Content (render) ------------------------------------------
     // List of submissions that the user is a member of for the selected
@@ -157,4 +163,4 @@ function SubmissionList(props) {
     );
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SubmissionList);
+export default connect(mapStateToProps, mapDispatchToProps)(SubmissionsNavbar);

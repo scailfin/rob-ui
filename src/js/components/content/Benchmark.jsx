@@ -2,7 +2,7 @@
  * This file is part of the Reproducible Open Benchmarks for Data Analysis
  * Platform (ROB).
  *
- * Copyright (C) 2019 NYU.
+ * Copyright (C) [2019-2020] NYU.
  *
  * ROB is free software; you can redistribute it and/or modify it under the
  * terms of the MIT License; see LICENSE file for more details.
@@ -15,12 +15,11 @@ import Grid from '@material-ui/core/Grid';
 import Leaderboard from './Leaderboard.jsx';
 import Paper from '@material-ui/core/Paper';
 import ReactMarkdown from 'react-markdown';
-import Submission from './Submission.jsx';
-import SubmissionList from './SubmissionList.jsx';
+import SubmissionPanel from './submission/SubmissionPanel.jsx';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
-import { selectTab, updateBenchmark } from '../../actions/Benchmark';
+import { selectTab } from '../../actions/Benchmark';
 import { createSubmission } from '../../actions/Submission';
 
 
@@ -38,7 +37,9 @@ const useStyles = makeStyles(theme => ({
 
 const mapStateToProps = state => {
     return {
-        mainPanel: state.mainPanel
+        app: state.app,
+        mainPanel: state.mainPanel,
+        submissions: state.submissions
     };
 };
 
@@ -46,8 +47,9 @@ const mapStateToProps = state => {
 function mapDispatchToProps(dispatch) {
   return {
       createSubmission: (url, name) => dispatch(createSubmission(url, name)),
-      selectTab: (tabId) => dispatch(selectTab(tabId)),
-      updateBenchmark: (benchmark) => dispatch(updateBenchmark(benchmark))
+      selectTab: (api, benchmark, tabId) => dispatch(
+          selectTab(api, benchmark, tabId)
+      )
   };
 }
 
@@ -59,10 +61,7 @@ function Benchmark(props) {
      * Change handler to display a different tab.
      */
     const handleTabChange = (event, newValue) => {
-        if (newValue === 1) {
-            props.updateBenchmark(selectedBenchmark);
-        }
-        props.selectTab(newValue);
+        props.selectTab(props.app, selectedBenchmark, newValue);
     };
     // -- Main Content (render) -----------------------------------------------
     let content = null;
@@ -75,22 +74,10 @@ function Benchmark(props) {
         );
     } else if (selectedTab === 1) {
         // -- Current Results -------------------------------------------------
-        content = (<Leaderboard leaderboard={selectedBenchmark.leaderboard}/>);
+        content = (<Leaderboard />);
     } else if (selectedTab === 2) {
         // -- My Submissions --------------------------------------------------
-        content = (
-            <Grid container spacing={2}>
-                <Grid item xs={3}>
-                    <SubmissionList />
-                </Grid>
-                <Grid item xs={9}>
-                    <div  className={classes.mainContent}>
-                        <Submission />
-                    </div>
-                </Grid>
-            </Grid>
-        );
-
+        content = (<SubmissionPanel />);
     }
     return (
         <div className={classes.paper}>

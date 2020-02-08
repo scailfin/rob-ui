@@ -14,21 +14,21 @@ import { makeStyles } from '@material-ui/core/styles';
 import CloudUpload from '@material-ui/icons/CloudUpload';
 import CreateSubmissionForm from './CreateSubmissionForm';
 import DialogHeader from './DialogHeader.jsx';
-import FileListing from './FileListing';
+import FileListing from '../FileListing';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Paper from '@material-ui/core/Paper';
 import Dropzone from 'react-dropzone';
-import RunListing from './RunListing.jsx';
-import SubmitForm from '../form/SubmitForm';
+import RunListing from '../run/RunListing.jsx';
+import SubmitForm from '../../form/SubmitForm';
 import Typography from '@material-ui/core/Typography';
-import { cancelRun, getRun, submitRun } from '../../actions/Run';
+import { cancelRun, getRun, submitRun } from '../../../actions/Run';
 import {
     downloadResource, selectDialog, uploadFile
-} from '../../actions/Submission';
+} from '../../../actions/Submission';
 import {
     CREATE_SUBMISSION, SHOW_RUNS, SUBMIT_RUN, UPLOAD_FILES
-} from '../../resources/Dialog';
-import { Urls } from '../../resources/Urls';
+} from '../../../resources/Dialog';
+import { Urls } from '../../../resources/Urls';
 
 
 const useStyles = makeStyles(theme => ({
@@ -58,7 +58,7 @@ const useStyles = makeStyles(theme => ({
 
 const mapStateToProps = state => {
     return {
-        mainPanel: state.mainPanel
+        submissions: state.submissions
     };
 };
 
@@ -84,9 +84,9 @@ function mapDispatchToProps(dispatch) {
 
 
 function Submission(props) {
-    const { selectedSubmission, submissionDialog } = props.mainPanel;
+    const { selectedSubmission, selectedDialog } = props.submissions;
     const classes = useStyles();
-    /**
+    /*
      * Handler to upload a file that was selected using the drop zone
      */
     const handleFileDrop = (files) => {
@@ -100,7 +100,7 @@ function Submission(props) {
             props.uploadFile(url, selectedSubmission, files[0]);
         }
     }
-    /**
+    /*
      * Handler for downloads of previously uploaded files. The tab index is used
      * to keep track of whether a run result resource is being downloaded or a
      * file that has previously been uploaded.
@@ -116,14 +116,14 @@ function Submission(props) {
         const url = new Urls(run.links).self();
         props.getRun(url, selectedSubmission);
     }
-    /**
+    /*
      * Click handler for cancel button.
      */
     const handleRunCancel = (run) => {
         const url = new Urls(run.links).get('self:cancel');
         props.cancelRun(url, selectedSubmission);
     }
-    /**
+    /*
      * Handle submission of new run for given ser of arguments
      */
     const handleSubmit = (args) => {
@@ -153,7 +153,7 @@ function Submission(props) {
         //setValues({selectedTab: 0});
     }
     let tabContent = null;
-    if (submissionDialog === CREATE_SUBMISSION) {
+    if (selectedDialog === CREATE_SUBMISSION) {
         tabContent = (<CreateSubmissionForm />);
     } else if (selectedSubmission != null) {
         const { fetching, displayContent, contentId } = selectedSubmission;
@@ -166,33 +166,9 @@ function Submission(props) {
                     <LinearProgress color='secondary'/>
                 </div>
             );
-        } else if (submissionDialog === SHOW_RUNS) {
-            const { runs } = selectedSubmission;
-            if (runs.length > 0) {
-                tabContent = (
-                    <RunListing
-                        contentId={contentId}
-                        content={displayContent}
-                        onCancel={handleRunCancel}
-                        onDownload={(fh) => (
-                            handleFileDownload(
-                                new Urls(fh.links).get('self'),
-                                fh.id
-                            )
-                        )}
-                        onPoll={handleGetRunState}
-                        runs={runs}
-                        submission={selectedSubmission}
-                    />
-                );
-            } else {
-                tabContent = (
-                    <Typography variant='body1' color='error' className={classes.emptyTabMsg}>
-                        No Runs Found
-                    </Typography>
-                );
-            }
-        } else if (submissionDialog === SUBMIT_RUN) {
+        } else if (selectedDialog === SHOW_RUNS) {
+            tabContent = (<RunListing />);
+        } else if (selectedDialog === SUBMIT_RUN) {
             tabContent = (
                 <SubmitForm
                     onCancel={() => (props.selectDialog(SHOW_RUNS))}
@@ -200,7 +176,7 @@ function Submission(props) {
                     submission={selectedSubmission}
                 />
             )
-        } else if (submissionDialog === UPLOAD_FILES) {
+        } else if (selectedDialog === UPLOAD_FILES) {
             tabContent = (
                 <div>
                     <FileListing

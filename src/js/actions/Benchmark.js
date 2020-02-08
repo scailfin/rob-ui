@@ -2,73 +2,95 @@
  * This file is part of the Reproducible Open Benchmarks for Data Analysis
  * Platform (ROB).
  *
- * Copyright (C) 2019 NYU.
+ * Copyright (C) [2019-2020] NYU.
  *
  * ROB is free software; you can redistribute it and/or modify it under the
  * terms of the MIT License; see LICENSE file for more details.
  */
 
-import { getUrl } from './Requests';
-import { Urls } from '../resources/Urls';
+import { fetchApiResource } from './Requests';
+import { fetchSubmissions } from './Submission.js';
 
-
-export const DESELECT_BENCHMARK = 'DESELECT_BENCHMARK';
+export const FETCH_BENCHMARKS_ERROR = 'FETCH_BENCHMARKS_ERROR';
+export const FETCH_BENCHMARKS_START = 'FETCH_BENCHMARKS_START';
 export const FETCH_BENCHMARKS_SUCCESS = 'FETCH_BENCHMARKS_SUCCESS';
+export const FETCH_LEADERBOARD_ERROR = 'FETCH_LEADERBOARD_ERROR';
+export const FETCH_LEADERBOARD_START = 'FETCH_LEADERBOARD_START';
+export const FETCH_LEADERBOARD_SUCCESS = 'FETCH_LEADERBOARD_SUCCESS';
 export const SELECT_BENCHMARK = 'SELECT_BENCHMARK';
 export const SELECT_TAB = 'SELECT_TAB';
-export const UPDATE_BENCHMARK = 'UPDATE_BENCHMARK';
 
 
-export const deselectBenchmark = () => ({type: DESELECT_BENCHMARK});
+// -- Benchmark listings ------------------------------------------------------
 
-export function fetchBenchmarks(url) {
-    return getUrl(url, fetchBenchmarksSuccess);
+/**
+ * Fetch benchmark listing from API.
+ */
+export function fetchBenchmarks(api) {
+    const url = api.urls.listBenchmarks();
+    return fetchApiResource(
+        url,
+        (json) => ({type: FETCH_BENCHMARKS_SUCCESS, payload: json}),
+        (msg) => ({type: FETCH_BENCHMARKS_ERROR, payload: msg}),
+        () => ({type: FETCH_BENCHMARKS_START})
+    );
 }
 
 
-function fetchBenchmarksSuccess(json) {
-    return {
-        type: FETCH_BENCHMARKS_SUCCESS, payload: json
+// -- Benchmarks --------------------------------------------------------------
+
+/**
+ * Set the selected benchmark. The benchmark descriptor that was contained in
+ * the benchmark listing contains all the necessary information. Thus, there
+ * is no need at this point to fetch information from the API.
+ */
+export const selectBenchmark = (benchmark) => ({
+    type: SELECT_BENCHMARK, payload: benchmark
+});
+
+/**
+ * Set the information that is currently shown for a selected benchmark. The
+ * following values for tabId are possible:
+ *
+ * 0 : Show benchmark instructions
+ * 1 : Benchmark leaderboard
+ * 2 : User submissions for the benchmark
+ */
+export function selectTab(api, benchmark, tabId) {
+    if (tabId === 1) {
+        // Fetch benchmark leaderboard
+        return dispatch => {
+            dispatch(fetchLeaderboard(api, benchmark));
+            return dispatch({type: SELECT_TAB, payload: tabId});
+        };
+    } else if (tabId === 2) {
+        // Fetch benchmark submissions
+        return dispatch => {
+            dispatch(fetchSubmissions(api, benchmark));
+            return dispatch({type: SELECT_TAB, payload: tabId});
+        };
+    } else {
+        return {type: SELECT_TAB, payload: tabId};
     }
 }
 
 
-export function selectBenchmark(benchmark) {
-    const url = new Urls(benchmark.links).get('leaderboard');
-    return getUrl(url, (json) => (fetchLeaderboardSuccess(benchmark, json, SELECT_BENCHMARK)), false);
-}
+// -- Leader board ------------------------------------------------------------
 
-
-export const selectTab = (tabId) => ({type: SELECT_TAB, payload: tabId});
-
-
-export function updateBenchmark(benchmark) {
-    const url = benchmark.urls.get('leaderboard');
+/**
+ * Fetch leader board information for the selected benchmark.
+ */
+function fetchLeaderboard(api, benchmark) {
+    const url = api.urls.getLeaderboard(benchmark.id);
     return dispatch => {
-        dispatch(fetchLeaderboardSuccess(benchmark, null, UPDATE_BENCHMARK));
+        // Set the current leader board to null before fetch starts
         return dispatch(
-            getUrl(
+            fetchApiResource(
                 url,
-                (json) => (fetchLeaderboardSuccess(benchmark, json, UPDATE_BENCHMARK)),
-                false
+                (json) => ({type: FETCH_LEADERBOARD_SUCCESS, payload: json}),
+                (msg) => ({type: FETCH_LEADERBOARD_ERROR, payload: msg}),
+                () => ({type: FETCH_LEADERBOARD_START})
             )
         );
-    }
-}
-
-
-function fetchLeaderboardSuccess(benchmark, leaderboard, actionType) {
-    const { id, name, description, instructions, links } = benchmark;
-    return {
-        type: actionType,
-        payload: {
-            id,
-            name,
-            description,
-            instructions,
-            leaderboard,
-            links,
-            urls: new Urls(links)
-        }
     }
 }

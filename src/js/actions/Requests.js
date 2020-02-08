@@ -8,10 +8,7 @@
  * terms of the MIT License; see LICENSE file for more details.
  */
 
-import {fetchStart, fetchSuccess, fetchError} from './App';
-
-
-export function getFile(url, successHandler) {
+export function getFile(url, successHandler, errorHandler) {
     const accessToken = localStorage.getItem('accessToken');
     return dispatch => {
         // Set API key in header
@@ -21,7 +18,7 @@ export function getFile(url, successHandler) {
             .then(response => {
                 if (!response.ok) {
                     response.json().then(json => {
-                        dispatch(fetchError(json.message));
+                        dispatch(errorHandler(json.message));
                     });
                 } else {
                     response.blob().then(blob => {
@@ -39,7 +36,7 @@ export function getFile(url, successHandler) {
                     })
                 }
             })
-            .catch(error => dispatch(fetchError(error.message)));
+            .catch(error => dispatch(errorHandler(error.message)));
     };
 }
 
@@ -48,27 +45,29 @@ export function getFile(url, successHandler) {
  * Generic function to send asyncronous get requests. This function takes
  * care of the error handling and the setting of the progress indicator. The
  * caller has to provide a function that is called with the response body that
- * is received by a successful request. If the optional sendSignals flag is true
- * the global fetchStart() and fetchSuccess() functions are used to signal the
- * start and the end of fetching. The function takes the following parameters:
+ * is received by a successful request. The error handler is called in case of
+ * an error.
+ * If the optional signal function is given it is dispatched at the start of
+ * the request.
  *
  * - url: Request Url
  * - successHandler: Function that is being called when a valid (non-error)
  *   response is received. This function is being called with the response body
  *   as the only argument.
- * - sendSignals: bool, optional
- *   Send start and success signals if true. If the value is missing it is
- *   assumed to be true.
+ * - errorHandler: Handler that is called in case of an error. The function
+ *   will receive the error message as the only argument.
+ * - startSignal:Function that is called at the start of the request
  */
-export function getUrl(
+export function fetchApiResource(
     url,
     successHandler,
-    sendSignals
+    errorHandler,
+    startSignal
 ) {
     const accessToken = localStorage.getItem('accessToken');
     return dispatch => {
-        if (sendSignals !== false) {
-            dispatch(fetchStart());
+        if (startSignal != null) {
+            dispatch(startSignal());
         }
         // Set API key in header
         const headers = new Headers();
@@ -78,18 +77,15 @@ export function getUrl(
             .then(response => {
                 if (!response.ok) {
                     response.json().then(json => {
-                        dispatch(fetchError(json.message));
+                        dispatch(errorHandler(json.message));
                     });
                 } else {
                     response.json().then(json => {
-                        if (sendSignals !== false) {
-                            dispatch(fetchSuccess());
-                        }
                         dispatch(successHandler(json));
                     })
                 }
             })
-            .catch(error => dispatch(fetchError(error.message)));
+            .catch(error => dispatch(errorHandler(error.message)));
     };
 }
 
@@ -109,11 +105,12 @@ export function getUrl(
  * - method: Method name to distinguish between POST and PUT requests. The
  *   default is POST.
  */
-export function postUrl(
+export function postRequest(
     url,
     data,
     successHandler,
-    sendSignals,
+    errorHandler,
+    startSignal,
     method
 ) {
     // Ensure that the method os set
@@ -122,8 +119,8 @@ export function postUrl(
     }
     return dispatch => {
         const accessToken = localStorage.getItem('accessToken');
-        if (sendSignals !== false) {
-            dispatch(fetchStart());
+        if (startSignal != null) {
+            dispatch(startSignal());
         }
         const headers = {
             'api_key': accessToken
@@ -139,17 +136,14 @@ export function postUrl(
             .then(response => {
                 if (!response.ok) {
                     response.json().then(json => {
-                        dispatch(fetchError(json.message));
+                        dispatch(errorHandler(json.message));
                     });
                 } else {
                     response.json().then(json => {
                         dispatch(successHandler(json));
-                        if (sendSignals !== false) {
-                            dispatch(fetchSuccess());
-                        }
                     })
                 }
             })
-            .catch(error => dispatch(fetchError(error.message)));
+            .catch(error => dispatch(errorHandler(error.message)));
     };
 }
