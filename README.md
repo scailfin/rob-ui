@@ -1,5 +1,3 @@
-# Reproducible Open Benchmarks - User Interface
-
 [![LICENSE](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/scailfin/benchmark-templates/blob/master/LICENSE)
 
 
