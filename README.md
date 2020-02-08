@@ -2,6 +2,12 @@
 
 [![LICENSE](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/scailfin/benchmark-templates/blob/master/LICENSE)
 
+
+
+[!ROB User Interface](https://github.com/scailfin/rob-ui/blob/flowserv/docs/graphics/header-webapi.png)
+
+
+
 ## About
 
 The is the Web-based user interface for the *Reproducible Open Benchmarks for Data Analysis Platform (ROB)*.
