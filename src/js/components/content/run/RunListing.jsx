@@ -17,7 +17,7 @@ import Button from '@material-ui/core/Button';
 import CheckCircleOutline from '@material-ui/icons/CheckCircleOutline';
 import DirectionsRunOutlined from '@material-ui/icons/DirectionsRunOutlined';
 import Divider from '@material-ui/core/Divider';
-import ErrorMessage from '../../app/ErrorMessage';
+import ErrorMessage from '../../util/ErrorMessage';
 import ErrorOutlineOutlined from '@material-ui/icons/ErrorOutlineOutlined';
 import FileListing from '../FileListing';
 import HourglassEmptyOutlined from '@material-ui/icons/HourglassEmptyOutlined';
@@ -25,7 +25,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import Spinner from '../../app/Spinner';
+import Spinner from '../../util/Spinner';
 import Typography from '@material-ui/core/Typography';
 import { utc2LocalTime } from '../../../resources/Timestamps';
 

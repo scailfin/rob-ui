@@ -14,14 +14,15 @@ import { makeStyles } from '@material-ui/core/styles';
 import { withStyles } from '@material-ui/core';
 import Assessment from '@material-ui/icons/Assessment';
 import Avatar from '@material-ui/core/Avatar';
-import Benchmark from './Benchmark.jsx'
+import Benchmark from './benchmark/Benchmark.jsx'
+import BenchmarkListing from './benchmark/BenchmarkListing.jsx'
 import Divider from '@material-ui/core/Divider';
-import ErrorMessage from '../app/ErrorMessage';
+import ErrorMessage from '../util/ErrorMessage';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import Spinner from '../app/Spinner.jsx';
+import Spinner from '../util/Spinner.jsx';
 import Typography from '@material-ui/core/Typography';
 import { selectBenchmark } from '../../actions/Benchmark';
 
@@ -49,8 +50,9 @@ const useStyles = makeStyles(theme => ({
         color:  'textSecondary'
     },
     mainContent: {
-        marginLeft: theme.spacing(4),
-        marginRight: theme.spacing(4)
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        width: 1000
     }
 }));
 
@@ -77,8 +79,8 @@ const StyledBenchmark = withStyles({
 
 const mapStateToProps = state => {
     return {
-        api: state.api,
-        mainPanel: state.mainPanel
+        app: state.app,
+        benchmarks: state.benchmarks
     };
 };
 
@@ -90,7 +92,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-/**
+/*
  * Main application panel. the content of the panel depends on whether a
  * benchmark is currently being selected or not. If no benchmark is selected
  * a list of available benchmarks is shown. If a benchmark is selected, the
@@ -111,55 +113,24 @@ function MainPanel(props) {
         fetchError,
         isFetching,
         selectedBenchmark
-    } = props.mainPanel;
+    } = props.benchmarks;
     // The main content depends on whether the benchmark and submission data
     // has already been loaded and on whether there is a benchmark that has
     // been selected by the user as the current benchmark.
     let content = null;
-    if (isFetching) {
-        // If the data has not been loaded yet completely, a spinner is shown.
+    if ((isFetching) && (benchmarks == null)) {
+        // Show spinner while loading the benchmark listing.
         content = (<Spinner message='Loading benchmarks ...' showLogo={true} />);
+    } else if ((isFetching) && (benchmarks != null)) {
+        // Show spinner while loading the benchmark handle.
+        content = (<Spinner message='Loading benchmark ...' showLogo={true} />);
     } else if (fetchError) {
         content = (<ErrorMessage error={fetchError} isCritical={true} />);
-    }
-    if ((content == null) && (selectedBenchmark != null)) {
-        return (
-            <div  className={classes.mainContent}>
-                <Benchmark key={selectedBenchmark.id}/>
-            </div>
-        );
+    } else if (selectedBenchmark != null) {
+        // Return immediately to avoid showing the ROB overview header.
+        return (<Benchmark />);
     } else if (benchmarks != null) {
-        // If no benchmark is selected, a brief overview of ROB is shown
-        // together with a list of available benchmarks.
-        const benchmarklistItems = [];
-        benchmarks.sort((a, b) => ((a.name).localeCompare(b.name)));
-        for (let i = 0; i < benchmarks.length; i++) {
-            const bm = benchmarks[i];
-            benchmarklistItems.push(
-                <StyledBenchmark
-                    key={bm.id}
-                    button
-                    onClick={() => (handleBenchmarkSelect(bm.id))}
-                >
-                    <ListItemAvatar>
-                        <Avatar className={classes.avatarBenchmark}>
-                            <Assessment />
-                        </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText primary={bm.name} secondary={bm.description} />
-                </StyledBenchmark>
-            );
-        }
-        content = (
-            <div>
-                <Typography className={classes.contentPanel} variant="h4">
-                    Participate in Community Benchmarks
-                </Typography>
-                <List component="nav" className={classes.root}>
-                    {benchmarklistItems}
-                </List>
-            </div>
-        );
+        content = (<BenchmarkListing />);
     }
     return (
         <div  className={classes.mainContent}>

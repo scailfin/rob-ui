@@ -10,7 +10,7 @@
 
 import {
     CREATE_SUBMISSIONS_SUCCESS, FETCH_SUBMISSIONS_START,
-    FETCH_SUBMISSIONS_SUCCESS, SELECT_DIALOG, SELECT_SUBMISSION,
+    FETCH_SUBMISSIONS_SUCCESS, SELECT_SUBMISSION,
     SHOW_SUBMISSION, SUBMISSIONS_ERROR
 } from '../actions/Submission';
 import { SHOW_RUNS } from '../resources/Dialog'
@@ -49,8 +49,6 @@ const submissions = (state = INITIAL_STATE, action) => {
                 isFetching: false,
                 fetchError: null
             };
-        case SELECT_DIALOG:
-            return {...state, selectedDialog: action.payload};
         case SHOW_SUBMISSION:
             return {
                 ...state,

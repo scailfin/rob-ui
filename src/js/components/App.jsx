@@ -12,14 +12,14 @@ import React, { Component } from "react";
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import ErrorMessage from './ErrorMessage';
-import Footer from './Footer.jsx';
-import Spinner from './Spinner.jsx';
-import MainPanel from '../content/MainPanel';
-import SignIn from './SignIn.jsx';
-import Topbar from '../layout/Topbar';
-import { clearError, fetchApi } from "../../actions/App";
-import theme from '../../../theme';
+import ErrorMessage from './util/ErrorMessage';
+import Footer from './util/Footer.jsx';
+import Spinner from './util/Spinner.jsx';
+import MainPanel from './content/MainPanel';
+import SignIn from './content/SignIn.jsx';
+import Topbar from './layout/Topbar';
+import { clearError, fetchApi } from "../actions/App";
+import theme from '../../theme';
 
 
 const styles = {
@@ -27,7 +27,7 @@ const styles = {
         marginTop: theme.spacing(12),
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'left',
+        alignItems: 'left'
     },
 };
 
@@ -62,10 +62,16 @@ class App extends Component {
         if (apiError != null) {
             const { error, isCritical } = apiError;
             if (isCritical) {
-                content = (<ErrorMessage error={error} isCritical={isCritical} />);
+                content = (
+                    <ErrorMessage error={error} isCritical={isCritical} />
+                );
             } else {
                 minorError = (
-                    <ErrorMessage error={error} isCritical={isCritical} onClose={this.clearError}/>
+                    <ErrorMessage
+                        error={error}
+                        isCritical={isCritical}
+                        onClose={this.clearError}
+                    />
                 );
             }
         } if ((content == null) && (username == null)) {

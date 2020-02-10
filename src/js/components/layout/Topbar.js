@@ -10,18 +10,16 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { withStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import LogoutMenu from './LogoutMenu';
-import theme from '../../../theme';
 import logo from '../../../assets/rob-ui-header.png'
 
 
 // Use higher-order component API to create styles for the logo
-const styles = {
+const useStyles = makeStyles(theme => ({
     root: {
       flexGrow: 1,
     },
@@ -31,41 +29,23 @@ const styles = {
     title: {
       flexGrow: 1,
     },
-};
+}));
 
 
-const mapStateToProps = state => {
-    return {
-        mainPanel: state.mainPanel
-    };
-};
-
-
-class Topbar extends Component {
-    static propTypes = {
-        classes: PropTypes.object.isRequired
-    }
-    render() {
-        const { classes, mainPanel } = this.props;
-        let title;
-        if (mainPanel.selectedBenchmark != null) {
-            title = mainPanel.selectedBenchmark.name;
-        } else {
-            title = (<img src={logo} alt={'Reproducible Open Benchmarks'}/>);
-        }
-        return (
-            <div className={classes.root}>
-                <AppBar position="fixed">
-                    <Toolbar>
-                        <Typography variant="h6" className={classes.title}>
-                            { title }
-                        </Typography>
-                        <LogoutMenu />
-                    </Toolbar>
-                </AppBar>
-            </div>
-        );
-    }
+function Topbar(props) {
+    const classes = useStyles();
+    return (
+        <div className={classes.root}>
+            <AppBar position="fixed">
+                <Toolbar>
+                    <Typography variant="h6" className={classes.title}>
+                        <img src={logo} alt={'Reproducible Open Benchmarks'}/>
+                    </Typography>
+                    <LogoutMenu />
+                </Toolbar>
+            </AppBar>
+        </div>
+    );
 }
 
-export default withStyles(styles)(connect(mapStateToProps)(Topbar));
+export default Topbar;

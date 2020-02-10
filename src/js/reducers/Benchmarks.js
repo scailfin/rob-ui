@@ -11,13 +11,14 @@
 import { SHOW_HOMEPAGE } from '../actions/App';
 import { LOGOUT_SUCCESS } from '../actions/Auth';
 import {
-    FETCH_BENCHMARKS_ERROR, FETCH_BENCHMARKS_START, FETCH_BENCHMARKS_SUCCESS, SELECT_BENCHMARK, SELECT_TAB
+    FETCH_BENCHMARKS_ERROR, FETCH_BENCHMARKS_START, FETCH_BENCHMARKS_SUCCESS,
+    SELECT_BENCHMARK, SELECT_DIALOG
 } from '../actions/Benchmark';
-import { SHOW_RUNS } from '../resources/Dialog';
+import { SHOW_INSTRUCTIONS } from '../resources/Dialog';
 
 
 /**
- * The main panel state contains the listing of all benchmark descriptors as
+ * The benchmark state maintains the listing of all benchmark descriptors as
  * well as the current selected benchmark and the selected tab.
  */
 const INITIAL_STATE = {
@@ -25,11 +26,12 @@ const INITIAL_STATE = {
     fetchError: null,
     isFetching: false,
     selectedBenchmark: null,
-    selectedTab: 0
+    selectedSubmission: null,
+    selectedDialog: SHOW_INSTRUCTIONS
 }
 
 
-const mainPanel = (state = INITIAL_STATE, action) => {
+const benchmarkPanel = (state = INITIAL_STATE, action) => {
     switch (action.type) {
         case FETCH_BENCHMARKS_ERROR:
             return {...state, isFetching: false, fetchError: action.payload};
@@ -48,17 +50,17 @@ const mainPanel = (state = INITIAL_STATE, action) => {
                 submissions: null
             };
         case SELECT_BENCHMARK:
+            console.log(action);
             return {
                 ...state,
+                fetchError: null,
+                isFetching: false,
                 selectedBenchmark: action.payload,
                 selectedSubmission: null,
                 selectedTab: 0
             };
-        case SELECT_TAB:
-            return {
-                ...state,
-                selectedTab: action.payload
-            };
+        case SELECT_DIALOG:
+            return {...state, selectedDialog: action.payload}
         case SHOW_HOMEPAGE:
             return {
                 ...state,
@@ -71,4 +73,4 @@ const mainPanel = (state = INITIAL_STATE, action) => {
     }
 }
 
-export default mainPanel;
+export default benchmarkPanel;

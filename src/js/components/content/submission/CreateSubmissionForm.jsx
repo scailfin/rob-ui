@@ -14,7 +14,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
-import { createSubmission, selectDialog } from '../../../actions/Submission';
+import { selectDialog } from '../../../actions/Benchmark';
+import { createSubmission } from '../../../actions/Submission';
 import { SHOW_RUNS } from '../../../resources/Dialog';
 
 
@@ -37,7 +38,7 @@ const useStyles = makeStyles(theme => ({
 const mapStateToProps = state => {
     return {
         app: state.app,
-        mainPanel: state.mainPanel
+        benchmarks: state.benchmarks
     };
 };
 

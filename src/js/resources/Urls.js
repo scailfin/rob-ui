@@ -38,6 +38,12 @@ export class Urls {
     /*
      * Get listing of all benchmarks.
      */
+    getBenchmark(benchmarkId) {
+        return this.get('benchmarks:get').replace('{benchmarkId}', benchmarkId);
+    }
+    /*
+     * Get listing of all benchmarks.
+     */
     listBenchmarks() {
         return this.get('benchmarks:list');
     }

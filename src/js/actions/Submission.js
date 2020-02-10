@@ -15,7 +15,6 @@ import { fetchRuns } from './RunListing';
 export const CREATE_SUBMISSIONS_SUCCESS = 'CREATE_SUBMISSIONS_SUCCESS';
 export const FETCH_SUBMISSIONS_START = 'FETCH_SUBMISSIONS_START';
 export const FETCH_SUBMISSIONS_SUCCESS = 'FETCH_SUBMISSIONS_SUCCESS';
-export const SELECT_DIALOG = 'SELECT_DIALOG';
 export const SHOW_SUBMISSION = 'SHOW_SUBMISSION';
 export const SUBMISSIONS_ERROR = 'FETCH_SUBMISSIONS_ERROR';
 export const UPDATE_SUBMISSION = 'UPDATE_SUBMISSION';
@@ -140,10 +139,4 @@ function uploadFileSuccess(submission, response) {
             contentId: null
         }
     }
-}
-
-// -- Submission panel dialog -------------------------------------------------
-
-export function selectDialog(dialogId) {
-    return {type: SELECT_DIALOG, payload: dialogId}
 }

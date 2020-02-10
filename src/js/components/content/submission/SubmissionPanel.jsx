@@ -11,11 +11,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
-import ErrorMessage from '../../app/ErrorMessage';
+import ErrorMessage from '../../util/ErrorMessage';
 import Grid from '@material-ui/core/Grid';
-import Spinner from '../../app/Spinner';
+import Spinner from '../../util/Spinner';
 import Submission from './Submission.jsx';
-import SubmissionsNavbar from './SubmissionsNavbar.jsx';
 import { dismissError } from '../../../actions/Submission';
 
 
@@ -74,7 +73,6 @@ function SubmissionPanel(props) {
     return (
         <Grid container spacing={2}>
             <Grid item xs={3}>
-                <SubmissionsNavbar />
             </Grid>
             <Grid item xs={9}>
                 <div>

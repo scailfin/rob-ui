@@ -15,14 +15,18 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';
 import CloudUpload from '@material-ui/icons/CloudUpload';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import Divider from '@material-ui/core/Divider';
+import ViewHeadlineOutlinedIcon from '@material-ui/icons/ViewHeadlineOutlined';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import SendIcon from '@material-ui/icons/Send';
-import { fetchSubmission, selectDialog } from '../../../actions/Submission';
+import TableChartOutlinedIcon from '@material-ui/icons/TableChartOutlined';
+import { selectDialog } from '../../../actions/Benchmark';
+import { createSubmission, fetchSubmission } from '../../../actions/Submission';
 import {
-    CREATE_SUBMISSION, SUBMIT_RUN, UPLOAD_FILES
+    CREATE_SUBMISSION, SHOW_INSTRUCTIONS, SHOW_LEADERBOARD, SHOW_RUNS,
+    SUBMIT_RUN, UPLOAD_FILES
 } from '../../../resources/Dialog';
 
 
@@ -38,15 +42,17 @@ const useStyles = makeStyles(theme => ({
 const mapStateToProps = state => {
     return {
         app: state.app,
-        mainPanel: state.mainPanel,
-        submissions: state.submissions
+        benchmarks: state.benchmarks
     };
 };
 
 
 function mapDispatchToProps(dispatch) {
   return {
-      selectDialog: (dialogId) => dispatch(selectDialog(dialogId)),
+      createSubmission: (url, name) => dispatch(createSubmission(url, name)),
+      selectDialog: (api, tabId, benchmark, submission) => dispatch(
+          selectDialog(api, tabId, benchmark, submission)
+      ),
       selectSubmission: (api, submission) => dispatch(
           fetchSubmission(api, submission)
       )
@@ -54,17 +60,21 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-function SubmissionsNavbar(props) {
+function BenchmarkNavbar(props) {
     const classes = useStyles();
     const {
-        selectedBenchmark
-    } = props.mainPanel;
-    const {
+        selectedBenchmark,
         selectedSubmission,
-        submissionDialog,
-        submissions
-    } = props.submissions;
-    /**
+        selectedDialog
+    } = props.benchmarks;
+    /*
+     * Event handler when selecting a submission from the list.
+     */
+    const handleSelectDialog = (key) => {
+        const { selectedBenchmark, selectedSubmission } = props.benchmarks;
+        props.selectDialog(props.app, key, selectedBenchmark, selectedSubmission);
+    }
+    /*
      * Event handler when selecting a submission from the list.
      */
     const handleSubmissionSelect = (key) => {
@@ -80,25 +90,24 @@ function SubmissionsNavbar(props) {
     if (selectedSubmission != null) {
         selectedItem = selectedSubmission.id;
     }
+    const submissions = []; //selectedBenchmark.submissions;
     if (submissions.length > 0) {
         submissions.sort((a, b) => ((a.name).localeCompare(b.name)));
         for (let i = 0; i < submissions.length; i++) {
             const s = submissions[i];
-            if (s.benchmark === selectedBenchmark.id) {
-                listItems.push(
-                    <ListItem
-                        key={s.id}
-                        button
-                        selected={s.id === selectedItem}
-                        onClick={() => (handleSubmissionSelect(s.id))}
-                    >
-                        <ListItemIcon>
-                            <DashboardIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={s.name} />
-                    </ListItem>
-                );
-            }
+            listItems.push(
+                <ListItem
+                    key={s.id}
+                    button
+                    selected={s.id === selectedItem}
+                    onClick={() => (handleSubmissionSelect(s.id))}
+                >
+                    <ListItemIcon>
+                        <DashboardIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={s.name} />
+                </ListItem>
+            );
         }
     }
     let submissionsList = null;
@@ -112,13 +121,39 @@ function SubmissionsNavbar(props) {
     }
     // List of action buttons
     const actionButtons = [];
+    actionButtons.push(
+        <ListItem
+            key={'instructions'}
+            button
+            disabled={selectedDialog === SHOW_INSTRUCTIONS}
+            onClick={() => (handleSelectDialog(CREATE_SUBMISSION))}
+        >
+            <ListItemIcon>
+                <ViewHeadlineOutlinedIcon />
+            </ListItemIcon>
+            <ListItemText primary='Instructions' />
+        </ListItem>
+    );
+    actionButtons.push(
+        <ListItem
+            key={'ranking'}
+            button
+            disabled={selectedDialog === SHOW_LEADERBOARD}
+            onClick={() => (handleSelectDialog(CREATE_SUBMISSION))}
+        >
+            <ListItemIcon>
+                <TableChartOutlinedIcon />
+            </ListItemIcon>
+            <ListItemText primary='Current Results' />
+        </ListItem>
+    );
     if (selectedSubmission != null) {
         actionButtons.push(
             <ListItem
                 key={'submit'}
                 button
-                disabled={submissionDialog === SUBMIT_RUN}
-                onClick={() => (props.selectDialog(SUBMIT_RUN))}
+                disabled={selectedDialog === SUBMIT_RUN}
+                onClick={() => (handleSelectDialog(SUBMIT_RUN))}
             >
                 <ListItemIcon>
                     <SendIcon />
@@ -130,8 +165,8 @@ function SubmissionsNavbar(props) {
             <ListItem
                 key={'upload'}
                 button
-                disabled={submissionDialog === UPLOAD_FILES}
-                onClick={() => (props.selectDialog(UPLOAD_FILES))}
+                disabled={selectedDialog === UPLOAD_FILES}
+                onClick={() => (handleSelectDialog(UPLOAD_FILES))}
             >
                 <ListItemIcon>
                     <CloudUpload />
@@ -144,8 +179,8 @@ function SubmissionsNavbar(props) {
         <ListItem
             key={'add'}
             button
-            disabled={submissionDialog === CREATE_SUBMISSION}
-            onClick={() => (props.selectDialog(CREATE_SUBMISSION))}
+            disabled={selectedDialog === CREATE_SUBMISSION}
+            onClick={() => (handleSelectDialog(CREATE_SUBMISSION))}
         >
             <ListItemIcon>
                 <AddCircleIcon />
@@ -163,4 +198,4 @@ function SubmissionsNavbar(props) {
     );
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SubmissionsNavbar);
+export default connect(mapStateToProps, mapDispatchToProps)(BenchmarkNavbar);

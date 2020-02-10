@@ -10,6 +10,11 @@
 
 import { fetchApiResource } from './Requests';
 import { fetchSubmissions } from './Submission.js';
+import {
+    CREATE_SUBMISSION, SHOW_INSTRUCTIONS, SHOW_LEADERBOARD, SHOW_RUNS,
+    SUBMIT_RUN, UPLOAD_FILES
+} from '../resources/Dialog';
+
 
 export const FETCH_BENCHMARKS_ERROR = 'FETCH_BENCHMARKS_ERROR';
 export const FETCH_BENCHMARKS_START = 'FETCH_BENCHMARKS_START';
@@ -18,7 +23,7 @@ export const FETCH_LEADERBOARD_ERROR = 'FETCH_LEADERBOARD_ERROR';
 export const FETCH_LEADERBOARD_START = 'FETCH_LEADERBOARD_START';
 export const FETCH_LEADERBOARD_SUCCESS = 'FETCH_LEADERBOARD_SUCCESS';
 export const SELECT_BENCHMARK = 'SELECT_BENCHMARK';
-export const SELECT_TAB = 'SELECT_TAB';
+export const SELECT_DIALOG = 'SELECT_DIALOG';
 
 
 // -- Benchmark listings ------------------------------------------------------
@@ -44,33 +49,34 @@ export function fetchBenchmarks(api) {
  * the benchmark listing contains all the necessary information. Thus, there
  * is no need at this point to fetch information from the API.
  */
-export const selectBenchmark = (benchmark) => ({
-    type: SELECT_BENCHMARK, payload: benchmark
-});
+export function selectBenchmark(api, benchmark) {
+    const url = api.urls.getBenchmark(benchmark.id);
+    return fetchApiResource(
+        url,
+        (json) => ({type: SELECT_BENCHMARK, payload: json}),
+        (msg) => ({type: FETCH_BENCHMARKS_ERROR, payload: msg}),
+        () => ({type: FETCH_BENCHMARKS_START})
+    );
+}
 
-/**
- * Set the information that is currently shown for a selected benchmark. The
- * following values for tabId are possible:
- *
- * 0 : Show benchmark instructions
- * 1 : Benchmark leaderboard
- * 2 : User submissions for the benchmark
+/*
+ * Set the information that is currently shown for a selected benchmark.
  */
-export function selectTab(api, benchmark, tabId) {
-    if (tabId === 1) {
+export function selectDialog(api, dialogId, benchmark, submission) {
+    if (dialogId === SHOW_LEADERBOARD) {
         // Fetch benchmark leaderboard
         return dispatch => {
             dispatch(fetchLeaderboard(api, benchmark));
-            return dispatch({type: SELECT_TAB, payload: tabId});
+            return dispatch({type: SELECT_DIALOG, payload: dialogId});
         };
-    } else if (tabId === 2) {
+    } else if (dialogId === 2) {
         // Fetch benchmark submissions
         return dispatch => {
             dispatch(fetchSubmissions(api, benchmark));
-            return dispatch({type: SELECT_TAB, payload: tabId});
+            return dispatch({type: SELECT_DIALOG, payload: dialogId});
         };
     } else {
-        return {type: SELECT_TAB, payload: tabId};
+        return {type: SELECT_DIALOG, payload: dialogId};
     }
 }
 

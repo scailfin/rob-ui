@@ -11,23 +11,29 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
+import BenchmarkNavbar from './BenchmarkNavbar';
+import CreateSubmissionForm from '../submission/CreateSubmissionForm.jsx';
 import Grid from '@material-ui/core/Grid';
 import Leaderboard from './Leaderboard.jsx';
 import Paper from '@material-ui/core/Paper';
 import ReactMarkdown from 'react-markdown';
-import SubmissionPanel from './submission/SubmissionPanel.jsx';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
-import { selectTab } from '../../actions/Benchmark';
-import { createSubmission } from '../../actions/Submission';
-
+import {
+    CREATE_SUBMISSION, SHOW_INSTRUCTIONS, SHOW_LEADERBOARD, SHOW_RUNS,
+    SUBMIT_RUN, UPLOAD_FILES
+} from '../../../resources/Dialog';
 
 
 const useStyles = makeStyles(theme => ({
+    benchmarkContent: {
+        marginLeft: theme.spacing(8),
+        marginRight: theme.spacing(8)
+    },
     paperBlock: {
-        marginTop: theme.spacing(2),
-        padding: theme.spacing(2)
+        marginTop: theme.spacing(0),
+        padding: theme.spacing(0)
     },
     instructions: {
         marginTop: theme.spacing(4)
@@ -38,25 +44,14 @@ const useStyles = makeStyles(theme => ({
 const mapStateToProps = state => {
     return {
         app: state.app,
-        mainPanel: state.mainPanel,
-        submissions: state.submissions
+        benchmarks: state.benchmarks
     };
 };
 
 
-function mapDispatchToProps(dispatch) {
-  return {
-      createSubmission: (url, name) => dispatch(createSubmission(url, name)),
-      selectTab: (api, benchmark, tabId) => dispatch(
-          selectTab(api, benchmark, tabId)
-      )
-  };
-}
-
-
 function Benchmark(props) {
     const classes = useStyles();
-    const { selectedBenchmark, selectedTab } = props.mainPanel;
+    const { selectedBenchmark, selectedDialog } = props.benchmarks;
     /**
      * Change handler to display a different tab.
      */
@@ -65,38 +60,39 @@ function Benchmark(props) {
     };
     // -- Main Content (render) -----------------------------------------------
     let content = null;
-    if (selectedTab === 0) {
+    if (selectedDialog === SHOW_INSTRUCTIONS) {
         // -- Overview --------------------------------------------------------
         content = (
-            <Paper className={classes.paperBlock}>
+            <div className={classes.paperBlock}>
                 <ReactMarkdown source={selectedBenchmark.instructions} />
-            </Paper>
+            </div>
         );
-    } else if (selectedTab === 1) {
+    } else if (selectedDialog === SHOW_LEADERBOARD) {
         // -- Current Results -------------------------------------------------
         content = (<Leaderboard />);
-    } else if (selectedTab === 2) {
+    } else if (selectedDialog === CREATE_SUBMISSION) {
         // -- My Submissions --------------------------------------------------
-        content = (<SubmissionPanel />);
+        content = (<CreateSubmissionForm />);
     }
+    let errorMessage = null;
     return (
-        <div className={classes.paper}>
-            <Typography variant='h4'>
-                {selectedBenchmark.description}
+        <div className={classes.benchmarkContent}>
+            <Typography variant='h3'>
+                { selectedBenchmark.name}
             </Typography>
-            <Tabs
-                value={selectedTab}
-                indicatorColor="primary"
-                textColor="primary"
-                onChange={handleTabChange}
-            >
-                <Tab label="Overview" />
-                <Tab label="Current Results" />
-                <Tab label="My Submissions" />
-            </Tabs>
-            { content }
+            <Grid container spacing={2}>
+                <Grid item xs={3}>
+                    <BenchmarkNavbar />
+                </Grid>
+                <Grid item xs={9}>
+                    <div>
+                        { content }
+                    </div>
+                </Grid>
+                { errorMessage }
+            </Grid>
         </div>
     );
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Benchmark);
+export default connect(mapStateToProps)(Benchmark);
