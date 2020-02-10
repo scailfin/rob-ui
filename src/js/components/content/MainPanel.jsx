@@ -11,17 +11,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
-import { withStyles } from '@material-ui/core';
-import Assessment from '@material-ui/icons/Assessment';
-import Avatar from '@material-ui/core/Avatar';
 import Benchmark from './benchmark/Benchmark.jsx'
 import BenchmarkListing from './benchmark/BenchmarkListing.jsx'
 import Divider from '@material-ui/core/Divider';
 import ErrorMessage from '../util/ErrorMessage';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Spinner from '../util/Spinner.jsx';
 import Typography from '@material-ui/core/Typography';
 import { selectBenchmark } from '../../actions/Benchmark';
@@ -57,26 +50,6 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-//
-// Based on https://github.com/mui-org/material-ui/issues/13672
-//
-const StyledBenchmark = withStyles({
-    root: {
-        backgroundColor: "inherit",
-        "&$selected": {
-            backgroundColor: "#e8eaf6"
-        },
-        '&:hover': {
-            backgroundColor: "#c5cae9",
-            "&$selected": {
-                backgroundColor: "#c5cae9"
-            }
-        }
-    },
-    selected: {}
-})(ListItem);
-
-
 const mapStateToProps = state => {
     return {
         app: state.app,
@@ -100,14 +73,6 @@ function mapDispatchToProps(dispatch) {
  */
 function MainPanel(props) {
     const classes = useStyles();
-    /**
-     * Event handler to set the selected benchmark.
-     */
-    const handleBenchmarkSelect = (key) => {
-        const benchmarks = props.mainPanel.benchmarks;
-        const benchmark = benchmarks.find((b) => (b.id === key));
-        props.selectBenchmark(benchmark);
-    }
     const {
         benchmarks,
         fetchError,

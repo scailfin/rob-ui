@@ -8,12 +8,13 @@
  * terms of the MIT License; see LICENSE file for more details.
  */
 
+ import { LOGOUT_SUCCESS } from '../actions/Auth';
+ import { SELECT_BENCHMARK, SELECT_DIALOG } from '../actions/Benchmark';
 import {
-    CREATE_SUBMISSIONS_SUCCESS, FETCH_SUBMISSIONS_START,
-    FETCH_SUBMISSIONS_SUCCESS, SELECT_SUBMISSION,
-    SHOW_SUBMISSION, SUBMISSIONS_ERROR
+    CREATE_SUBMISSION_SUCCESS, FETCH_SUBMISSION_START,
+    FETCH_SUBMISSION_SUCCESS, FETCH_SUBMISSION_ERROR
 } from '../actions/Submission';
-import { SHOW_RUNS } from '../resources/Dialog'
+import { SHOW_INSTRUCTIONS, SHOW_LEADERBOARD } from '../resources/Dialog';
 
 
 /**
@@ -22,17 +23,15 @@ import { SHOW_RUNS } from '../resources/Dialog'
  * submission, and the submission dialog tab.
  */
 const INITIAL_STATE = {
-    submissions: null,
     fetchError: null,
     isFetching: false,
-    selectedSubmission: null,
-    selectedDialog: SHOW_RUNS
+    selectedSubmission: null
 }
 
 
 const submissions = (state = INITIAL_STATE, action) => {
     switch (action.type) {
-        case CREATE_SUBMISSIONS_SUCCESS:
+        case CREATE_SUBMISSION_SUCCESS:
             const createdSubmission = action.payload;
             return {
                 ...state,
@@ -40,23 +39,33 @@ const submissions = (state = INITIAL_STATE, action) => {
                 selectedSubmission: createdSubmission,
                 submissionDialog: 0
             };
-        case FETCH_SUBMISSIONS_START:
+        case FETCH_SUBMISSION_START:
             return {...state, isFetching: true, fetchError: null};
-        case FETCH_SUBMISSIONS_SUCCESS:
-            return {
-                ...state,
-                submissions: action.payload.submissions,
-                isFetching: false,
-                fetchError: null
-            };
-        case SHOW_SUBMISSION:
+        case FETCH_SUBMISSION_SUCCESS:
             return {
                 ...state,
                 selectedSubmission: action.payload,
-                selectedDialog: SHOW_RUNS
+                isFetching: false,
+                fetchError: null
             };
-        case SUBMISSIONS_ERROR:
+        case FETCH_SUBMISSION_ERROR:
             return {...state, isFetching: false, fetchError: action.payload};
+        case LOGOUT_SUCCESS:
+        case SELECT_BENCHMARK:
+            return {
+                ...state,
+                fetchError: null,
+                isFetching: false,
+                selectedSubmission: null
+            };
+        case SELECT_DIALOG:
+            switch (action.payload) {
+                case SHOW_INSTRUCTIONS:
+                case SHOW_LEADERBOARD:
+                    return {...state, selectedSubmission: null};
+                default:
+                    return state;
+            }
         default:
             return state
     }

@@ -9,40 +9,27 @@
  */
 
 import { getFile, fetchApiResource, postRequest } from './Requests';
-import { fetchRuns } from './RunListing';
 
 
-export const CREATE_SUBMISSIONS_SUCCESS = 'CREATE_SUBMISSIONS_SUCCESS';
-export const FETCH_SUBMISSIONS_START = 'FETCH_SUBMISSIONS_START';
-export const FETCH_SUBMISSIONS_SUCCESS = 'FETCH_SUBMISSIONS_SUCCESS';
-export const SHOW_SUBMISSION = 'SHOW_SUBMISSION';
-export const SUBMISSIONS_ERROR = 'FETCH_SUBMISSIONS_ERROR';
-export const UPDATE_SUBMISSION = 'UPDATE_SUBMISSION';
+export const CREATE_SUBMISSION_SUCCESS = 'CREATE_SUBMISSIONS_SUCCESS';
+export const FETCH_SUBMISSION_ERROR = 'FETCH_SUBMISSION_ERROR';
+export const FETCH_SUBMISSION_SUCCESS = 'FETCH_SUBMISSIONS_SUCCESS';
+export const FETCH_SUBMISSION_START = 'FETCH_SUBMISSION_START';
+
+const UPDATE_SUBMISSION = 'UPDATE_SUBMISSION'
 
 
 // -- Errors ------------------------------------------------------------------
 
 export const criticalError = (error) => ({
-    type: SUBMISSIONS_ERROR, payload: {error: error, isCritical: true}
+    type: FETCH_SUBMISSION_ERROR, payload: {error: error, isCritical: true}
 })
 
 export const minorError = (error) => ({
-    type: SUBMISSIONS_ERROR, payload: {error: error, isCritical: false}
+    type: FETCH_SUBMISSION_ERROR, payload: {error: error, isCritical: false}
 })
 
-export const dismissError = () => ({type: SUBMISSIONS_ERROR, payload: null})
-
-
-// -- Fetch submission listing ------------------------------------------------
-
-export function fetchSubmissions(api, benchmark) {
-    return fetchApiResource(
-        api.urls.listSubmissions(benchmark.id),
-        (json) => ({type: FETCH_SUBMISSIONS_SUCCESS, payload: json}),
-        criticalError,
-        () => ({type: FETCH_SUBMISSIONS_START})
-    );
-}
+export const dismissError = () => ({type: FETCH_SUBMISSION_ERROR, payload: null})
 
 
 // -- Fetch submission handle -------------------------------------------------
@@ -50,32 +37,10 @@ export function fetchSubmissions(api, benchmark) {
 export function fetchSubmission(api, submission) {
     return fetchApiResource(
         api.urls.getSubmission(submission.id),
-        (json) => (showSubmission(api, json)),
-        criticalError
+        (json) => ({type: FETCH_SUBMISSION_SUCCESS, payload: json}),
+        criticalError,
+        () => ({type: FETCH_SUBMISSION_START})
     );
-}
-
-export const  showSubmission = (api, submission) => {
-    return dispatch => {
-        dispatch({type: SHOW_SUBMISSION, payload: submission});
-        return dispatch(fetchRuns(api, submission));
-    }
-}
-
-
-// -- Create new submission ---------------------------------------------------
-
-export function createSubmission(api, benchmark, name) {
-    return postRequest(
-        api.urls.createSubmission(benchmark.id),
-        {name},
-        (json) => {return dispatch => {
-            dispatch(fetchSubmissions(api, benchmark));
-            return dispatch(showSubmission(api, json))
-        }},
-        minorError,
-        () => (selectDialog(-1))
-    )
 }
 
 

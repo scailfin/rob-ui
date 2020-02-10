@@ -15,6 +15,7 @@ import ApiPolling from '../ApiPolling';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CheckCircleOutline from '@material-ui/icons/CheckCircleOutline';
+import DialogHeader from '../DialogHeader.jsx';
 import DirectionsRunOutlined from '@material-ui/icons/DirectionsRunOutlined';
 import Divider from '@material-ui/core/Divider';
 import ErrorMessage from '../../util/ErrorMessage';
@@ -25,6 +26,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import Paper from '@material-ui/core/Paper';
 import Spinner from '../../util/Spinner';
 import Typography from '@material-ui/core/Typography';
 import { utc2LocalTime } from '../../../resources/Timestamps';
@@ -65,6 +67,14 @@ const useStyles = makeStyles(theme => ({
  errorText: {
      color: '#912d2b',
      fontSize: '1.2em'
+ },
+ paperForm: {
+     marginTop: theme.spacing(0),
+     padding: theme.spacing(2),
+     display: 'flex',
+     flexDirection: 'column',
+     alignItems: 'left',
+     backgroundColor: '#ebebeb'
  }
 }));
 
@@ -150,11 +160,12 @@ function RunListing(props) {
             );
         }
         return (
-        <div className={classes.root}>
-            <List>
-            {runListing}
-            </List>
-        </div>
+            <Paper className={classes.paperForm}>
+                <DialogHeader title={'Runs ...'} />
+                <List>
+                    {runListing}
+                </List>
+            </Paper>
         );
     }
     return null;

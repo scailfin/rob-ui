@@ -15,10 +15,8 @@ import BenchmarkNavbar from './BenchmarkNavbar';
 import CreateSubmissionForm from '../submission/CreateSubmissionForm.jsx';
 import Grid from '@material-ui/core/Grid';
 import Leaderboard from './Leaderboard.jsx';
-import Paper from '@material-ui/core/Paper';
 import ReactMarkdown from 'react-markdown';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
+import Submission from '../submission/Submission';
 import Typography from '@material-ui/core/Typography';
 import {
     CREATE_SUBMISSION, SHOW_INSTRUCTIONS, SHOW_LEADERBOARD, SHOW_RUNS,
@@ -52,27 +50,35 @@ const mapStateToProps = state => {
 function Benchmark(props) {
     const classes = useStyles();
     const { selectedBenchmark, selectedDialog } = props.benchmarks;
-    /**
-     * Change handler to display a different tab.
-     */
-    const handleTabChange = (event, newValue) => {
-        props.selectTab(props.app, selectedBenchmark, newValue);
-    };
-    // -- Main Content (render) -----------------------------------------------
+    // ------------------------------------------------------------------------
+    // Render
+    // ------------------------------------------------------------------------
     let content = null;
-    if (selectedDialog === SHOW_INSTRUCTIONS) {
-        // -- Overview --------------------------------------------------------
-        content = (
-            <div className={classes.paperBlock}>
-                <ReactMarkdown source={selectedBenchmark.instructions} />
-            </div>
-        );
-    } else if (selectedDialog === SHOW_LEADERBOARD) {
-        // -- Current Results -------------------------------------------------
-        content = (<Leaderboard />);
-    } else if (selectedDialog === CREATE_SUBMISSION) {
-        // -- My Submissions --------------------------------------------------
-        content = (<CreateSubmissionForm />);
+    switch (selectedDialog) {
+        case SHOW_INSTRUCTIONS:
+            // -- Overview ----------------------------------------------------
+            content = (
+                <div className={classes.paperBlock}>
+                    <ReactMarkdown source={selectedBenchmark.instructions} />
+                </div>
+            );
+            break;
+        case SHOW_LEADERBOARD:
+            // -- Current Results ---------------------------------------------
+            content = (<Leaderboard />);
+            break;
+        case CREATE_SUBMISSION:
+            // -- My Submissions ----------------------------------------------
+            content = (<CreateSubmissionForm />);
+            break;
+        case SHOW_RUNS:
+        case SUBMIT_RUN:
+        case UPLOAD_FILES:
+            // -- Submission --------------------------------------------------
+            content = (<Submission />);
+            break;
+        default:
+            content = null;
     }
     let errorMessage = null;
     return (

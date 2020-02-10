@@ -12,22 +12,18 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import CloudUpload from '@material-ui/icons/CloudUpload';
-import CreateSubmissionForm from './CreateSubmissionForm';
-import DialogHeader from './DialogHeader.jsx';
+import ErrorMessage from '../../util/ErrorMessage';
 import FileListing from '../FileListing';
-import LinearProgress from '@material-ui/core/LinearProgress';
 import Paper from '@material-ui/core/Paper';
 import Dropzone from 'react-dropzone';
 import RunListing from '../run/RunListing.jsx';
-import SubmitForm from '../../form/SubmitForm';
+import Spinner from '../../util/Spinner';
+import SubmitForm from '../run/form/SubmitForm';
 import Typography from '@material-ui/core/Typography';
+import { selectDialog } from '../../../actions/Benchmark';
 import { cancelRun, getRun, submitRun } from '../../../actions/Run';
-import {
-    downloadResource, selectDialog, uploadFile
-} from '../../../actions/Submission';
-import {
-    CREATE_SUBMISSION, SHOW_RUNS, SUBMIT_RUN, UPLOAD_FILES
-} from '../../../resources/Dialog';
+import { downloadResource, uploadFile } from '../../../actions/Submission';
+import { SHOW_RUNS, SUBMIT_RUN, UPLOAD_FILES } from '../../../resources/Dialog';
 import { Urls } from '../../../resources/Urls';
 
 
@@ -58,7 +54,8 @@ const useStyles = makeStyles(theme => ({
 
 const mapStateToProps = state => {
     return {
-        submissions: state.submissions
+        benchmarks: state.benchmarks,
+        submission: state.submission
     };
 };
 
@@ -84,8 +81,9 @@ function mapDispatchToProps(dispatch) {
 
 
 function Submission(props) {
-    const { selectedSubmission, selectedDialog } = props.submissions;
     const classes = useStyles();
+    const selectedDialog = props.benchmarks.selectedDialog;
+    const { fetchError, isFetching, selectedSubmission} = props.submission;
     /*
      * Handler to upload a file that was selected using the drop zone
      */
@@ -111,17 +109,6 @@ function Submission(props) {
             selectedSubmission,
             resourceId
         );
-    }
-    const handleGetRunState = (run) => {
-        const url = new Urls(run.links).self();
-        props.getRun(url, selectedSubmission);
-    }
-    /*
-     * Click handler for cancel button.
-     */
-    const handleRunCancel = (run) => {
-        const url = new Urls(run.links).get('self:cancel');
-        props.cancelRun(url, selectedSubmission);
     }
     /*
      * Handle submission of new run for given ser of arguments
@@ -152,72 +139,62 @@ function Submission(props) {
         props.submitRun(url, {arguments: runArgs}, selectedSubmission);
         //setValues({selectedTab: 0});
     }
-    let tabContent = null;
-    if (selectedDialog === CREATE_SUBMISSION) {
-        tabContent = (<CreateSubmissionForm />);
-    } else if (selectedSubmission != null) {
-        const { fetching, displayContent, contentId } = selectedSubmission;
-        if (fetching === true) {
-            tabContent = (
-                <div className={classes.spinner}>
-                    <Typography variant="overline">
-                        Loading Submission Details ...
-                    </Typography>
-                    <LinearProgress color='secondary'/>
-                </div>
-            );
-        } else if (selectedDialog === SHOW_RUNS) {
-            tabContent = (<RunListing />);
-        } else if (selectedDialog === SUBMIT_RUN) {
-            tabContent = (
-                <SubmitForm
-                    onCancel={() => (props.selectDialog(SHOW_RUNS))}
-                    onSubmit={handleSubmit}
-                    submission={selectedSubmission}
+    // ------------------------------------------------------------------------
+    // Render
+    // ------------------------------------------------------------------------
+    if (isFetching) {
+        return (
+            <div className={classes.spinner}>
+                <Spinner message='Loading submission ...' showLogo={true}/>
+            </div>
+        );
+    } else if (fetchError != null) {
+        return (<ErrorMessage error={fetchError} isCritical={true} />);
+    } else if (selectedSubmission == null) {
+        return null;
+    } else if (selectedDialog === SHOW_RUNS) {
+        return (<RunListing />);
+    } else if (selectedDialog === SUBMIT_RUN) {
+        return (
+            <SubmitForm
+                onCancel={() => (props.selectDialog(SHOW_RUNS))}
+                onSubmit={handleSubmit}
+                submission={selectedSubmission}
+            />
+        )
+    } else if (selectedDialog === UPLOAD_FILES) {
+        return (
+            <div>
+                <FileListing
+                    files={selectedSubmission.files}
+                    onDownload={(fh) => (
+                        handleFileDownload(
+                            new Urls(fh.links).get('self:download'),
+                            fh.id
+                        )
+                    )}
                 />
-            )
-        } else if (selectedDialog === UPLOAD_FILES) {
-            tabContent = (
-                <div>
-                    <FileListing
-                        files={selectedSubmission.files}
-                        onDownload={(fh) => (
-                            handleFileDownload(
-                                new Urls(fh.links).get('self:download'),
-                                fh.id
-                            )
-                        )}
-                        contentId={contentId}
-                        content={displayContent}
-                    />
-                    <Dropzone
-                        onDrop={acceptedFiles => handleFileDrop(acceptedFiles)}
-                        multiple={false}
-                    >
-                      {({getRootProps, getInputProps}) => (
-                        <section>
-                          <div {...getRootProps()}>
-                            <input {...getInputProps()} />
-                            <Paper className={classes.uploadForm}>
-                            <CloudUpload fontSize='large'/>
-                            <Typography variant='body2'>
-                                Drag files here, or click to select
-                            </Typography>
-                            </Paper>
-                          </div>
-                        </section>
-                      )}
-                    </Dropzone>
-                </div>
-            );
-        }
+                <Dropzone
+                    onDrop={acceptedFiles => handleFileDrop(acceptedFiles)}
+                    multiple={false}
+                >
+                  {({getRootProps, getInputProps}) => (
+                    <section>
+                      <div {...getRootProps()}>
+                        <input {...getInputProps()} />
+                        <Paper className={classes.uploadForm}>
+                        <CloudUpload fontSize='large'/>
+                        <Typography variant='body2'>
+                            Drag files here, or click to select
+                        </Typography>
+                        </Paper>
+                      </div>
+                    </section>
+                  )}
+                </Dropzone>
+            </div>
+        );
     }
-    return (
-        <div className={classes.paper}>
-            <DialogHeader />
-            { tabContent }
-        </div>
-    );
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Submission);

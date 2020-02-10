@@ -12,11 +12,11 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import DialogHeader from '../DialogHeader';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
-import { selectDialog } from '../../../actions/Benchmark';
-import { createSubmission } from '../../../actions/Submission';
-import { SHOW_RUNS } from '../../../resources/Dialog';
+import { createSubmission, selectDialog } from '../../../actions/Benchmark';
+import { SHOW_INSTRUCTIONS, SHOW_RUNS } from '../../../resources/Dialog';
 
 
 const useStyles = makeStyles(theme => ({
@@ -38,14 +38,17 @@ const useStyles = makeStyles(theme => ({
 const mapStateToProps = state => {
     return {
         app: state.app,
-        benchmarks: state.benchmarks
+        benchmarks: state.benchmarks,
+        submission: state.submission
     };
 };
 
 
 function mapDispatchToProps(dispatch) {
   return {
-      selectDialog: (dialogId) => dispatch(selectDialog(dialogId)),
+      selectDialog: (api, dialogId, benchmark) => dispatch(
+          selectDialog(api, dialogId, benchmark)
+      ),
       createSubmission: (api, benchmark, name) => dispatch(
           createSubmission(api, benchmark, name)
       )
@@ -58,15 +61,31 @@ function CreateSubmissionForm(props) {
     const [values, setValues] = useState({
         submissionName: ''
     });
-    const benchmark = props.mainPanel.selectedBenchmark;
+    const benchmark = props.benchmarks.selectedBenchmark;
     const submissionName = values.submissionName;
-    /**
+    // ------------------------------------------------------------------------
+    // Event handlers
+    // ------------------------------------------------------------------------
+    /*
+     * Show instructions information if the user canceles the create submission
+     * action.
+     */
+    const handleCancel = () => {
+        const benchmark = props.benchmarks.selectedBenchmark;
+        const selectedSubmission = props.submission.selectedSubmission;
+        if (selectedSubmission != null) {
+            props.selectDialog(props.app, SHOW_RUNS, benchmark);
+        } else {
+            props.selectDialog(props.app, SHOW_INSTRUCTIONS, benchmark);
+        }
+    }
+    /*
      * Handle changes in the submision name input field.
      */
     const handleSubmissionChanges = (event) => {
         setValues({...values, submissionName: event.target.value});
     }
-    /**
+    /*
      * Event handler for the submit button that creates a new submission for
      * the benchmark.
      */
@@ -75,8 +94,15 @@ function CreateSubmissionForm(props) {
         props.createSubmission(app, benchmark, submissionName);
         setValues({open: false, submissionName: ''});
     }
+    // ------------------------------------------------------------------------
+    // Render
+    // ------------------------------------------------------------------------
     return (
         <Paper className={classes.paperForm}>
+            <DialogHeader
+                title={'Create Sumission ...'}
+                onClose={handleCancel}
+            />
             <div className={classes.form} noValidate>
                 <TextField
                     variant="outlined"
@@ -104,7 +130,7 @@ function CreateSubmissionForm(props) {
                     variant="contained"
                     color="secondary"
                     className={classes.button}
-                    onClick={() => (props.selectDialog(SHOW_RUNS))}
+                    onClick={handleCancel}
                 >
                     Cancel
                 </Button>

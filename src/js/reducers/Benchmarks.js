@@ -26,7 +26,6 @@ const INITIAL_STATE = {
     fetchError: null,
     isFetching: false,
     selectedBenchmark: null,
-    selectedSubmission: null,
     selectedDialog: SHOW_INSTRUCTIONS
 }
 
@@ -46,17 +45,14 @@ const benchmarkPanel = (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 selectedBenchmark: null,
-                selectedSubmission: null,
                 submissions: null
             };
         case SELECT_BENCHMARK:
-            console.log(action);
             return {
                 ...state,
                 fetchError: null,
                 isFetching: false,
                 selectedBenchmark: action.payload,
-                selectedSubmission: null,
                 selectedTab: 0
             };
         case SELECT_DIALOG:

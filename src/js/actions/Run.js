@@ -9,9 +9,10 @@
  */
 
 import { NO_OP, criticalError } from './App';
-import { SHOW_SUBMISSION, UPDATE_SUBMISSION } from './Submission.js'
 import { fetchApiResource, postRequest } from './Requests';
 
+const UPDATE_SUBMISSION = 'UPDATE_SUBMISSION'
+const SHOW_SUBMISSION = 'SHOW_SUBMISSION'
 
 
 export function cancelRun(url, submission) {

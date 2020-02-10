@@ -54,8 +54,7 @@ const useStyles = makeStyles(theme => ({
 const mapStateToProps = state => {
     return {
         api: state.api,
-        leaderboard: state.leaderboard,
-        mainPanel: state.mainPanel
+        leaderboard: state.leaderboard
     };
 };
 
@@ -67,6 +66,9 @@ function Leaderboard(props) {
         schema,
         ranking
     } = props.leaderboard;
+    // ------------------------------------------------------------------------
+    // Render
+    // ------------------------------------------------------------------------
     if (isFetching) {
         return (
             <div className={classes.spinner}>
@@ -150,7 +152,7 @@ function Leaderboard(props) {
     return (
         <div className={classes.root}>
             <Typography variant='h6' >
-                Performance Metrics
+                Performance Metrics for Submissions
             </Typography>
             <Paper className={classes.paper}>
                 <Table className={classes.table}>

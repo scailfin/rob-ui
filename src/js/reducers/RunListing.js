@@ -8,6 +8,7 @@
  * terms of the MIT License; see LICENSE file for more details.
  */
 
+import { FETCH_SUBMISSION_SUCCESS } from '../actions/Submission';
 import {
     FETCH_RUNS_ERROR, FETCH_RUNS_START, FETCH_RUNS_SUCCESS
 } from '../actions/RunListing'
@@ -30,6 +31,7 @@ const runListing = (state = INITIAL_STATE, action) => {
         case FETCH_RUNS_START:
             return {...state, isFetching: true, fetchError: null};
         case FETCH_RUNS_SUCCESS:
+        case FETCH_SUBMISSION_SUCCESS:
             return {
                 ...state,
                 runs: action.payload.runs,

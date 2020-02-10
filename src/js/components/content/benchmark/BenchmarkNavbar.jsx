@@ -20,10 +20,10 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListSubheader from '@material-ui/core/ListSubheader';
 import SendIcon from '@material-ui/icons/Send';
 import TableChartOutlinedIcon from '@material-ui/icons/TableChartOutlined';
 import { selectDialog } from '../../../actions/Benchmark';
-import { createSubmission, fetchSubmission } from '../../../actions/Submission';
 import {
     CREATE_SUBMISSION, SHOW_INSTRUCTIONS, SHOW_LEADERBOARD, SHOW_RUNS,
     SUBMIT_RUN, UPLOAD_FILES
@@ -42,19 +42,16 @@ const useStyles = makeStyles(theme => ({
 const mapStateToProps = state => {
     return {
         app: state.app,
-        benchmarks: state.benchmarks
+        benchmarks: state.benchmarks,
+        submission: state.submission
     };
 };
 
 
 function mapDispatchToProps(dispatch) {
   return {
-      createSubmission: (url, name) => dispatch(createSubmission(url, name)),
       selectDialog: (api, tabId, benchmark, submission) => dispatch(
           selectDialog(api, tabId, benchmark, submission)
-      ),
-      selectSubmission: (api, submission) => dispatch(
-          fetchSubmission(api, submission)
       )
   };
 }
@@ -64,69 +61,37 @@ function BenchmarkNavbar(props) {
     const classes = useStyles();
     const {
         selectedBenchmark,
-        selectedSubmission,
         selectedDialog
     } = props.benchmarks;
+    const selectedSubmission = props.submission.selectedSubmission;
+    // ------------------------------------------------------------------------
+    // Event handlers
+    // ------------------------------------------------------------------------
     /*
-     * Event handler when selecting a submission from the list.
+     * Event handler when selecting an item from the dialog list.
      */
-    const handleSelectDialog = (key) => {
+    const handleSelectDialog = (key, submission) => {
         const { selectedBenchmark, selectedSubmission } = props.benchmarks;
-        props.selectDialog(props.app, key, selectedBenchmark, selectedSubmission);
+        const api = props.app;
+        if (key === SHOW_RUNS) {
+            props.selectDialog(api, key, selectedBenchmark, submission);
+        } else {
+            props.selectDialog(api, key, selectedBenchmark, selectedSubmission);
+        }
     }
-    /*
-     * Event handler when selecting a submission from the list.
-     */
-    const handleSubmissionSelect = (key) => {
-        const submissions = props.submissions.submissions;
-        const submission = submissions.find((s) => (s.id === key));
-        props.selectSubmission(props.app, submission);
-    }
-    // -- Component Content (render) ------------------------------------------
+    // ------------------------------------------------------------------------
+    // Render
+    // ------------------------------------------------------------------------
     // List of submissions that the user is a member of for the selected
     // benchmark.
     const listItems = [];
-    let selectedItem = null;
-    if (selectedSubmission != null) {
-        selectedItem = selectedSubmission.id;
-    }
-    const submissions = []; //selectedBenchmark.submissions;
-    if (submissions.length > 0) {
-        submissions.sort((a, b) => ((a.name).localeCompare(b.name)));
-        for (let i = 0; i < submissions.length; i++) {
-            const s = submissions[i];
-            listItems.push(
-                <ListItem
-                    key={s.id}
-                    button
-                    selected={s.id === selectedItem}
-                    onClick={() => (handleSubmissionSelect(s.id))}
-                >
-                    <ListItemIcon>
-                        <DashboardIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={s.name} />
-                </ListItem>
-            );
-        }
-    }
-    let submissionsList = null;
-    if (listItems.length > 0) {
-        submissionsList = (
-            <List component="nav" aria-label="main submissions">
-                { listItems }
-                <Divider />
-            </List>
-        )
-    }
-    // List of action buttons
-    const actionButtons = [];
-    actionButtons.push(
+    // -- Benchmark dialog items ----------------------------------------------
+    listItems.push(
         <ListItem
             key={'instructions'}
             button
-            disabled={selectedDialog === SHOW_INSTRUCTIONS}
-            onClick={() => (handleSelectDialog(CREATE_SUBMISSION))}
+            selected={selectedDialog === SHOW_INSTRUCTIONS}
+            onClick={() => (handleSelectDialog(SHOW_INSTRUCTIONS))}
         >
             <ListItemIcon>
                 <ViewHeadlineOutlinedIcon />
@@ -134,12 +99,12 @@ function BenchmarkNavbar(props) {
             <ListItemText primary='Instructions' />
         </ListItem>
     );
-    actionButtons.push(
+    listItems.push(
         <ListItem
             key={'ranking'}
             button
-            disabled={selectedDialog === SHOW_LEADERBOARD}
-            onClick={() => (handleSelectDialog(CREATE_SUBMISSION))}
+            selected={selectedDialog === SHOW_LEADERBOARD}
+            onClick={() => (handleSelectDialog(SHOW_LEADERBOARD))}
         >
             <ListItemIcon>
                 <TableChartOutlinedIcon />
@@ -147,12 +112,61 @@ function BenchmarkNavbar(props) {
             <ListItemText primary='Current Results' />
         </ListItem>
     );
+    listItems.push(<Divider key={'div1'}/>);
+    // -- Submissions ---------------------------------------------------------
+    listItems.push(
+        <ListSubheader key={'submissions'}>
+            <ListItemText primary='My Submissions ...' />
+        </ListSubheader>
+    );
+    let selectedItem = null;
+    if ((selectedDialog === SHOW_RUNS) && (selectedSubmission != null)) {
+        selectedItem = selectedSubmission.id;
+    }
+    const submissions = selectedBenchmark.submissions;
+    submissions.sort((a, b) => ((a.name).localeCompare(b.name)));
+    for (let i = 0; i < submissions.length; i++) {
+        const s = submissions[i];
+        listItems.push(
+            <ListItem
+                key={s.id}
+                button
+                selected={s.id === selectedItem}
+                onClick={() => (handleSelectDialog(SHOW_RUNS, s))}
+            >
+                <ListItemIcon>
+                    <DashboardIcon />
+                </ListItemIcon>
+                <ListItemText primary={s.name} />
+            </ListItem>
+        );
+    }
+    listItems.push(
+        <ListItem
+            key={'add'}
+            button
+            selected={selectedDialog === CREATE_SUBMISSION}
+            onClick={() => (handleSelectDialog(CREATE_SUBMISSION))}
+        >
+            <ListItemIcon>
+                <AddCircleIcon />
+            </ListItemIcon>
+            <ListItemText primary='Create Submission ...' />
+        </ListItem>
+    );
+    // -- Submission actions --------------------------------------------------
     if (selectedSubmission != null) {
-        actionButtons.push(
+        listItems.push(<Divider key={'div2'}/>);
+        listItems.push(
+            <ListSubheader key={'actions'}>
+                <ListItemText primary={selectedSubmission.name} />
+            </ListSubheader>
+        );
+        listItems.push(
             <ListItem
                 key={'submit'}
                 button
-                disabled={selectedDialog === SUBMIT_RUN}
+                selected={selectedDialog === SUBMIT_RUN}
                 onClick={() => (handleSelectDialog(SUBMIT_RUN))}
             >
                 <ListItemIcon>
@@ -161,11 +175,11 @@ function BenchmarkNavbar(props) {
                 <ListItemText primary='Submit New Run ...' />
             </ListItem>
         );
-        actionButtons.push(
+        listItems.push(
             <ListItem
                 key={'upload'}
                 button
-                disabled={selectedDialog === UPLOAD_FILES}
+                selected={selectedDialog === UPLOAD_FILES}
                 onClick={() => (handleSelectDialog(UPLOAD_FILES))}
             >
                 <ListItemIcon>
@@ -175,24 +189,10 @@ function BenchmarkNavbar(props) {
             </ListItem>
         );
     }
-    actionButtons.push(
-        <ListItem
-            key={'add'}
-            button
-            disabled={selectedDialog === CREATE_SUBMISSION}
-            onClick={() => (handleSelectDialog(CREATE_SUBMISSION))}
-        >
-            <ListItemIcon>
-                <AddCircleIcon />
-            </ListItemIcon>
-            <ListItemText primary='New Submission ...' />
-        </ListItem>
-    );
     return (
         <div className={classes.root}>
-            { submissionsList }
             <List component="nav" aria-label="secondary actions">
-                { actionButtons }
+                { listItems }
             </List>
         </div>
     );

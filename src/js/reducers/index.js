@@ -13,14 +13,14 @@ import app from './App';
 import benchmarks from './Benchmarks';
 import leaderboard from './Leaderboard'
 import runListing from './RunListing';
-import submissions from './Submissions';
+import submission from './Submission';
 
 const rootReducer = combineReducers({
     app,
     benchmarks,
     leaderboard,
     runListing,
-    submissions
+    submission
 })
 
 export default rootReducer;

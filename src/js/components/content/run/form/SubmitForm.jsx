@@ -12,6 +12,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import DialogHeader from '../../DialogHeader';
 import FileInput from './FileInput';
 import Paper from '@material-ui/core/Paper';
 import ScalarInput from './ScalarInput';
@@ -97,9 +98,11 @@ function SubmitForm(props) {
             );
         }
     });
+    const dialogTitle = submission.name + ' - Submit New Run';
     return (
         <Paper className={classes.paperForm}>
             <div>
+                <DialogHeader title={dialogTitle} onClose={onCancel} />
                 <div className={classes.form} noValidate>
                     { controls }
                 </div>

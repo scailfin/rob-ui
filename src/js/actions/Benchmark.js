@@ -8,12 +8,9 @@
  * terms of the MIT License; see LICENSE file for more details.
  */
 
-import { fetchApiResource } from './Requests';
-import { fetchSubmissions } from './Submission.js';
-import {
-    CREATE_SUBMISSION, SHOW_INSTRUCTIONS, SHOW_LEADERBOARD, SHOW_RUNS,
-    SUBMIT_RUN, UPLOAD_FILES
-} from '../resources/Dialog';
+import { fetchApiResource, postRequest } from './Requests';
+import { fetchSubmission } from './Submission.js';
+import { SHOW_LEADERBOARD, SHOW_RUNS } from '../resources/Dialog';
 
 
 export const FETCH_BENCHMARKS_ERROR = 'FETCH_BENCHMARKS_ERROR';
@@ -59,6 +56,9 @@ export function selectBenchmark(api, benchmark) {
     );
 }
 
+
+// -- Content -----------------------------------------------------------------
+
 /*
  * Set the information that is currently shown for a selected benchmark.
  */
@@ -69,10 +69,10 @@ export function selectDialog(api, dialogId, benchmark, submission) {
             dispatch(fetchLeaderboard(api, benchmark));
             return dispatch({type: SELECT_DIALOG, payload: dialogId});
         };
-    } else if (dialogId === 2) {
+    } else if ((dialogId === SHOW_RUNS) && (submission != null)) {
         // Fetch benchmark submissions
         return dispatch => {
-            dispatch(fetchSubmissions(api, benchmark));
+            dispatch(fetchSubmission(api, submission));
             return dispatch({type: SELECT_DIALOG, payload: dialogId});
         };
     } else {
@@ -99,4 +99,19 @@ function fetchLeaderboard(api, benchmark) {
             )
         );
     }
+}
+
+
+// -- Create new submission ---------------------------------------------------
+
+export function createSubmission(api, benchmark, name) {
+    return postRequest(
+        api.urls.createSubmission(benchmark.id),
+        {name},
+        (json) => {return dispatch => {
+            dispatch(selectBenchmark(api, benchmark))
+            return dispatch(selectDialog(api, SHOW_RUNS, benchmark, json))
+        }},
+        (msg) => ({type: FETCH_BENCHMARKS_ERROR, payload: msg})
+    )
 }
