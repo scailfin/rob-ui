@@ -39,10 +39,12 @@ export function fetchSubmission(api, submission) {
         api.urls.getSubmission(submission.id),
         (json) => ({type: FETCH_SUBMISSION_SUCCESS, payload: json}),
         criticalError,
-        () => ({type: FETCH_SUBMISSION_START})
+        fetchSubmissionStart
     );
 }
 
+
+export const fetchSubmissionStart = () => ({type: FETCH_SUBMISSION_START})
 
 
 export function downloadResource(url, submission, resourceId) {

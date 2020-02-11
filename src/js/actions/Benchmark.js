@@ -9,13 +9,15 @@
  */
 
 import { fetchApiResource, postRequest } from './Requests';
-import { fetchSubmission } from './Submission.js';
-import { SHOW_LEADERBOARD, SHOW_RUNS } from '../resources/Dialog';
+import { fetchSubmission, fetchSubmissionStart } from './Submission.js';
+import {
+    SHOW_INSTRUCTIONS, SHOW_LEADERBOARD, SHOW_RUNS
+} from '../resources/Dialog';
 
 
-export const FETCH_BENCHMARKS_ERROR = 'FETCH_BENCHMARKS_ERROR';
-export const FETCH_BENCHMARKS_START = 'FETCH_BENCHMARKS_START';
-export const FETCH_BENCHMARKS_SUCCESS = 'FETCH_BENCHMARKS_SUCCESS';
+export const FETCH_BENCHMARK_ERROR = 'FETCH_BENCHMARK_ERROR';
+export const FETCH_BENCHMARK_START = 'FETCH_BENCHMARK_START';
+export const FETCH_BENCHMARK_SUCCESS = 'FETCH_BENCHMARK_SUCCESS';
 export const FETCH_LEADERBOARD_ERROR = 'FETCH_LEADERBOARD_ERROR';
 export const FETCH_LEADERBOARD_START = 'FETCH_LEADERBOARD_START';
 export const FETCH_LEADERBOARD_SUCCESS = 'FETCH_LEADERBOARD_SUCCESS';
@@ -23,38 +25,43 @@ export const SELECT_BENCHMARK = 'SELECT_BENCHMARK';
 export const SELECT_DIALOG = 'SELECT_DIALOG';
 
 
-// -- Benchmark listings ------------------------------------------------------
+// -- Errors ------------------------------------------------------------------
 
-/**
- * Fetch benchmark listing from API.
- */
-export function fetchBenchmarks(api) {
-    const url = api.urls.listBenchmarks();
-    return fetchApiResource(
-        url,
-        (json) => ({type: FETCH_BENCHMARKS_SUCCESS, payload: json}),
-        (msg) => ({type: FETCH_BENCHMARKS_ERROR, payload: msg}),
-        () => ({type: FETCH_BENCHMARKS_START})
-    );
-}
+export const criticalError = (error) => ({
+    type: FETCH_BENCHMARK_ERROR, payload: {error: error, isCritical: true}
+})
+
+export const minorError = (error) => ({
+    type: FETCH_BENCHMARK_ERROR, payload: {error: error, isCritical: false}
+})
+
+export const dismissError = () => ({type: FETCH_BENCHMARK_ERROR, payload: null})
 
 
 // -- Benchmarks --------------------------------------------------------------
 
 /**
- * Set the selected benchmark. The benchmark descriptor that was contained in
- * the benchmark listing contains all the necessary information. Thus, there
- * is no need at this point to fetch information from the API.
+ * Set the selected benchmark. Fetches the benchmark handle from the API. If
+ * the optional sobmission handle is given it will be set as the selected
+ * submission.
  */
-export function selectBenchmark(api, benchmark) {
+export function fetchBenchmark(api, benchmark, submission) {
     const url = api.urls.getBenchmark(benchmark.id);
     return fetchApiResource(
         url,
-        (json) => ({type: SELECT_BENCHMARK, payload: json}),
-        (msg) => ({type: FETCH_BENCHMARKS_ERROR, payload: msg}),
-        () => ({type: FETCH_BENCHMARKS_START})
+        (json) => ({
+            type: SELECT_BENCHMARK,
+            payload: {benchmark: json, submission: submission}
+        }),
+        (msg) => criticalError,
+        () => (fetchBenchmarkStart(benchmark))
     );
 }
+
+const fetchBenchmarkStart = (benchmark) => ({
+    type: FETCH_BENCHMARK_START,
+    payload: benchmark
+})
 
 
 // -- Content -----------------------------------------------------------------
@@ -102,16 +109,31 @@ function fetchLeaderboard(api, benchmark) {
 }
 
 
-// -- Create new submission ---------------------------------------------------
+// -- Submissions -------------------------------------------------------------
 
 export function createSubmission(api, benchmark, name) {
     return postRequest(
         api.urls.createSubmission(benchmark.id),
         {name},
         (json) => {return dispatch => {
-            dispatch(selectBenchmark(api, benchmark))
-            return dispatch(selectDialog(api, SHOW_RUNS, benchmark, json))
+            dispatch(fetchBenchmark(api, benchmark, json))
+            return dispatch(selectDialog(api, SHOW_RUNS))
         }},
-        (msg) => ({type: FETCH_BENCHMARKS_ERROR, payload: msg})
+        minorError,
+        () => (fetchBenchmarkStart(benchmark))
+    )
+}
+
+export function deleteSubmission(api, benchmark, submission) {
+    return postRequest(
+        api.urls.deleteSubmission(submission.id),
+        {name},
+        () => {return dispatch => {
+            dispatch(selectDialog(api, SHOW_INSTRUCTIONS, benchmark));
+            return dispatch(fetchBenchmark(api, benchmark))
+        }},
+        minorError,
+        () => (fetchBenchmarkStart(benchmark)),
+        'DELETE'
     )
 }

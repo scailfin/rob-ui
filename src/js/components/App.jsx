@@ -11,14 +11,15 @@
 import React, { Component } from "react";
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
+import Benchmark from './content/benchmark/Benchmark.jsx'
+import BenchmarkListing from './content/benchmark/BenchmarkListing.jsx'
 import Container from '@material-ui/core/Container';
 import ErrorMessage from './util/ErrorMessage';
 import Footer from './util/Footer.jsx';
 import Spinner from './util/Spinner.jsx';
-import MainPanel from './content/MainPanel';
 import SignIn from './content/SignIn.jsx';
 import Topbar from './layout/Topbar';
-import { clearError, fetchApi } from "../actions/App";
+import { fetchApi } from "../actions/App";
 import theme from '../../theme';
 
 
@@ -33,12 +34,14 @@ const styles = {
 
 
 const mapStateToProps = state => {
-  return { app: state.app };
+  return {
+      app: state.app,
+      benchmark: state.benchmark
+  };
 };
 
 function mapDispatchToProps(dispatch) {
   return {
-      clearError: () => dispatch(clearError()),
       fetchApi: () => dispatch(fetchApi())
   };
 }
@@ -48,36 +51,24 @@ class App extends Component {
     componentDidMount() {
         this.props.fetchApi();
     }
-    clearError = () => {
-        this.props.clearError();
-    }
     render() {
-        const { app, classes } = this.props;
+        const { app, benchmark, classes } = this.props;
         const { apiError, isFetching, username } = app;
+        const { selectedBenchmark } = benchmark;
         let content = null;
         let minorError = null;
         if (isFetching) {
             content = (<Spinner showLogo={true} />);
-        }
-        if (apiError != null) {
-            const { error, isCritical } = apiError;
-            if (isCritical) {
-                content = (
-                    <ErrorMessage error={error} isCritical={isCritical} />
-                );
-            } else {
-                minorError = (
-                    <ErrorMessage
-                        error={error}
-                        isCritical={isCritical}
-                        onClose={this.clearError}
-                    />
-                );
-            }
-        } if ((content == null) && (username == null)) {
+        } else if (apiError != null) {
+            content = (
+                <ErrorMessage error={apiError} isCritical={true} />
+            );
+        } else if (username == null) {
             content = (<SignIn />);
-        } else if (content == null) {
-            content = (<MainPanel />);
+        } else if (selectedBenchmark != null){
+            content = (<Benchmark />);
+        } else {
+            content = (<BenchmarkListing />);
         }
         return (
             <div>

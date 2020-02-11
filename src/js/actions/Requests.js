@@ -138,6 +138,8 @@ export function postRequest(
                     response.json().then(json => {
                         dispatch(errorHandler(json.message));
                     });
+                } else if (method === 'DELETE') {
+                    return dispatch(successHandler());
                 } else {
                     response.json().then(json => {
                         dispatch(successHandler(json));

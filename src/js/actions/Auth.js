@@ -10,7 +10,7 @@
 
 import { nonCriticalError } from './App';
 import { postRequest } from './Requests';
-import { fetchBenchmarks } from './Benchmark';
+import { fetchBenchmarks } from './BenchmarkListing';
 
 
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS'
@@ -50,14 +50,10 @@ export function submitLoginSuccess(api, response) {
 // -- Logout ------------------------------------------------------------------
 
 export function submitLogout(api) {
-    return dispatch => (
-            dispatch(
-                postRequest(
-                    api.urls.logout(),
-                    {},
-                    (json) => ({type: LOGOUT_SUCCESS}),
-                    nonCriticalError
-                )
-            )
-        )
-};
+    return postRequest(
+        api.urls.logout(),
+        {},
+        (json) => ({type: LOGOUT_SUCCESS}),
+        nonCriticalError
+    )
+}

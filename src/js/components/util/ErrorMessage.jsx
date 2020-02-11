@@ -26,12 +26,14 @@ const useStyles = makeStyles(theme => ({
         color: theme.palette.secondary.main,
         marginTop: theme.spacing(8)
     },
+    error: {
+      backgroundColor: theme.palette.error.dark,
+    },
+    errorMessage: {
+      marginLeft: theme.spacing(2),
+    },
     icon: {
       fontSize: 20,
-    },
-    iconVariant: {
-      opacity: 0.9,
-      marginRight: theme.spacing(1),
     },
     message: {
       display: 'flex',
@@ -62,14 +64,16 @@ function ErrorMessage(props) {
                 onClose={onClose}
             >
                 <SnackbarContent
-                    className={clsx(classes['error'], classes.margin)}
+                    className={classes.error}
                     aria-describedby="client-snackbar"
                     message={
                         <span id="client-snackbar" className={classes.message}>
                         <ErrorIcon
-                            className={clsx(classes.icon, classes.iconVariant)}
+                            className={classes.icon}
                         />
-                        {error}
+                            <span className={classes.errorMessage}>
+                                {error}
+                            </span>
                         </span>
                     }
                     action={[
@@ -79,7 +83,7 @@ function ErrorMessage(props) {
                             color="inherit"
                             onClick={onClose}
                         >
-                            <CloseIcon className={classes.icon} />
+                            <CloseIcon />
                         </IconButton>,
                     ]}
                 />

@@ -20,13 +20,12 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Typography from '@material-ui/core/Typography';
 
 
 const useStyles = makeStyles(theme => ({
     root: {
       width: '100%',
-      marginTop: theme.spacing(3),
+      marginTop: theme.spacing(0),
       overflowX: 'auto',
     },
     spinner: {
@@ -36,7 +35,7 @@ const useStyles = makeStyles(theme => ({
     paper: {
         backgroundColor: '#ebebeb',
         padding: 10,
-        marginTop: theme.spacing(2),
+        marginTop: theme.spacing(1),
         marginBottom: theme.spacing(4)
     },
     table: {
@@ -151,9 +150,6 @@ function Leaderboard(props) {
     // -- Assemble content ----------------------------------------------------
     return (
         <div className={classes.root}>
-            <Typography variant='h6' >
-                Performance Metrics for Submissions
-            </Typography>
             <Paper className={classes.paper}>
                 <Table className={classes.table}>
                     <TableHead>

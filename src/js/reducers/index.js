@@ -10,14 +10,16 @@
 
 import { combineReducers } from 'redux';
 import app from './App';
-import benchmarks from './Benchmarks';
+import benchmark from './Benchmark';
+import benchmarkListing from './BenchmarkListing';
 import leaderboard from './Leaderboard'
 import runListing from './RunListing';
 import submission from './Submission';
 
 const rootReducer = combineReducers({
     app,
-    benchmarks,
+    benchmark,
+    benchmarkListing,
     leaderboard,
     runListing,
     submission

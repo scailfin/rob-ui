@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
       marginRight: theme.spacing(2)
     },
     paperForm: {
-        marginTop: theme.spacing(0),
+        marginTop: theme.spacing(1),
         padding: theme.spacing(2),
         display: 'flex',
         flexDirection: 'column',
@@ -38,7 +38,7 @@ const useStyles = makeStyles(theme => ({
 const mapStateToProps = state => {
     return {
         app: state.app,
-        benchmarks: state.benchmarks,
+        benchmark: state.benchmark,
         submission: state.submission
     };
 };
@@ -61,7 +61,7 @@ function CreateSubmissionForm(props) {
     const [values, setValues] = useState({
         submissionName: ''
     });
-    const benchmark = props.benchmarks.selectedBenchmark;
+    const selectedBenchmark = props.benchmark.selectedBenchmark;
     const submissionName = values.submissionName;
     // ------------------------------------------------------------------------
     // Event handlers
@@ -71,12 +71,12 @@ function CreateSubmissionForm(props) {
      * action.
      */
     const handleCancel = () => {
-        const benchmark = props.benchmarks.selectedBenchmark;
+        const selectedBenchmark = props.benchmark.selectedBenchmark;
         const selectedSubmission = props.submission.selectedSubmission;
         if (selectedSubmission != null) {
-            props.selectDialog(props.app, SHOW_RUNS, benchmark);
+            props.selectDialog(props.app, SHOW_RUNS, selectedBenchmark);
         } else {
-            props.selectDialog(props.app, SHOW_INSTRUCTIONS, benchmark);
+            props.selectDialog(props.app, SHOW_INSTRUCTIONS, selectedBenchmark);
         }
     }
     /*
@@ -91,7 +91,7 @@ function CreateSubmissionForm(props) {
      */
     const handleSubmissionSubmit = () => {
         const app = props.app;
-        props.createSubmission(app, benchmark, submissionName);
+        props.createSubmission(app, selectedBenchmark, submissionName);
         setValues({open: false, submissionName: ''});
     }
     // ------------------------------------------------------------------------

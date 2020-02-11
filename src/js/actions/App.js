@@ -9,7 +9,7 @@
  */
 
 import { submitLoginSuccess } from './Auth';
-import { fetchBenchmarks } from './Benchmark';
+import { fetchBenchmarks } from './BenchmarkListing';
 import { fetchApiResource } from './Requests';
 import { Urls } from '../resources/Urls';
 

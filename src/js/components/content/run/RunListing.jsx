@@ -69,8 +69,8 @@ const useStyles = makeStyles(theme => ({
      fontSize: '1.2em'
  },
  paperForm: {
-     marginTop: theme.spacing(0),
-     padding: theme.spacing(2),
+     marginTop: theme.spacing(1),
+     padding: theme.spacing(0),
      display: 'flex',
      flexDirection: 'column',
      alignItems: 'left',

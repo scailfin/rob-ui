@@ -54,7 +54,8 @@ const useStyles = makeStyles(theme => ({
 
 const mapStateToProps = state => {
     return {
-        benchmarks: state.benchmarks,
+        app: state.app,
+        benchmark: state.benchmark,
         submission: state.submission
     };
 };
@@ -74,7 +75,9 @@ function mapDispatchToProps(dispatch) {
       ),
       cancelRun: (url, submission) => (dispatch(cancelRun(url, submission))),
       getRun: (url, submission) => (dispatch(getRun(url, submission))),
-      selectDialog: (dialogId) => dispatch(selectDialog(dialogId)),
+      selectDialog: (api, dialogId, behcnmark, submission) => dispatch(
+          selectDialog(api, dialogId, behcnmark, submission)
+      ),
       submitRun: (url, data, submission) => (dispatch(submitRun(url, data, submission)))
   };
 }
@@ -82,8 +85,17 @@ function mapDispatchToProps(dispatch) {
 
 function Submission(props) {
     const classes = useStyles();
-    const selectedDialog = props.benchmarks.selectedDialog;
+    const selectedDialog = props.benchmark.selectedDialog;
     const { fetchError, isFetching, selectedSubmission} = props.submission;
+    // ------------------------------------------------------------------------
+    // Event handler
+    // ------------------------------------------------------------------------
+    const handleCloseDialog = () => {
+        const api = props.app;
+        const selectedBenchmark = props.benchmark.selectedBenchmark;
+        const selectedSubmission = props.submission.selectedSubmission;
+        props.selectDialog(api, SHOW_RUNS, selectedBenchmark, selectedSubmission);
+    }
     /*
      * Handler to upload a file that was selected using the drop zone
      */
@@ -157,7 +169,7 @@ function Submission(props) {
     } else if (selectedDialog === SUBMIT_RUN) {
         return (
             <SubmitForm
-                onCancel={() => (props.selectDialog(SHOW_RUNS))}
+                onCancel={handleCloseDialog}
                 onSubmit={handleSubmit}
                 submission={selectedSubmission}
             />

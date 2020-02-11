@@ -14,12 +14,15 @@ import { makeStyles } from '@material-ui/core/styles';
 import { withStyles } from '@material-ui/core';
 import Assessment from '@material-ui/icons/Assessment';
 import Avatar from '@material-ui/core/Avatar';
+import Divider from '@material-ui/core/Divider';
+import ErrorMessage from '../../util/ErrorMessage';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import Spinner from '../../util/Spinner.jsx';
 import Typography from '@material-ui/core/Typography';
-import { selectBenchmark } from '../../../actions/Benchmark';
+import { fetchBenchmark } from '../../../actions/Benchmark';
 
 
 const useStyles = makeStyles(theme => ({
@@ -30,6 +33,11 @@ const useStyles = makeStyles(theme => ({
     contentPanel: {
         marginTop: theme.spacing(2),
         marginBottom: theme.spacing(2)
+    },
+    mainContent: {
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        width: 1000
     }
 }));
 
@@ -57,15 +65,15 @@ const StyledBenchmark = withStyles({
 const mapStateToProps = state => {
     return {
         app: state.app,
-        benchmarks: state.benchmarks
+        benchmarkListing: state.benchmarkListing
     };
 };
 
 
 function mapDispatchToProps(dispatch) {
   return {
-      selectBenchmark: (api, benchmark) => dispatch(
-          selectBenchmark(api, benchmark)
+      fetchBenchmark: (api, benchmark) => dispatch(
+          fetchBenchmark(api, benchmark)
       )
   };
 }
@@ -79,18 +87,29 @@ function mapDispatchToProps(dispatch) {
  */
 function BenchmarkListing(props) {
     const classes = useStyles();
-    /**
+    // ------------------------------------------------------------------------
+    // Event handlers
+    // ------------------------------------------------------------------------
+    /*
      * Event handler to set the selected benchmark.
      */
     const handleBenchmarkSelect = (key) => {
-        const benchmarks = props.benchmarks.benchmarks;
+        const benchmarks = props.benchmarkListing.benchmarks;
         const benchmark = benchmarks.find((b) => (b.id === key));
-        props.selectBenchmark(props.app, benchmark);
+        props.fetchBenchmark(props.app, benchmark);
     }
-    const benchmarks = props.benchmarks.benchmarks;
+    // ------------------------------------------------------------------------
+    // Render
+    // ------------------------------------------------------------------------
+    const { benchmarks, fetchError, isFetching } = props.benchmarkListing;
     // -- Render benchmark listing (only if list of benchmarks is defined) ----
     let content = null;
-    if (benchmarks != null) {
+    if (isFetching) {
+        // Show spinner while loading the benchmark listing.
+        content = (<Spinner message='Loading benchmarks ...' showLogo={true} />);
+    } else if (fetchError) {
+        content = (<ErrorMessage error={fetchError} isCritical={true} />);
+    } else if (benchmarks != null) {
         // If no benchmark is selected, a brief overview of ROB is shown
         // together with a list of available benchmarks.
         const benchmarklistItems = [];
@@ -113,7 +132,11 @@ function BenchmarkListing(props) {
             );
         }
         content = (
-            <div>
+            <div className={classes.mainContent}>
+                <Typography className={classes.contentPanel} variant='body1'>
+                    The <span className={classes.highlight}>Reproducible Open Benchmarks for Data Analysis Platform (ROB)</span> is an experimental prototype for enabling community benchmarks of data analysis algorithms. The goal of ROB is to allow user communities to evaluate the performance of their different data analysis algorithms in a controlled competition-style format.
+                </Typography>
+                <Divider />
                 <Typography className={classes.contentPanel} variant="h4">
                     Participate in Community Benchmarks
                 </Typography>

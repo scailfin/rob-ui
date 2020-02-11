@@ -8,8 +8,8 @@
  * terms of the MIT License; see LICENSE file for more details.
  */
 
- import { LOGOUT_SUCCESS } from '../actions/Auth';
- import { SELECT_BENCHMARK, SELECT_DIALOG } from '../actions/Benchmark';
+import { LOGOUT_SUCCESS } from '../actions/Auth';
+import { SELECT_BENCHMARK, SELECT_DIALOG } from '../actions/Benchmark';
 import {
     CREATE_SUBMISSION_SUCCESS, FETCH_SUBMISSION_START,
     FETCH_SUBMISSION_SUCCESS, FETCH_SUBMISSION_ERROR
@@ -51,12 +51,18 @@ const submissions = (state = INITIAL_STATE, action) => {
         case FETCH_SUBMISSION_ERROR:
             return {...state, isFetching: false, fetchError: action.payload};
         case LOGOUT_SUCCESS:
-        case SELECT_BENCHMARK:
             return {
                 ...state,
                 fetchError: null,
                 isFetching: false,
                 selectedSubmission: null
+            };
+        case SELECT_BENCHMARK:
+            return {
+                ...state,
+                fetchError: null,
+                isFetching: false,
+                selectedSubmission: action.payload.submission
             };
         case SELECT_DIALOG:
             switch (action.payload) {

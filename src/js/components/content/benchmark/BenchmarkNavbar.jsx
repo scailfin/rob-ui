@@ -14,6 +14,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import CloudUpload from '@material-ui/icons/CloudUpload';
 import DashboardIcon from '@material-ui/icons/Dashboard';
+import DeleteIcon from '@material-ui/icons/Delete';
 import Divider from '@material-ui/core/Divider';
 import ViewHeadlineOutlinedIcon from '@material-ui/icons/ViewHeadlineOutlined';
 import List from '@material-ui/core/List';
@@ -25,8 +26,8 @@ import SendIcon from '@material-ui/icons/Send';
 import TableChartOutlinedIcon from '@material-ui/icons/TableChartOutlined';
 import { selectDialog } from '../../../actions/Benchmark';
 import {
-    CREATE_SUBMISSION, SHOW_INSTRUCTIONS, SHOW_LEADERBOARD, SHOW_RUNS,
-    SUBMIT_RUN, UPLOAD_FILES
+    CREATE_SUBMISSION, DELETE_SUBMISSION, SHOW_INSTRUCTIONS, SHOW_LEADERBOARD,
+    SHOW_RUNS, SUBMIT_RUN, UPLOAD_FILES
 } from '../../../resources/Dialog';
 
 
@@ -42,7 +43,7 @@ const useStyles = makeStyles(theme => ({
 const mapStateToProps = state => {
     return {
         app: state.app,
-        benchmarks: state.benchmarks,
+        benchmark: state.benchmark,
         submission: state.submission
     };
 };
@@ -62,7 +63,7 @@ function BenchmarkNavbar(props) {
     const {
         selectedBenchmark,
         selectedDialog
-    } = props.benchmarks;
+    } = props.benchmark;
     const selectedSubmission = props.submission.selectedSubmission;
     // ------------------------------------------------------------------------
     // Event handlers
@@ -71,8 +72,9 @@ function BenchmarkNavbar(props) {
      * Event handler when selecting an item from the dialog list.
      */
     const handleSelectDialog = (key, submission) => {
-        const { selectedBenchmark, selectedSubmission } = props.benchmarks;
         const api = props.app;
+        const selectedBenchmark = props.benchmark.selectedBenchmark;
+        const selectedSubmission = props.submission.selectedSubmission
         if (key === SHOW_RUNS) {
             props.selectDialog(api, key, selectedBenchmark, submission);
         } else {
@@ -186,6 +188,19 @@ function BenchmarkNavbar(props) {
                     <CloudUpload />
                 </ListItemIcon>
                 <ListItemText primary='Upload Files ...' />
+            </ListItem>
+        );
+        listItems.push(
+            <ListItem
+                key={'delete'}
+                button
+                selected={selectedDialog === DELETE_SUBMISSION}
+                onClick={() => (handleSelectDialog(DELETE_SUBMISSION))}
+            >
+                <ListItemIcon>
+                    <DeleteIcon />
+                </ListItemIcon>
+                <ListItemText primary='Delete Submission' />
             </ListItem>
         );
     }

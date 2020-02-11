@@ -11,7 +11,7 @@
 import { SHOW_HOMEPAGE } from '../actions/App';
 import { LOGOUT_SUCCESS } from '../actions/Auth';
 import {
-    FETCH_BENCHMARKS_ERROR, FETCH_BENCHMARKS_START, FETCH_BENCHMARKS_SUCCESS,
+    FETCH_BENCHMARK_ERROR, FETCH_BENCHMARK_START, FETCH_BENCHMARK_SUCCESS,
     SELECT_BENCHMARK, SELECT_DIALOG
 } from '../actions/Benchmark';
 import { SHOW_INSTRUCTIONS } from '../resources/Dialog';
@@ -22,7 +22,6 @@ import { SHOW_INSTRUCTIONS } from '../resources/Dialog';
  * well as the current selected benchmark and the selected tab.
  */
 const INITIAL_STATE = {
-    benchmarks: null,
     fetchError: null,
     isFetching: false,
     selectedBenchmark: null,
@@ -30,13 +29,13 @@ const INITIAL_STATE = {
 }
 
 
-const benchmarkPanel = (state = INITIAL_STATE, action) => {
+const benchmark = (state = INITIAL_STATE, action) => {
     switch (action.type) {
-        case FETCH_BENCHMARKS_ERROR:
+        case FETCH_BENCHMARK_ERROR:
             return {...state, isFetching: false, fetchError: action.payload};
-        case FETCH_BENCHMARKS_START:
-            return {...state, isFetching: true};
-        case FETCH_BENCHMARKS_SUCCESS:
+        case FETCH_BENCHMARK_START:
+            return {...state, isFetching: true, selectedBenchmark: action.payload};
+        case FETCH_BENCHMARK_SUCCESS:
             return {
                 ...state, benchmarks: action.payload.benchmarks,
                 isFetching: false
@@ -52,7 +51,7 @@ const benchmarkPanel = (state = INITIAL_STATE, action) => {
                 ...state,
                 fetchError: null,
                 isFetching: false,
-                selectedBenchmark: action.payload,
+                selectedBenchmark: action.payload.benchmark,
                 selectedTab: 0
             };
         case SELECT_DIALOG:
@@ -69,4 +68,4 @@ const benchmarkPanel = (state = INITIAL_STATE, action) => {
     }
 }
 
-export default benchmarkPanel;
+export default benchmark;

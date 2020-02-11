@@ -8,6 +8,7 @@
  * terms of the MIT License; see LICENSE file for more details.
  */
 
+import { SELECT_BENCHMARK } from '../actions/Benchmark';
 import { FETCH_SUBMISSION_SUCCESS } from '../actions/Submission';
 import {
     FETCH_RUNS_ERROR, FETCH_RUNS_START, FETCH_RUNS_SUCCESS
@@ -38,6 +39,13 @@ const runListing = (state = INITIAL_STATE, action) => {
                 isFetching: false,
                 fetchError: null
             };
+        case SELECT_BENCHMARK:
+            const selectedSubmission = action.payload.submission;
+            if (selectedSubmission != null) {
+                return {...state, runs: selectedSubmission.runs};
+            } else {
+                return {...state, runs: null}
+            }
         default:
             return state
     }

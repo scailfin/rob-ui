@@ -78,6 +78,12 @@ export class Urls {
         return this.get('submissions:create').replace('{benchmarkId}', benchmarkId);
     }
     /*
+     * Get Url to DELETE a submission
+     */
+    deleteSubmission(submissionId) {
+        return this.get('submissions:delete').replace('{submissionId}', submissionId);
+    }
+    /*
      * Get listing of user submissions
      */
     getSubmission(submissionId) {
