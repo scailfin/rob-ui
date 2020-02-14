@@ -23,7 +23,6 @@ import Dropzone from 'react-dropzone';
 import ErrorMessage from '../../util/ErrorMessage';
 import FileListing from '../FileListing';
 import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
 import Spinner from '../../util/Spinner';
 import Typography from '@material-ui/core/Typography';
 import { selectDialog } from '../../../actions/Benchmark';
@@ -43,7 +42,7 @@ const useStyles = makeStyles(theme => ({
         marginRight: theme.spacing(2),
     },
     gridColumn: {
-        backgroundColor: '#fff',
+        backgroundColor: '#f0f0f0',
         marginTop: theme.spacing(2)
     },
     paperForm: {
@@ -54,7 +53,9 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'left',
-        backgroundColor: '#fff'
+        backgroundColor: '#f0f0f0',
+        borderColor: '#a0a0a0',
+        borderRadius: 4
     },
     spinner: {
         marginTop: theme.spacing(2),
@@ -142,7 +143,7 @@ function FileUploads(props) {
         );
     }
     return (
-        <Paper className={classes.paperForm}>
+        <Box border={1} className={classes.paperForm}>
             <DialogHeader
                 title={selectedSubmission.name + ' - Input Files'}
                 onClose={handleClose}
@@ -181,7 +182,7 @@ function FileUploads(props) {
                 </Grid>
             </Grid>
             { minorError }
-        </Paper>
+        </Box>
     );
 }
 

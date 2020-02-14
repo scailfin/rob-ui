@@ -12,8 +12,8 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import Box from '@material-ui/core/Box';
 import DialogHeader from '../DialogHeader';
-import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import { createSubmission, selectDialog } from '../../../actions/Benchmark';
 import { SHOW_INSTRUCTIONS, SHOW_RUNS } from '../../../resources/Dialog';
@@ -32,7 +32,9 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'left',
-        backgroundColor: '#ebebeb'
+        backgroundColor: '#f0f0f0',
+        borderColor: '#a0a0a0',
+        borderRadius: 4
     }
 }));
 
@@ -100,7 +102,7 @@ function CreateSubmissionForm(props) {
     // Render
     // ------------------------------------------------------------------------
     return (
-        <Paper className={classes.paperForm}>
+        <Box border={1} className={classes.paperForm}>
             <DialogHeader
                 title={'Create Sumission ...'}
                 onClose={handleCancel}
@@ -137,7 +139,7 @@ function CreateSubmissionForm(props) {
                     Cancel
                 </Button>
             </div>
-        </Paper>
+        </Box>
     );
 }
 

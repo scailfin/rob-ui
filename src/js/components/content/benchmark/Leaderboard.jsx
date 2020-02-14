@@ -12,8 +12,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
+import Box from '@material-ui/core/Box';
 import ErrorMessage from '../../util/ErrorMessage';
-import Paper from '@material-ui/core/Paper';
 import Spinner from '../../util/Spinner';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -33,10 +33,12 @@ const useStyles = makeStyles(theme => ({
         marginRight: theme.spacing(24)
     },
     paper: {
-        backgroundColor: '#ebebeb',
         padding: 10,
         marginTop: theme.spacing(1),
-        marginBottom: theme.spacing(4)
+        marginBottom: theme.spacing(4),
+        backgroundColor: '#f0f0f0',
+        borderColor: '#a0a0a0',
+        borderRadius: 4
     },
     table: {
         minWidth: 700,
@@ -150,7 +152,7 @@ function Leaderboard(props) {
     // -- Assemble content ----------------------------------------------------
     return (
         <div className={classes.root}>
-            <Paper className={classes.paper}>
+            <Box border={1} className={classes.paper}>
                 <Table className={classes.table}>
                     <TableHead>
                         <TableRow>
@@ -161,7 +163,7 @@ function Leaderboard(props) {
                         { rows }
                     </TableBody>
                 </Table>
-            </Paper>
+            </Box>
             { plotListing }
         </div>
   );

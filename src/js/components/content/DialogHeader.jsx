@@ -34,7 +34,7 @@ const useStyles = makeStyles(theme => ({
     root: {
         marginTop: theme.spacing(1),
         height: 50,
-        color: '#888'
+        color: '#444'
     },
 }));
 

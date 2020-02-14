@@ -17,10 +17,10 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import Box from '@material-ui/core/Box';
 import DialogHeader from '../DialogHeader';
 import ErrorMessage from '../../util/ErrorMessage';
 import FileInput from './FileInput';
-import Paper from '@material-ui/core/Paper';
 import ScalarInput from './ScalarInput';
 import Spinner from '../../util/Spinner';
 import { selectDialog } from '../../../actions/Benchmark';
@@ -43,7 +43,9 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'left',
-        backgroundColor: '#ebebeb'
+        backgroundColor: '#f0f0f0',
+        borderColor: '#a0a0a0',
+        borderRadius: 4
     }
 }));
 
@@ -52,11 +54,13 @@ const useStyles = makeStyles(theme => ({
 
 /*
  * The component requires access to the application state, the state of the
- * submitted run request, and the selected submission.
+ * submitted run request, the list of uploaded files, and the selected
+ * submission.
  */
 const mapStateToProps = state => {
     return {
         app: state.app,
+        fileUploads: state.fileUploads,
         submitRunForm: state.submitRunForm,
         submission: state.submission
     };
@@ -81,10 +85,11 @@ function mapDispatchToProps(dispatch) {
 function SubmitRunForm(props) {
     const classes = useStyles();
     const submission = props.submission.selectedSubmission;
+    const files = props.fileUploads.files;
     const { isSubmitting, submitError } = props.submitRunForm;
     // -- Initialize local state ----------------------------------------------
     const defaultArgs = {};
-    const { files, parameters } = submission;
+    const { parameters } = submission;
     parameters.sort((p1, p2) => {
         if (p1.index === p2.index) {
             return (p1.name).localeCompare(p2.name);
@@ -200,7 +205,7 @@ function SubmitRunForm(props) {
     });
     const dialogTitle = submission.name + ' - Submit New Run';
     return (
-        <Paper className={classes.paperForm}>
+        <Box border={1} className={classes.paperForm}>
             <div>
                 <DialogHeader title={dialogTitle} onClose={handleCancel} />
                 <div className={classes.form} noValidate>
@@ -224,7 +229,7 @@ function SubmitRunForm(props) {
                 </Button>
             </div>
             { minorError }
-        </Paper>
+        </Box>
     );
 }
 

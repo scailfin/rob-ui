@@ -52,9 +52,9 @@ const StyledBenchmark = withStyles({
             backgroundColor: "#e8eaf6"
         },
         '&:hover': {
-            backgroundColor: "#c5cae9",
+            backgroundColor: "#dff0ff",
             "&$selected": {
-                backgroundColor: "#c5cae9"
+                backgroundColor: "#dff0ff"
             }
         }
     },

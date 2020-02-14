@@ -24,7 +24,6 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import Paper from '@material-ui/core/Paper';
 import Run from './Run';
 import { fetchRun } from '../../../actions/Run';
 import { utc2LocalTime } from '../../../resources/Timestamps';
@@ -49,7 +48,7 @@ const useStyles = makeStyles(theme => ({
         paddingLeft: theme.spacing(1)
     },
     gridColumn: {
-        backgroundColor: '#fff',
+        backgroundColor: '#f0f0f0',
         marginTop: theme.spacing(2)
     },
     paperForm: {
@@ -60,7 +59,9 @@ const useStyles = makeStyles(theme => ({
          display: 'flex',
          flexDirection: 'column',
          alignItems: 'left',
-         backgroundColor: '#fff' //'#ebebeb'
+         backgroundColor: '#f0f0f0',
+         borderColor: '#a0a0a0',
+         borderRadius: 4
      }
 }));
 
@@ -150,7 +151,7 @@ function RunListing(props) {
         );
     }
     return (
-        <Paper className={classes.paperForm}>
+        <Box border={1} className={classes.paperForm}>
             <DialogHeader title={selectedSubmission.name + ' - Runs'} />
             <Grid container spacing={2}>
                 <Grid item xs={6} className={classes.gridColumn}>
@@ -165,7 +166,7 @@ function RunListing(props) {
                 </Grid>
             </Grid>
             { minorError }
-        </Paper>
+        </Box>
     );
 }
 
