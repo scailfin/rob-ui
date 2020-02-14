@@ -8,8 +8,10 @@
  * terms of the MIT License; see LICENSE file for more details.
  */
 
+import { SHOW_HOMEPAGE } from '../actions/App';
+import { LOGOUT_SUCCESS } from '../actions/Auth';
 import {
-    FETCH_LEADERBOARD_ERROR, FETCH_LEADERBOARD_START,
+    FETCH_BENCHMARK_START, FETCH_LEADERBOARD_ERROR, FETCH_LEADERBOARD_START,
     FETCH_LEADERBOARD_SUCCESS
 } from '../actions/Benchmark';
 
@@ -22,29 +24,58 @@ import {
 const INITIAL_STATE = {
     fetchError: null,
     isFetching: false,
+    outputs: null,
+    pollInterval: -1,
     postProcRun: null,
     ranking: null,
     schema: null
 }
 
 
- const leaderboard = (state = INITIAL_STATE, action) => {
-     switch (action.type) {
-         case FETCH_LEADERBOARD_ERROR:
-            return {...state, isFetching: false, fetchError: action.payload};
-         case FETCH_LEADERBOARD_START:
+const leaderboard = (state = INITIAL_STATE, action) => {
+    switch (action.type) {
+        case FETCH_LEADERBOARD_ERROR:
+            return {
+                ...state,
+                isFetching: false,
+                fetchError: action.payload,
+                pollInterval: -1
+            };
+        case FETCH_LEADERBOARD_START:
             return {...state, isFetching: true};
-         case FETCH_LEADERBOARD_SUCCESS:
-             return {
-                 ...state,
-                 ranking: action.payload.ranking,
-                 postProcRun: action.payload.postProc,
-                 schema: action.payload.schema,
-                 isFetching: false,
-                 fetchError: null
-             };
-         default:
-             return state
+        case FETCH_LEADERBOARD_SUCCESS:
+            let pollInterval = 10000;
+            const postProcRun = action.payload.postproc;
+            if (postProcRun != null) {
+                if ((postProcRun.state === 'PENDING') || (postProcRun.state === 'RUNNING')) {
+                    pollInterval = 1000;
+                }
+            }
+            return {
+                ...state,
+                ranking: action.payload.ranking,
+                outputs: action.payload.outputs,
+                postProcRun,
+                schema: action.payload.schema,
+                isFetching: false,
+                fetchError: null,
+                pollInterval
+            };
+        case SHOW_HOMEPAGE:
+        case LOGOUT_SUCCESS:
+        case FETCH_BENCHMARK_START:
+            return {
+                ...state,
+                isFetching: false,
+                fetchError: null,
+                pollInterval: -1,
+                ranking: null,
+                schema: null,
+                outputs: null,
+                postProcRun: null
+            };
+        default:
+            return state
      }
  }
 

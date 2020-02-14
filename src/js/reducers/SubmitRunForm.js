@@ -8,7 +8,9 @@
  * terms of the MIT License; see LICENSE file for more details.
  */
 
-import { SUBMIT_RUN_ERROR, SUBMIT_RUN_START } from '../actions/Run';
+import {
+    SUBMIT_RUN_ERROR, SUBMIT_RUN_START, SUBMIT_RUN_SUCCESS
+} from '../actions/Run';
 
 
 /*
@@ -26,6 +28,8 @@ const submitRunForm = (state = INITIAL_STATE, action) => {
             return {...state, isSubmitting: false, submitError: action.payload};
         case SUBMIT_RUN_START:
             return {...state, isSubmitting: true, submitError: null};
+        case SUBMIT_RUN_SUCCESS:
+            return {...state, isSubmitting: false, submitError: null};
         default:
             return state
     }

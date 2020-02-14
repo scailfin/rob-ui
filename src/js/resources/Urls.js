@@ -44,6 +44,14 @@ export class Urls {
     /*
      * Get listing of all benchmarks.
      */
+    getBenchmarkResource(benchmarkId, resourceId) {
+        return this.get('benchmarks:resource')
+            .replace('{benchmarkId}', benchmarkId)
+            .replace('{resourceId}', resourceId);
+    }
+    /*
+     * Get listing of all benchmarks.
+     */
     listBenchmarks() {
         return this.get('benchmarks:list');
     }

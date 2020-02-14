@@ -28,6 +28,8 @@ export const FETCH_RUNS_SUCCESS = 'FETCH_RUNS_SUCCESS';
 // Run submission
 export const SUBMIT_RUN_ERROR = 'SUBMIT_RUN_ERROR';
 export const SUBMIT_RUN_START = 'SUBMIT_RUN_START';
+export const SUBMIT_RUN_SUCCESS = 'SUBMIT_RUN_SUCCESS';
+
 
 /*
  * Actions
@@ -120,6 +122,7 @@ export function submitRun(api, submission, data) {
 
 function submitRunSuccess(api, submission) {
     return dispatch => {
+        dispatch({type: SUBMIT_RUN_SUCCESS});
         dispatch(selectDialog(api, SHOW_RUNS));
         return dispatch(fetchRuns(api, submission))
     }

@@ -19,7 +19,7 @@ import Footer from './util/Footer.jsx';
 import Spinner from './util/Spinner.jsx';
 import SignIn from './content/SignIn.jsx';
 import Topbar from './layout/Topbar';
-import { fetchApi } from "../actions/App";
+import { clearError, fetchApi } from "../actions/App";
 import theme from '../../theme';
 
 
@@ -42,6 +42,7 @@ const mapStateToProps = state => {
 
 function mapDispatchToProps(dispatch) {
   return {
+      dismissError: () => (dispatch(clearError())),
       fetchApi: () => dispatch(fetchApi())
   };
 }
@@ -60,9 +61,17 @@ class App extends Component {
         if (isFetching) {
             content = (<Spinner showLogo={true} />);
         } else if (apiError != null) {
-            content = (
-                <ErrorMessage error={apiError} isCritical={true} />
-            );
+            const {error, isCritical} = apiError;
+            if (isCritical) {
+                content = (
+                    <ErrorMessage error={error} isCritical={isCritical} />
+                );
+            } else {
+                content = (<SignIn />);
+                minorError = (
+                    <ErrorMessage error={error} isCritical={isCritical} onClose={this.props.dismissError}/>
+                );
+            }
         } else if (username == null) {
             content = (<SignIn />);
         } else if (selectedBenchmark != null){

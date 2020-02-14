@@ -52,7 +52,7 @@ const benchmark = (state = INITIAL_STATE, action) => {
                 fetchError: null,
                 isFetching: false,
                 selectedBenchmark: action.payload.benchmark,
-                selectedTab: 0
+                selectedDialog: SHOW_INSTRUCTIONS
             };
         case SELECT_DIALOG:
             return {...state, selectedDialog: action.payload}
@@ -61,7 +61,7 @@ const benchmark = (state = INITIAL_STATE, action) => {
                 ...state,
                 benchmarks: null,
                 selectedBenchmark: null,
-                selectedTab: 0
+                selectedDialog: SHOW_INSTRUCTIONS
             };
         default:
             return state

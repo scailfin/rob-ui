@@ -8,8 +8,7 @@
  * terms of the MIT License; see LICENSE file for more details.
  */
 
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
@@ -20,6 +19,8 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import Typography from '@material-ui/core/Typography';
+import { fetchLeaderboard } from '../../../actions/Benchmark';
 
 
 const useStyles = makeStyles(theme => ({
@@ -48,28 +49,63 @@ const useStyles = makeStyles(theme => ({
     },
     plots: {
         marginTop: theme.spacing(4),
+    },
+    errorText: {
+        color: '#912d2b',
+        fontSize: '1.2em'
     }
 }));
 
 
 const mapStateToProps = state => {
     return {
-        api: state.api,
+        app: state.app,
+        benchmark: state.benchmark,
         leaderboard: state.leaderboard
     };
 };
 
+
+function mapDispatchToProps(dispatch) {
+  return {
+      poll: (api, benchmark) => (
+          dispatch(fetchLeaderboard(api, benchmark, false))
+      )
+  };
+}
+
+
 function Leaderboard(props) {
     const classes = useStyles();
+    const api = props.app;
+    const selectedBenchmark = props.benchmark.selectedBenchmark;
     const {
         fetchError,
         isFetching,
+        outputs,
+        pollInterval,
+        postProcRun,
         schema,
         ranking
     } = props.leaderboard;
-    // ------------------------------------------------------------------------
-    // Render
-    // ------------------------------------------------------------------------
+    const poll = props.poll;
+    // -- Set polling handler -------------------------------------------------
+    useEffect(() => {
+        let timer = null;
+        if ((pollInterval > 0) && (postProcRun != null)) {
+            timer = setInterval(() => (
+                    poll(api, selectedBenchmark)
+                ),
+                pollInterval
+            );
+        }
+        return () => {
+            if (timer != null) {
+                clearInterval(timer);
+            }
+        };
+    }, [api, selectedBenchmark, postProcRun, pollInterval, poll]);
+    // -- Render --------------------------------------------------------------
     if (isFetching) {
         return (
             <div className={classes.spinner}>
@@ -81,7 +117,7 @@ function Leaderboard(props) {
     } else if ((ranking == null) || (schema == null)) {
         return null;
     }
-    // -- Result table --------------------------------------------------------
+    // -- Result table
     const headline = [];
     headline.push(<TableCell key={'col'}></TableCell>);
     for (let i = 0; i < schema.length; i++) {
@@ -125,31 +161,48 @@ function Leaderboard(props) {
         }
         rows.push(<TableRow key={i} className={classes.row}>{cells}</TableRow>);
     }
-    // -- Plot listing --------------------------------------------------------
+    // -- Plot listing
     let plotListing = null;
-    /*if (resources.length > 0) {
-        const plots = [];
-        for (let i = 0; i < resources.length; i++) {
-            const res = resources[i];
-            plots.push(
-                <div key={res.id} className={classes.plots}>
-                    <Typography variant='h6' >
-                        {res.name}
-                    </Typography>
-                    <div align='center'>
-                        <div>
-                            <img src={new Urls(res.links).self()} alt={res.name} />
-                        </div>
-                        <Typography variant='caption' >
-                            {res.caption}
-                        </Typography>
-                    </div>
+    if (postProcRun != null) {
+        if (postProcRun.state === 'ERROR') {
+            plotListing = (
+                <div>
+                    <pre className={classes.errorText}>
+                        {postProcRun.messages.join('\n')}
+                    </pre>
                 </div>
             );
+        } else if (postProcRun.state === 'SUCCESS') {
+            if (outputs != null) {
+                const plots = [];
+                for (let i = 0; i < outputs.length; i++) {
+                    const res = outputs[i];
+                    const bId = selectedBenchmark.id;
+                    const rId = postProcRun.resources.find((r) => (r.name === res.id)).id;
+                    const url = api.urls.getBenchmarkResource(bId, rId);
+                    plots.push(
+                        <div key={res.id} className={classes.plots}>
+                            <Typography variant='h6' >
+                                {res.title}
+                            </Typography>
+                            <div align='center'>
+                                <div>
+                                    <img src={url} alt={res.name} />
+                                </div>
+                                <Typography variant='caption' >
+                                    {res.caption}
+                                </Typography>
+                            </div>
+                        </div>
+                    );
+                }
+                plotListing = plots;
+            }
+        } else {
+            plotListing = (<Spinner  message='Processing ...' showLogo={false}/>);
         }
-        plotListing = plots;
-    }*/
-    // -- Assemble content ----------------------------------------------------
+    }
+    // -- Assemble content
     return (
         <div className={classes.root}>
             <Box border={1} className={classes.paper}>
@@ -166,13 +219,8 @@ function Leaderboard(props) {
             </Box>
             { plotListing }
         </div>
-  );
+    );
 }
 
 
-Leaderboard.propTypes = {
-  leaderboard: PropTypes.object,
-};
-
-
-export default connect(mapStateToProps)(Leaderboard);
+export default connect(mapStateToProps, mapDispatchToProps)(Leaderboard);

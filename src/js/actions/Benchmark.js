@@ -93,7 +93,13 @@ export function selectDialog(api, dialogId, benchmark, submission) {
 /**
  * Fetch leader board information for the selected benchmark.
  */
-function fetchLeaderboard(api, benchmark) {
+export function fetchLeaderboard(api, benchmark, startSignal) {
+    let startSignalAction = () => ({type: FETCH_LEADERBOARD_START});
+    if (startSignal != null) {
+        if (!startSignal) {
+            startSignalAction = null;
+        }
+    }
     const url = api.urls.getLeaderboard(benchmark.id);
     return dispatch => {
         // Set the current leader board to null before fetch starts
@@ -102,7 +108,7 @@ function fetchLeaderboard(api, benchmark) {
                 url,
                 (json) => ({type: FETCH_LEADERBOARD_SUCCESS, payload: json}),
                 (msg) => ({type: FETCH_LEADERBOARD_ERROR, payload: msg}),
-                () => ({type: FETCH_LEADERBOARD_START})
+                startSignalAction
             )
         );
     }
