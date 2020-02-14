@@ -11,165 +11,164 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
-import ApiPolling from '../ApiPolling';
 import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
+import Box from '@material-ui/core/Box';
 import CheckCircleOutline from '@material-ui/icons/CheckCircleOutline';
 import DialogHeader from '../DialogHeader.jsx';
 import DirectionsRunOutlined from '@material-ui/icons/DirectionsRunOutlined';
-import Divider from '@material-ui/core/Divider';
 import ErrorMessage from '../../util/ErrorMessage';
 import ErrorOutlineOutlined from '@material-ui/icons/ErrorOutlineOutlined';
-import FileListing from '../FileListing';
+import Grid from '@material-ui/core/Grid';
 import HourglassEmptyOutlined from '@material-ui/icons/HourglassEmptyOutlined';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Paper from '@material-ui/core/Paper';
-import Spinner from '../../util/Spinner';
-import Typography from '@material-ui/core/Typography';
+import Run from './Run';
+import { fetchRun } from '../../../actions/Run';
 import { utc2LocalTime } from '../../../resources/Timestamps';
 
 
+// -- Component styles --------------------------------------------------------
+
 const useStyles = makeStyles(theme => ({
-  root: {
-    width: '100%',
-    overflowX: 'auto',
-  },
-  avatarPending: {
-      backgroundColor: '#ffeb3b',
-  },
-  avatarRunning: {
-      backgroundColor: '#03a9f4',
-  },
-  avatarError: {
-      backgroundColor: '#dd2c00',
-  },
-  avatarSuccess: {
-      backgroundColor: '#009688',
-  },
-  highlight: {
-      fontWeight: 'bold'
-  },
-  inputs: {
-      marginLeft: theme.spacing(2),
-      marginBottom: theme.spacing(2),
-  },
-  outputs: {
-      marginLeft: theme.spacing(2),
-      marginBottom: theme.spacing(2),
-  },
-  subtitle: {
-      marginTop: theme.spacing(2),
-      textDecoration: 'underline'
- },
- errorText: {
-     color: '#912d2b',
-     fontSize: '1.2em'
- },
- paperForm: {
-     marginTop: theme.spacing(1),
-     padding: theme.spacing(0),
-     display: 'flex',
-     flexDirection: 'column',
-     alignItems: 'left',
-     backgroundColor: '#ebebeb'
- }
+    avatarPending: {
+        backgroundColor: '#ffeb3b',
+    },
+    avatarRunning: {
+        backgroundColor: '#03a9f4',
+    },
+    avatarError: {
+        backgroundColor: '#dd2c00',
+    },
+    avatarSuccess: {
+        backgroundColor: '#009688',
+    },
+    cellHeader: {
+        paddingLeft: theme.spacing(1)
+    },
+    gridColumn: {
+        backgroundColor: '#fff',
+        marginTop: theme.spacing(2)
+    },
+    paperForm: {
+         marginTop: theme.spacing(1),
+         paddingLeft: theme.spacing(2),
+         paddingRight: theme.spacing(2),
+         paddingBottom: theme.spacing(2),
+         display: 'flex',
+         flexDirection: 'column',
+         alignItems: 'left',
+         backgroundColor: '#fff' //'#ebebeb'
+     }
 }));
 
 
+// -- Mappings between global and component state -----------------------------
+
+/*
+ * The component requires the application state to access the upload urls,
+ * the selected submission, and the list of submission runs.
+ */
 const mapStateToProps = state => {
     return {
-        runListing: state.runListing
+        app: state.app,
+        run: state.run,
+        runListing: state.runListing,
+        submission: state.submission
     };
 };
 
 
-/*function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch) {
   return {
-      uploadFile: (url, submission, file) => (
-          dispatch(
-              uploadFile(url, submission, file)
-          )
-      ),
-      downloadResource: (url, submission, type) => (
-          dispatch(
-              downloadResource(url, submission, type)
-          )
-      ),
-      cancelRun: (url, submission) => (dispatch(cancelRun(url, submission))),
-      getRun: (url, submission) => (dispatch(getRun(url, submission))),
-      selectDialog: (dialogId) => dispatch(selectDialog(dialogId)),
-      submitRun: (url, data, submission) => (dispatch(submitRun(url, data, submission)))
+      selectRun: (api, runId) => (dispatch(fetchRun(api, runId)))
   };
-}*/
-
-
-function RunListing(props) {
-    const classes = useStyles();
-    const { fetchError, isFetching, runs } = props.runListing;
-    if (isFetching) {
-        return (
-            <Spinner
-                message={'Loading submission runs ...'}
-                showLogo={false}
-            />
-        );
-    } else if (fetchError) {
-        const { error, isCritical } = fetchError;
-        return (<ErrorMessage error={error} isCritical={isCritical}/>);
-    } else if (runs != null) {
-        // Sort runs by decreasing start time
-        runs.sort((a, b) => ((b.createdAt).localeCompare(a.createdAt)));
-        let runListing = [];
-        for (let i = 0; i < runs.length; i++) {
-            const run = runs[i];
-            let icon = null;
-            let iconClass = null;
-            if (run.state === 'SUCCESS') {
-                icon = (<CheckCircleOutline />);
-                iconClass = classes.avatarSuccess;
-            } else if ((run.state === 'CANCELED') || (run.state === 'ERROR')) {
-                icon = (<ErrorOutlineOutlined />);
-                iconClass = classes.avatarError;
-            } else if (run.state === 'RUNNING') {
-                icon = (<DirectionsRunOutlined />);
-                iconClass = classes.avatarRunning;
-            } else {
-                icon = (<HourglassEmptyOutlined />);
-                iconClass = classes.avatarPending;
-            }
-            const startedAt = 'Submitted at ' + utc2LocalTime(run.createdAt);
-            runListing.push(
-                <ListItem key={run.id}>
-                    <ListItemAvatar>
-                        <Avatar className={iconClass}>
-                            {icon}
-                        </Avatar>
-                    </ListItemAvatar>
-                    {startedAt}
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={() => (alert('click'))}
-                    >
-                        Cancel
-                    </Button>
-                </ListItem>
-            );
-        }
-        return (
-            <Paper className={classes.paperForm}>
-                <DialogHeader title={'Runs ...'} />
-                <List>
-                    {runListing}
-                </List>
-            </Paper>
-        );
-    }
-    return null;
 }
 
 
-export default connect(mapStateToProps)(RunListing);
+// -- Component ---------------------------------------------------------------
+
+function RunListing(props) {
+    const classes = useStyles();
+    const { fetchError, runs } = props.runListing;
+    const selectedRun = props.run.selectedRun;
+    const selectedSubmission = props.submission.selectedSubmission;
+    // -- Event handlers ------------------------------------------------------
+    const handleSelectRun = (runId) => {
+        props.selectRun(props.app, runId);
+    }
+    // Render -----------------------------------------------------------------
+    let minorError = null;
+    if (fetchError != null) {
+        minorError = (<ErrorMessage error={fetchError} isCritical={false}/>);
+    }
+    // The selected item key depends on whether a run is currently selected or
+    // not.
+    let selectedItem = null;
+    if (selectedRun != null) {
+        selectedItem = selectedRun.id;
+    }
+    // Sort runs by decreasing start time
+    runs.sort((a, b) => ((b.createdAt).localeCompare(a.createdAt)));
+    let runListing = [];
+    for (let i = 0; i < runs.length; i++) {
+        const run = runs[i];
+        let icon = null;
+        let iconClass = null;
+        if (run.state === 'SUCCESS') {
+            icon = (<CheckCircleOutline />);
+            iconClass = classes.avatarSuccess;
+        } else if ((run.state === 'CANCELED') || (run.state === 'ERROR')) {
+            icon = (<ErrorOutlineOutlined />);
+            iconClass = classes.avatarError;
+        } else if (run.state === 'RUNNING') {
+            icon = (<DirectionsRunOutlined />);
+            iconClass = classes.avatarRunning;
+        } else {
+            icon = (<HourglassEmptyOutlined />);
+            iconClass = classes.avatarPending;
+        }
+        runListing.push(
+            <ListItem
+                key={run.id}
+                button
+                selected={run.id === selectedItem}
+                onClick={() => (handleSelectRun(run.id))}
+            >
+                <ListItemAvatar>
+                    <Avatar className={iconClass}>
+                        {icon}
+                    </Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                    primary={run.id.substring(0,8)}
+                    secondary={utc2LocalTime(run.createdAt)}
+                />
+            </ListItem>
+        );
+    }
+    return (
+        <Paper className={classes.paperForm}>
+            <DialogHeader title={selectedSubmission.name + ' - Runs'} />
+            <Grid container spacing={2}>
+                <Grid item xs={6} className={classes.gridColumn}>
+                    <Box>
+                        <List component="nav" className={classes.root}>
+                            { runListing }
+                        </List>
+                    </Box>
+                </Grid>
+                <Grid item xs={6} className={classes.gridColumn}>
+                    <Run />
+                </Grid>
+            </Grid>
+            { minorError }
+        </Paper>
+    );
+}
+
+// -- Connect component to the Redux store ------------------------------------
+
+export default connect(mapStateToProps, mapDispatchToProps)(RunListing);

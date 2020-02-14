@@ -9,7 +9,7 @@
  */
 
 import { fetchApiResource, postRequest } from './Requests';
-import { fetchSubmission, fetchSubmissionStart } from './Submission.js';
+import { fetchSubmission } from './Submission.js';
 import {
     SHOW_INSTRUCTIONS, SHOW_LEADERBOARD, SHOW_RUNS
 } from '../resources/Dialog';
@@ -127,7 +127,7 @@ export function createSubmission(api, benchmark, name) {
 export function deleteSubmission(api, benchmark, submission) {
     return postRequest(
         api.urls.deleteSubmission(submission.id),
-        {name},
+        {},
         () => {return dispatch => {
             dispatch(selectDialog(api, SHOW_INSTRUCTIONS, benchmark));
             return dispatch(fetchBenchmark(api, benchmark))

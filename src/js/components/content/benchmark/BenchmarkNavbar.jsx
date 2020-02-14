@@ -187,7 +187,7 @@ function BenchmarkNavbar(props) {
                 <ListItemIcon>
                     <CloudUpload />
                 </ListItemIcon>
-                <ListItemText primary='Upload Files ...' />
+                <ListItemText primary='Input Files' />
             </ListItem>
         );
         listItems.push(

@@ -26,7 +26,9 @@ const useStyles = makeStyles(theme => ({
     },
     paperForm: {
         marginTop: theme.spacing(1),
-        padding: theme.spacing(2),
+        paddingLeft: theme.spacing(2),
+        paddingRight: theme.spacing(2),
+        paddingBottom: theme.spacing(2),
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'left',

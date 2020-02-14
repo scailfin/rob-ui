@@ -96,9 +96,56 @@ export class Urls {
         return this.get('benchmarks:submissions').replace('{benchmarkId}', benchmarkId);
     }
     /*
+     * Get list of handles for all files that have previously been uploaded for
+     * a submission.
+     */
+    getSubmissionFiles(submissionId) {
+        return this.get('uploads:list').replace('{submissionId}', submissionId);
+    }
+    /*
+     * Url to download a given submission file
+     */
+    downloadSubmissionFile(submissionId, fileId) {
+        return this.get('uploads:download')
+            .replace('{submissionId}', submissionId)
+            .replace('{fileId}', fileId);
+    }
+    /*
+     * Url for submission file uploads
+     */
+    uploadSubmissionFile(submissionId) {
+        return this.get('uploads:upload').replace('{submissionId}', submissionId);
+    }
+    /*
+     * Url to fetch run handle.
+     */
+    getRun(runId) {
+        return this.get('runs:get').replace('{runId}', runId);
+    }
+    /*
      * Get listing of all runs for a submission.
      */
     listRuns(submissionId) {
         return this.get('submissions:runs').replace('{submissionId}', submissionId);
+    }
+    /*
+     * Url to submit a new ron for the given submission
+     */
+    submitRun(submissionId) {
+        return this.get('submissions:submit').replace('{submissionId}', submissionId);
+    }
+    /*
+     * Post cancel request for active run
+     */
+    cancelRun = (runId) => {
+        return this.get('runs:cancel').replace('{runId}', runId);
+    }
+    /*
+     * Url to download a given run file
+     */
+    downloadRunFile(runId, fileId) {
+        return this.get('runs:resource')
+            .replace('{runId}', runId)
+            .replace('{resourceId}', fileId);
     }
 }

@@ -37,6 +37,9 @@ import { isCriticalError, isMinorError } from '../../../resources/Error';
 
 const useStyles = makeStyles(theme => ({
     benchmarkContent: {
+        padding: theme.spacing(1)
+    },
+    benchmarkGrid: {
         marginTop: theme.spacing(1)
     },
     paperBlock: {
@@ -167,11 +170,11 @@ function Benchmark(props) {
                 />);
         }
         content = (
-            <Grid container spacing={2} className={classes.benchmarkContent}>
+            <Grid container spacing={2} className={classes.benchmarkGrid}>
                 <Grid item xs={3}>
                     <BenchmarkNavbar />
                 </Grid>
-                <Grid item xs={9}>
+                <Grid item xs={9} className={classes.benchmarkContent}>
                     <div>
                         { content }
                     </div>

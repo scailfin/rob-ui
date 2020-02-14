@@ -11,8 +11,7 @@
 import { LOGOUT_SUCCESS } from '../actions/Auth';
 import { SELECT_BENCHMARK, SELECT_DIALOG } from '../actions/Benchmark';
 import {
-    CREATE_SUBMISSION_SUCCESS, FETCH_SUBMISSION_START,
-    FETCH_SUBMISSION_SUCCESS, FETCH_SUBMISSION_ERROR
+    FETCH_SUBMISSION_START, FETCH_SUBMISSION_SUCCESS, FETCH_SUBMISSION_ERROR
 } from '../actions/Submission';
 import { SHOW_INSTRUCTIONS, SHOW_LEADERBOARD } from '../resources/Dialog';
 
@@ -31,14 +30,6 @@ const INITIAL_STATE = {
 
 const submissions = (state = INITIAL_STATE, action) => {
     switch (action.type) {
-        case CREATE_SUBMISSION_SUCCESS:
-            const createdSubmission = action.payload;
-            return {
-                ...state,
-                submissions: state.submissions.concat([createdSubmission]),
-                selectedSubmission: createdSubmission,
-                submissionDialog: 0
-            };
         case FETCH_SUBMISSION_START:
             return {...state, isFetching: true, fetchError: null};
         case FETCH_SUBMISSION_SUCCESS:

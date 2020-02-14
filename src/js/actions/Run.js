@@ -10,61 +10,62 @@
 
 import { NO_OP, criticalError } from './App';
 import { fetchApiResource, postRequest } from './Requests';
-
-const UPDATE_SUBMISSION = 'UPDATE_SUBMISSION'
-const SHOW_SUBMISSION = 'SHOW_SUBMISSION'
+import { fetchRuns } from './RunListing';
 
 
-export function cancelRun(url, submission) {
+/******************************************************************************
+ * Action types
+ *****************************************************************************/
+
+// Run handle
+export const FETCH_RUN_ERROR = 'FETCH_RUN_ERROR';
+export const FETCH_RUN_START = 'FETCH_RUN_START';
+export const FETCH_RUN_SUCCESS = 'FETCH_RUN_SUCCESS';
+
+
+/******************************************************************************
+ * Actions
+ *****************************************************************************/
+
+
+// -- Errors ------------------------------------------------------------------
+
+export const dismissFetchRunError = () => (fetchRunError());
+const fetchRunError = (msg) => ({type: FETCH_RUN_ERROR, payload: msg});
+
+
+// -- Run handle --------------------------------------------------------------
+
+export function fetchRun(api, runId) {
+    return fetchApiResource(
+        api.urls.getRun(runId),
+        fetchRunSuccess,
+        fetchRunError,
+        fetchRunStart,
+    );
+}
+
+
+const fetchRunStart = () => ({type: FETCH_RUN_START});
+
+const fetchRunSuccess = (run) => ({type: FETCH_RUN_SUCCESS, payload: run})
+
+
+export function cancelRun(api, submission, run) {
     return postRequest(
-        url,
+        api.urls.cancelRun(run.id),
         {reason: 'Canceled at user request'},
-        (json) => (successFetchRun(submission, json, UPDATE_SUBMISSION)),
-        false,
+        (json) => (cancelRunSuccess(api, submission, json)),
+        fetchRunError,
+        fetchRunStart,
         'PUT'
     );
 }
 
 
-export function getRun(url, submission) {
-    return fetchApiResource(url, (json) => (successFetchRun(submission, json, UPDATE_SUBMISSION)), criticalError);
-}
-
-
-export function submitRun(url, data, submission) {
-    return postRequest(
-        url,
-        data,
-        (json) => (successFetchRun(submission, json, SHOW_SUBMISSION)),
-        false
-    );
-}
-
-
-function successFetchRun(submission, run, actionType) {
-    const updatedRuns = [];
-    let runFound = false;
-    for (let i = 0; i < submission.runs.length; i++) {
-        const r = submission.runs[i];
-        if (r.id === run.id) {
-            // If the run state has not changed there is no need to update
-            // the application state. Instead, we return an 'no operation'.
-            if (r.state === run.state) {
-                return {
-                    type: NO_OP
-                }
-            }
-            updatedRuns.push(run);
-            runFound = true;
-        } else {
-            updatedRuns.push(r);
-        }
-    }
-    if (!runFound) {
-        updatedRuns.push(run);
-    }
-    return {
-        type: actionType,
-        payload: {...submission, runs: updatedRuns}
+function cancelRunSuccess(api, submission, run) {
+    return dispatch => {
+        dispatch(fetchRuns(api, submission))
+        return dispatch(fetchRunSuccess(run))
     }
 }
