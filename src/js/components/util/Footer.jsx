@@ -16,18 +16,18 @@ import Typography from '@material-ui/core/Typography';
 
 
 const mapStateToProps = state => {
-  return { api: state.api };
+  return { app: state.app };
 };
 
 
-const APIFooter = ({api}) => {
-    const {name, version, urls} = api;
+const APIFooter = ({app}) => {
+    const {name, version, urls} = app;
     let apiInfo = null;
     if ((name != null) && (version != null) && (urls != null)) {
         apiInfo = (
             <span>
                 {'Connected to '}
-                <Link color="inherit" href={urls.self()}>
+                <Link color="inherit" href={urls.home()}>
                   {name}
                 </Link>
                 {' (Version ' + version + ').'}

@@ -9,16 +9,12 @@
  */
 
 import React from 'react';
-import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import CloseIcon from '@material-ui/icons/Close';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
-import { selectDialog } from '../../actions/Submission';
-import {
-    CREATE_SUBMISSION, SHOW_RUNS, SUBMIT_RUN, UPLOAD_FILES
-} from '../../resources/Dialog';
 
 
 const useStyles = makeStyles(theme => ({
@@ -30,59 +26,31 @@ const useStyles = makeStyles(theme => ({
         textAlign: 'right'
     },
     iconButton: {
-        color: '#004b87',
+        color: '#888',
         '&:hover': {
-            backgroundColor: '#e7f4ff'
+            backgroundColor: '#bcbcbc'
         }
     },
     root: {
         marginTop: theme.spacing(1),
         height: 50,
-        color: '#004b87'
+        color: '#444'
     },
 }));
 
 
-const mapStateToProps = state => {
-    return {
-        mainPanel: state.mainPanel
-    };
-};
-
-
-function mapDispatchToProps(dispatch) {
-  return {
-      selectDialog: (dialogId) => dispatch(selectDialog(dialogId))
-  };
-}
-
-
 function DialogHeader(props) {
-    const { selectedSubmission, submissionDialog } = props.mainPanel;
     const classes = useStyles();
-    // -- Main Content (render) -----------------------------------------------
-    let title = null;
-    let showCloseButton = false;
-    if (submissionDialog === CREATE_SUBMISSION) {
-        title = 'New Submission ...';
-        showCloseButton = true;
-    } else if (selectedSubmission != null) {
-        title = selectedSubmission.name;
-        if (submissionDialog === SHOW_RUNS) {
-            title = 'Runs (' + title + ')'
-        } else if (submissionDialog === SUBMIT_RUN) {
-            title = 'Submit New Run (' + title + ')'
-        } else if (submissionDialog === UPLOAD_FILES) {
-            title = 'Upload Files (' + title + ')'
-        }
-        showCloseButton = (submissionDialog !== SHOW_RUNS);
-    }
+    const { title, onClose } = props;
+    // ------------------------------------------------------------------------
+    // Render
+    // ------------------------------------------------------------------------
     let closeButton = null;
-    if (showCloseButton) {
+    if (onClose != null) {
         closeButton = (
             <IconButton
                 className={classes.iconButton}
-                onClick={() => (props.selectDialog(SHOW_RUNS))}
+                onClick={onClose}
                 aria-label="close"
             >
                 <CloseIcon />
@@ -107,4 +75,11 @@ function DialogHeader(props) {
     return content;
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(DialogHeader);
+
+DialogHeader.propTypes = {
+    onClose: PropTypes.func,
+    title: PropTypes.string.isRequired
+}
+
+
+export default DialogHeader;

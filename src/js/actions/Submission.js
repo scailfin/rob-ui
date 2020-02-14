@@ -8,142 +8,89 @@
  * terms of the MIT License; see LICENSE file for more details.
  */
 
-import { getFile, getUrl, postUrl } from './Requests';
-import { Urls } from '../resources/Urls';
+import { fetchApiResource, postRequest } from './Requests';
 
 
-export const CREATE_SUBMISSIONS_SUCCESS = 'CREATE_SUBMISSIONS_SUCCESS';
-export const FETCH_SUBMISSIONS_SUCCESS = 'FETCH_SUBMISSIONS_SUCCESS';
-export const SELECT_DIALOG = 'SELECT_DIALOG';
-export const SELECT_SUBMISSION = 'SELECT_SUBMISSION';
-export const UPDATE_SUBMISSION = 'UPDATE_SUBMISSION';
+/******************************************************************************
+ * Action types
+ *****************************************************************************/
 
 
-export function createSubmission(url, name) {
-    return postUrl(url, {name}, createSubmissionSuccess);
-}
+// -- Fetch submission --------------------------------------------------------
+
+export const FETCH_SUBMISSION_ERROR = 'FETCH_SUBMISSION_ERROR';
+export const FETCH_SUBMISSION_SUCCESS = 'FETCH_SUBMISSIONS_SUCCESS';
+export const FETCH_SUBMISSION_START = 'FETCH_SUBMISSION_START';
 
 
-function createSubmissionSuccess(response) {
-    return {
-        type: CREATE_SUBMISSIONS_SUCCESS,
-        payload: response
-    }
-}
+// -- Submission files --------------------------------------------------------
+
+export const FETCH_UPLOADFILES_ERROR = 'FETCH_UPLOADFILES_ERROR';
+export const FETCH_UPLOADFILES_START = 'FETCH_UPLOADFILES_START';
+export const FETCH_UPLOADFILES_SUCCESS = 'FETCH_UPLOADFILES_SUCCESS';
 
 
-export function downloadResource(url, submission, resourceId) {
-    if (submission.contentId === resourceId) {
-        return {
-            type: UPDATE_SUBMISSION,
-            payload: {
-                ...submission,
-                displayContent: null,
-                contentId: null
-            }
-        }
-    }
-    return getFile(
-        url,
-        (content) => (
-            fetchResourceSuccess(submission, resourceId, content)
-        )
+/******************************************************************************
+ * Actions
+ *****************************************************************************/
+
+
+// -- Errors ------------------------------------------------------------------
+
+export const fetchSubmissionError = (error) => ({
+    type: FETCH_SUBMISSION_ERROR, payload: error
+})
+
+const fetchFilesError = (msg) => ({type: FETCH_UPLOADFILES_ERROR, payload: msg});
+export const dismissFilesError = () => ({
+    type: FETCH_UPLOADFILES_ERROR, payload: null
+})
+
+
+// -- Fetch ubmission handle --------------------------------------------------
+
+export function fetchSubmission(api, submission) {
+    return fetchApiResource(
+        api.urls.getSubmission(submission.id),
+        (json) => ({type: FETCH_SUBMISSION_SUCCESS, payload: json}),
+        fetchSubmissionError,
+        () => ({type: FETCH_SUBMISSION_START})
     );
 }
 
 
-function fetchResourceSuccess(submission, resourceId, content) {
-    return {
-        type: UPDATE_SUBMISSION,
-        payload: {
-            ...submission,
-            displayContent: content,
-            contentId: resourceId
-        }
-    }
-}
+// -- Submission files --------------------------------------------------------
 
-
-export function fetchSubmissions(url) {
-    return getUrl(url, fetchSubmissionsSuccess);
-}
-
-
-function fetchSubmissionsSuccess(json) {
-    return {
-        type: FETCH_SUBMISSIONS_SUCCESS, payload: json
-    }
-}
-
-
-export function selectDialog(dialogId) {
-    return {type: SELECT_DIALOG, payload: dialogId}
-}
-
-
-/**
- * Set the selected submission that is shown in the main panel. At the beginning
- * when the submission listing is fetched we only receive a list of submission
- * descriptors. These descriptors do not contain information about submission
- * runs, uploaded files and the submission parameters. If a submission is to be
- * shown in the main panel for which we only have the descriptor yet we need to
- * fetch the full submission handle.
+/*
+ * Fetch update file list for a given submission.
  */
-export function selectSubmission(submission) {
-    // The submission may either be a descriptor or a handle. We assume that
-    // it is a descriptor if any of the properties that are only included in
-    // the submission handle are missing.
-    const { files, parameters, runs } = submission;
-    if ((parameters == null) || (runs == null) || (files == null)) {
-        const { links } = submission;
-        const urls = new Urls(links);
-        return dispatch => {
-            dispatch({
-                type: SELECT_SUBMISSION,
-                payload: {...submission, urls: urls, fetching: true}
-            })
-            return dispatch(getUrl(urls.self(), selectSubmission, false))
-        }
-    } else {
-        // If the response is coming directly from the server we still need to
-        // set the urls class.
-        const { urls, links } = submission;
-        if (urls == null) {
-            submission['urls'] = new Urls(links);
-        }
-        return {
-            type: SELECT_SUBMISSION,
-            payload: submission
-        }
-    }
+function fetchSubmissionFiles(api, submission) {
+    return fetchApiResource(
+        api.urls.getSubmissionFiles(submission.id),
+        (json) => ({type: FETCH_UPLOADFILES_SUCCESS, payload: json}),
+        fetchFilesError
+    );
 }
 
 
 /**
  * Upload a file for a given submission.
  */
-export function uploadFile(url, submission, file) {
-    const body = new FormData();
-    body.append('file', file);
-    return dispatch => (
-        dispatch(
-            postUrl(
-                url,
-                body,
-                ((response) => (uploadFileSuccess(submission, response)))
-            )
-        )
-    );
-}
-
-
-function uploadFileSuccess(submission, response) {
-    return {
-        type: UPDATE_SUBMISSION,
-        payload: {
-            ...submission,
-            files: submission.files.concat([response]),
-            contentId: null
-        }
-    }
+ export function uploadFiles(api, submission, files) {
+     const url = api.urls.uploadSubmissionFile(submission.id);
+     for (let i = 0; i < files.length; i++) {
+         const body = new FormData();
+         body.append('file', files[i]);
+         return dispatch => (
+             dispatch(
+                 postRequest(
+                     url,
+                     body,
+                     () => (fetchSubmissionFiles(api, submission)),
+                     fetchFilesError,
+                     () => ({type: FETCH_UPLOADFILES_START})
+                 )
+             )
+         )
+     }
 }

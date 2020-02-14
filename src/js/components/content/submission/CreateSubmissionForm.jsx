@@ -12,10 +12,11 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import Paper from '@material-ui/core/Paper';
+import Box from '@material-ui/core/Box';
+import DialogHeader from '../DialogHeader';
 import TextField from '@material-ui/core/TextField';
-import { createSubmission, selectDialog } from '../../actions/Submission';
-import { SHOW_RUNS } from '../../resources/Dialog';
+import { createSubmission, selectDialog } from '../../../actions/Benchmark';
+import { SHOW_INSTRUCTIONS, SHOW_RUNS } from '../../../resources/Dialog';
 
 
 const useStyles = makeStyles(theme => ({
@@ -24,27 +25,37 @@ const useStyles = makeStyles(theme => ({
       marginRight: theme.spacing(2)
     },
     paperForm: {
-        marginTop: theme.spacing(0),
-        padding: theme.spacing(2),
+        marginTop: theme.spacing(1),
+        paddingLeft: theme.spacing(2),
+        paddingRight: theme.spacing(2),
+        paddingBottom: theme.spacing(2),
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'left',
-        backgroundColor: '#ebebeb'
+        backgroundColor: '#f0f0f0',
+        borderColor: '#a0a0a0',
+        borderRadius: 4
     }
 }));
 
 
 const mapStateToProps = state => {
     return {
-        mainPanel: state.mainPanel
+        app: state.app,
+        benchmark: state.benchmark,
+        submission: state.submission
     };
 };
 
 
 function mapDispatchToProps(dispatch) {
   return {
-      selectDialog: (dialogId) => dispatch(selectDialog(dialogId)),
-      createSubmission: (url, name) => dispatch(createSubmission(url, name))
+      selectDialog: (api, dialogId, benchmark) => dispatch(
+          selectDialog(api, dialogId, benchmark)
+      ),
+      createSubmission: (api, benchmark, name) => dispatch(
+          createSubmission(api, benchmark, name)
+      )
   };
 }
 
@@ -54,25 +65,48 @@ function CreateSubmissionForm(props) {
     const [values, setValues] = useState({
         submissionName: ''
     });
-    const benchmark = props.mainPanel.selectedBenchmark;
+    const selectedBenchmark = props.benchmark.selectedBenchmark;
     const submissionName = values.submissionName;
-    /**
+    // ------------------------------------------------------------------------
+    // Event handlers
+    // ------------------------------------------------------------------------
+    /*
+     * Show instructions information if the user canceles the create submission
+     * action.
+     */
+    const handleCancel = () => {
+        const selectedBenchmark = props.benchmark.selectedBenchmark;
+        const selectedSubmission = props.submission.selectedSubmission;
+        if (selectedSubmission != null) {
+            props.selectDialog(props.app, SHOW_RUNS, selectedBenchmark);
+        } else {
+            props.selectDialog(props.app, SHOW_INSTRUCTIONS, selectedBenchmark);
+        }
+    }
+    /*
      * Handle changes in the submision name input field.
      */
     const handleSubmissionChanges = (event) => {
         setValues({...values, submissionName: event.target.value});
     }
-    /**
+    /*
      * Event handler for the submit button that creates a new submission for
      * the benchmark.
      */
     const handleSubmissionSubmit = () => {
-        const url = benchmark.urls.get('submissions:create')
-        props.createSubmission(url, submissionName);
+        const app = props.app;
+        props.createSubmission(app, selectedBenchmark, submissionName);
         setValues({open: false, submissionName: ''});
     }
+    // ------------------------------------------------------------------------
+    // Render
+    // ------------------------------------------------------------------------
     return (
-        <Paper className={classes.paperForm}>
+        <Box border={1} className={classes.paperForm}>
+            <DialogHeader
+                title={'Create Sumission ...'}
+                onClose={handleCancel}
+            />
             <div className={classes.form} noValidate>
                 <TextField
                     variant="outlined"
@@ -100,12 +134,12 @@ function CreateSubmissionForm(props) {
                     variant="contained"
                     color="secondary"
                     className={classes.button}
-                    onClick={() => (props.selectDialog(SHOW_RUNS))}
+                    onClick={handleCancel}
                 >
                     Cancel
                 </Button>
             </div>
-        </Paper>
+        </Box>
     );
 }
 

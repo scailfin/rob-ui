@@ -46,7 +46,7 @@ const styles = {
 
 
 const mapStateToProps = state => {
-  return { api: state.api };
+  return { app: state.app };
 };
 
 
@@ -146,14 +146,14 @@ class SignIn extends Component {
      * Submit user credentials for authentication to retrieve an access token.
      */
     submit = () => {
-        const {api} = this.props;
+        const {app} = this.props;
         const {username, password} = this.state;
         if (username === '') {
             alert('No user name given');
         } else if (password === '') {
             alert('No password given');
         } else {
-            this.props.submitLogin(api, username, password);
+            this.props.submitLogin(app, username, password);
         }
     }
 }

@@ -12,6 +12,9 @@
  * Constant values for the different submission dialogs.
  */
 export const CREATE_SUBMISSION = 0;
-export const SHOW_RUNS = 1;
-export const SUBMIT_RUN = 2;
-export const UPLOAD_FILES = 3;
+export const DELETE_SUBMISSION = 1;
+export const SHOW_INSTRUCTIONS = 2;
+export const SHOW_LEADERBOARD = 3;
+export const SHOW_RUNS = 4;
+export const SUBMIT_RUN = 5;
+export const UPLOAD_FILES = 6;

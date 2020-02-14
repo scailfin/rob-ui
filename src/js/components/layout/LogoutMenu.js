@@ -20,19 +20,19 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 import Menu from '@material-ui/core/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MenuItem from '@material-ui/core/MenuItem';
-import { deselectBenchmark } from '../../actions/Benchmark';
+import { showHomepage } from '../../actions/App';
 import { submitLogout } from "../../actions/Auth";
 
 
 const mapStateToProps = state => {
-    return { api: state.api, app: state.app };
+    return { app: state.app };
 };
 
 
 function mapDispatchToProps(dispatch) {
   return {
-      deselectBenchmark: () => dispatch(deselectBenchmark()),
-      submitLogout: (url, token) => dispatch(submitLogout(url, token))
+      showHomepage: (api) => dispatch(showHomepage(api)),
+      submitLogout: (api, token) => dispatch(submitLogout(api, token))
   };
 }
 
@@ -80,12 +80,11 @@ function LogoutMenu(props) {
     };
     const handleGoHome = () => {
         handleClose();
-        props.deselectBenchmark()
+        props.showHomepage(props.app)
     };
     const handleLogout = () => {
         handleClose();
-        const urls = props.api.urls;
-        props.submitLogout(urls.get('logout'))
+        props.submitLogout(props.app)
     };
     const username = props.app.username;
     if (username != null) {

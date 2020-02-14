@@ -66,7 +66,6 @@ function Markdown(props) {
             const regexpImg =  /!\[(.*)\]\((.*\s".*")\)/g;
             const match = regexpImg.exec(line);
             if (match != null) {
-                console.log(match);
                 const pos = match[2].indexOf(' ');
                 const url = match[2].substring(0, pos).trim();
                 let title = match[2].substring(pos + 1).trim()
