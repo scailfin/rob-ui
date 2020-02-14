@@ -24,7 +24,7 @@ import FileInput from './FileInput';
 import ScalarInput from './ScalarInput';
 import Spinner from '../../util/Spinner';
 import { selectDialog } from '../../../actions/Benchmark';
-import { dismissSubmitRunError, submitRun } from '../../../actions/RunListing';
+import { dismissSubmitRunError, submitRun } from '../../../actions/Run';
 import { SHOW_RUNS } from '../../../resources/Dialog';
 
 
@@ -121,7 +121,6 @@ function SubmitRunForm(props) {
      * Handle changes in form controls.
      */
     const handleControlChange = (id, value) => {
-        console.log(id + ' = ' + value)
         const modifiedArgs = {...args};
         modifiedArgs[id] = value;
         setArgs(modifiedArgs);
@@ -140,7 +139,6 @@ function SubmitRunForm(props) {
         const runArgs = [];
         submission.parameters.forEach((p) => {
             const val = args[p.id];
-            console.log(p.id + ' -> ' + val)
             if ((val != null) && (val !== '')) {
                 const arg = {id: p.id};
                 if (p.datatype === 'int') {

@@ -8,7 +8,7 @@
  * terms of the MIT License; see LICENSE file for more details.
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
@@ -25,7 +25,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Run from './Run';
-import { fetchRun } from '../../../actions/Run';
+import { dismissFetchRunsError, fetchRun, fetchRuns } from '../../../actions/Run';
 import { utc2LocalTime } from '../../../resources/Timestamps';
 
 
@@ -84,6 +84,10 @@ const mapStateToProps = state => {
 
 function mapDispatchToProps(dispatch) {
   return {
+      dismissFetchError: () => (dispatch(dismissFetchRunsError())),
+      fetchRuns: (api, submission, run) => (
+          dispatch(fetchRuns(api, submission, run))
+      ),
       selectRun: (api, runId) => (dispatch(fetchRun(api, runId)))
   };
 }
@@ -93,18 +97,39 @@ function mapDispatchToProps(dispatch) {
 
 function RunListing(props) {
     const classes = useStyles();
-    const { fetchError, runs } = props.runListing;
+    const api = props.app;
+    const {
+        fetchError,
+        pollInterval,
+        runs
+    } = props.runListing;
     const selectedRun = props.run.selectedRun;
     const selectedSubmission = props.submission.selectedSubmission;
+    const poll = props.fetchRuns;
+    // -- Set polling handler -------------------------------------------------
+    useEffect(() => {
+        let timer = null;
+        if ((pollInterval > 0) && (selectedSubmission != null)) {
+            timer = setInterval(() => (
+                    poll(api, selectedSubmission, selectedRun)
+                ),
+                pollInterval
+            );
+        }
+        return () => {
+            if (timer != null) {
+                clearInterval(timer);
+            }
+        };
+    }, [api, selectedSubmission, selectedRun, pollInterval, poll]);
     // -- Event handlers ------------------------------------------------------
-    const handleSelectRun = (runId) => {
-        props.selectRun(props.app, runId);
+    const handleDismissFetchError = () => {
+        props.dismissFetchError();
+    }
+    const handleSelectRun = (run) => {
+        props.selectRun(props.app, run);
     }
     // Render -----------------------------------------------------------------
-    let minorError = null;
-    if (fetchError != null) {
-        minorError = (<ErrorMessage error={fetchError} isCritical={false}/>);
-    }
     // The selected item key depends on whether a run is currently selected or
     // not.
     let selectedItem = null;
@@ -136,7 +161,7 @@ function RunListing(props) {
                 key={run.id}
                 button
                 selected={run.id === selectedItem}
-                onClick={() => (handleSelectRun(run.id))}
+                onClick={() => (handleSelectRun(run))}
             >
                 <ListItemAvatar>
                     <Avatar className={iconClass}>
@@ -148,6 +173,17 @@ function RunListing(props) {
                     secondary={utc2LocalTime(run.createdAt)}
                 />
             </ListItem>
+        );
+    }
+    // Show minor error message for fetch errors
+    let minorError = null;
+    if (fetchError != null) {
+        minorError = (
+            <ErrorMessage
+                error={fetchError}
+                isCritical={false}
+                onClose={handleDismissFetchError}
+            />
         );
     }
     return (

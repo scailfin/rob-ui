@@ -8,7 +8,7 @@
  * terms of the MIT License; see LICENSE file for more details.
  */
 
-import { SUBMIT_RUN_ERROR, SUBMIT_RUN_START } from '../actions/RunListing';
+import { SUBMIT_RUN_ERROR, SUBMIT_RUN_START } from '../actions/Run';
 
 
 /*

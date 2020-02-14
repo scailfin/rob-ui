@@ -14,11 +14,14 @@ import { fetchApiResource } from './Requests';
 import { Urls } from '../resources/Urls';
 
 
+/******************************************************************************
+ * Action types
+ *****************************************************************************/
+
 export const API_ERROR = 'API_ERROR';
 export const CLEAR_ERROR = 'CLEAR_ERROR';
 export const FETCH_API_START = 'FETCH_API_START';
 export const FETCH_API_SUCCESS = 'FETCH_API_SUCCESS';
-export const NO_OP = 'NO_OP'
 export const SHOW_HOMEPAGE = 'SHOW_HOMEPAGE';
 
 

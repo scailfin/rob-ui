@@ -46,7 +46,6 @@ const fileUploads = (state = INITIAL_STATE, action) => {
         case FETCH_UPLOADFILES_START:
             return {...state, isFetching: true, fetchError: null};
         case FETCH_UPLOADFILES_SUCCESS:
-            console.log(action);
             return {
                 ...state,
                 isFetching: false,

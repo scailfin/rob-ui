@@ -11,7 +11,7 @@
 import { SHOW_HOMEPAGE } from '../actions/App';
 import { LOGOUT_SUCCESS } from '../actions/Auth';
 import { FETCH_BENCHMARK_START } from '../actions/Benchmark';
-import { FETCH_RUNS_ERROR, FETCH_RUNS_SUCCESS } from '../actions/RunListing';
+import { FETCH_RUNS_ERROR, FETCH_RUNS_SUCCESS } from '../actions/Run';
 import { FETCH_SUBMISSION_SUCCESS } from '../actions/Submission';
 
 
@@ -23,6 +23,7 @@ import { FETCH_SUBMISSION_SUCCESS } from '../actions/Submission';
  */
 const INITIAL_STATE = {
     fetchError: null,
+    pollInterval: -1,
     runs: null
 }
 
@@ -30,13 +31,25 @@ const INITIAL_STATE = {
 const runListing = (state = INITIAL_STATE, action) => {
     switch (action.type) {
         case FETCH_RUNS_ERROR:
-            return {...state, fetchError: action.payload};
+            return {...state, fetchError: action.payload, pollInterval: -1};
         case FETCH_SUBMISSION_SUCCESS:
         case FETCH_RUNS_SUCCESS:
+            const runs = action.payload.runs;
+            // The default polling interval that checks for new runs is 10 sec.
+            // If there are active runs, the interval is set to 1 sec.
+            let pollInterval = 5000;
+            for (let i = 0; i < runs.length; i++) {
+                const state = runs[i].state;
+                if ((state === 'PENDING') ||( state === 'RUNNING')) {
+                    pollInterval = 1000;
+                    break;
+                }
+            }
             return {
                 ...state,
                 fetchError: null,
-                runs: action.payload.runs
+                pollInterval,
+                runs: runs
             };
         case FETCH_BENCHMARK_START:
         case LOGOUT_SUCCESS:
@@ -44,8 +57,8 @@ const runListing = (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 fetchError: null,
-                runs: [],
-                selectedRun: null
+                pollInterval: -1,
+                runs: []
             };
         default:
             return state

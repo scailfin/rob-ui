@@ -117,6 +117,20 @@ export class Urls {
         return this.get('uploads:upload').replace('{submissionId}', submissionId);
     }
     /*
+     * Post cancel request for active run
+     */
+    cancelRun(runId) {
+        return this.get('runs:cancel').replace('{runId}', runId);
+    }
+    /*
+     * Url to download a given run file
+     */
+    downloadRunFile(runId, fileId) {
+        return this.get('runs:resource')
+            .replace('{runId}', runId)
+            .replace('{resourceId}', fileId);
+    }
+    /*
      * Url to fetch run handle.
      */
     getRun(runId) {
@@ -129,23 +143,15 @@ export class Urls {
         return this.get('submissions:runs').replace('{submissionId}', submissionId);
     }
     /*
+     * Get list of active runs.
+     */
+    pollRuns(submissionId) {
+        return this.get('runs:poll').replace('{submissionId}', submissionId);
+    }
+    /*
      * Url to submit a new ron for the given submission
      */
     submitRun(submissionId) {
         return this.get('submissions:submit').replace('{submissionId}', submissionId);
-    }
-    /*
-     * Post cancel request for active run
-     */
-    cancelRun = (runId) => {
-        return this.get('runs:cancel').replace('{runId}', runId);
-    }
-    /*
-     * Url to download a given run file
-     */
-    downloadRunFile(runId, fileId) {
-        return this.get('runs:resource')
-            .replace('{runId}', runId)
-            .replace('{resourceId}', fileId);
     }
 }

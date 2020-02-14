@@ -17,7 +17,6 @@ import RunListing from '../run/RunListing.jsx';
 import Spinner from '../../util/Spinner';
 import SubmitRunForm from '../run/SubmitRunForm';
 import { selectDialog } from '../../../actions/Benchmark';
-import { submitRun } from '../../../actions/RunListing';
 import { SHOW_RUNS, SUBMIT_RUN, UPLOAD_FILES } from '../../../resources/Dialog';
 
 
