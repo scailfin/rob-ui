@@ -24,21 +24,32 @@ To start the development server use `yarn start`. Note that this is a very preli
 
 Below are screen shots that show some of the main activities that are currently supported by the user interface.
 
-### Create Submissions and View Overall Benchmark Results
 
-![Create Submission](./docs/graphics/screen-submission.jpg)
-![View Overall Benchmark Results](./docs/graphics/screen-leaders.jpg)
+### ROB Home Page
 
-### Upload Files and View their Content
-
-![Upload Files and View their Content](./docs/graphics/screen-upload.jpg)
-
-### Submit Benchmark Runs
-
-![Submit Benchmark Runs](./docs/graphics/screen-run-start.jpg)
+![ROB Home Screenshot](./docs/graphics/screen-home.png)
 
 
-### View Benchmark Runs and their Results
+### Benchmark Overview
 
-![View Benchmark Runs](./docs/graphics/screen-runs.jpg)
-![View Benchmark Run Results](./docs/graphics/screen-run-results.jpg)
+![Benchmark Overview Screenshot](./docs/graphics/screen-benchmark.png)
+
+
+### Current Benchmark Results
+
+![Current Benchmark Results Screenshot](./docs/graphics/screen-results.png)
+
+
+### Start New Benchmark Run
+
+![Start New Benchmark Run Screenshot](./docs/graphics/screen-run-create.png)
+
+
+### Running Benchmark Status
+
+![Running Benchmark Status Screenshot](./docs/graphics/screen-run-active.png)
+
+
+### Successful Benchmark Run
+
+![Successful Benchmark Run Screenshot](./docs/graphics/screen-run-success.png)
