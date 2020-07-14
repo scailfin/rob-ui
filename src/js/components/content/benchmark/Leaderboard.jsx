@@ -178,8 +178,8 @@ function Leaderboard(props) {
                 for (let i = 0; i < outputs.length; i++) {
                     const res = outputs[i];
                     const bId = selectedBenchmark.id;
-                    const rId = postProcRun.resources.find((r) => (r.name === res.id)).id;
-                    const url = api.urls.getBenchmarkResource(bId, rId);
+                    const fId = postProcRun.files.find((r) => (r.name === res.id)).id;
+                    const url = api.urls.getBenchmarkResource(bId, fId);
                     plots.push(
                         <div key={res.id} className={classes.plots}>
                             <Typography variant='h6' >
