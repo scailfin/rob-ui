@@ -143,8 +143,8 @@ function Run(props) {
             const argId = arg.id;
             const para = selectedRun.parameters.find((p) => (p.id === argId));
             let argValue = arg.value;
-            if (para.datatype === 'file') {
-                argValue = argValue.file.name;
+            if (para.type === 'file') {
+                argValue = argValue.value.targetPath;
             }
             inputList.push(
                 <Typography key={argId}>
@@ -170,7 +170,7 @@ function Run(props) {
                     </pre>
                 </div>
             );
-        } else if (selectedRun.state === 'RUNNING') {
+        } else if ((selectedRun.state === 'PENDING') || (selectedRun.state === 'RUNNING')) {
             runOutputs = (
                 <div className={classes.cancelButton}>
                     <Button
@@ -184,19 +184,19 @@ function Run(props) {
             );
         } else if (selectedRun.state === 'SUCCESS') {
             const items = [];
-            for (let i = 0; i < selectedRun.resources.length; i++) {
-                const rs = selectedRun.resources[i];
+            for (let i = 0; i < selectedRun.files.length; i++) {
+                const fh = selectedRun.files[i];
                 items.push(
                     <ListItem
-                        key={rs.id}
+                        key={fh.id}
                         button
-                        onClick={() => (handleDownload(rs.id))}
+                        onClick={() => (handleDownload(fh.id))}
                     >
                         <ListItemIcon>
                             <DescriptionOutlined />
                         </ListItemIcon>
                         <ListItemText
-                            primary={rs.name}
+                            primary={fh.name}
                         />
                     </ListItem>
                 );

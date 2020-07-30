@@ -99,12 +99,10 @@ function SubmitRunForm(props) {
     parameters.forEach((p) => {
         let val = null;
         if (p.defaultValue != null) {
-            if (p.datatype !== 'file') {
-                val = p.defaultValue;
-            } else if (p.as !== '$input') {
-                val = {file: p.defaultValue, as: ''}
+            if (p.type === 'file') {
+                val = {file: '', target: p.target};
             } else {
-                val = {file: '', as: p.defaultValue}
+                val = p.defaultValue;
             }
         }
         defaultArgs[p.id] = val;
@@ -141,15 +139,16 @@ function SubmitRunForm(props) {
             const val = args[p.id];
             if ((val != null) && (val !== '')) {
                 const arg = {id: p.id};
-                if (p.datatype === 'int') {
+                if (p.type === 'int') {
                     arg['value'] = parseInt(val, 10);
-                } else if (p.datatype === 'decimal') {
+                } else if (p.type === 'decimal') {
                     arg['value'] = parseFloat(val);
-                } else if (p.datatype === 'file') {
-                    arg['value'] = val.file;
-                    if (val.as !== '') {
-                        arg['as'] = val.as
+                } else if (p.type === 'file') {
+                    const fileRef = {fileId: val.file};
+                    if ((val.target != null) && (val.target !== '')) {
+                        fileRef['targetPath'] = val.target
                     }
+                    arg['value'] = {type: '$file', value: fileRef};
                 } else {
                     arg['value'] = val;
                 }
@@ -178,9 +177,10 @@ function SubmitRunForm(props) {
             />
         );
     }
+    // Render controls for workflow template parameters.
     const controls = [];
     parameters.forEach((p) => {
-        if (p.datatype === 'file') {
+        if (p.type === 'file') {
             controls.push(
                 <FileInput
                     key={p.id}

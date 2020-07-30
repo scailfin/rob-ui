@@ -35,7 +35,7 @@ function FileInput(props) {
     // Get the selected file value. If the value is null we use '' instead
     let selectedValue = value;
     if (selectedValue == null) {
-        selectedValue = {file: '', as: ''};
+        selectedValue = {file: '', target: ''};
     }
     /**
      * Change handler. The component value is an object with 'file' and 'as'
@@ -54,17 +54,17 @@ function FileInput(props) {
         listItems.push(<MenuItem key={f.id} value={f.id}>{f.name}</MenuItem>)
     ));
     let textControl = null;
-    if (para.as === '$input') {
+    if (para.target == null) {
         textControl = (
             <TextField
                 variant="outlined"
                 margin="normal"
                 required={para.defaultValue != null}
                 fullWidth
-                id={para.id + '-as'}
+                id={para.id + '-target'}
                 label={'Upload as ...'}
-                name={'as'}
-                value={selectedValue.as}
+                name={'target'}
+                value={selectedValue.target}
                 onChange={handleChange}
             />
         );
