@@ -143,8 +143,8 @@ function Run(props) {
             const argId = arg.id;
             const para = selectedRun.parameters.find((p) => (p.id === argId));
             let argValue = arg.value;
-            if (para.datatype === 'file') {
-                argValue = argValue.file.name;
+            if (para.type === 'file') {
+                argValue = argValue.value.targetPath;
             }
             inputList.push(
                 <Typography key={argId}>

@@ -110,6 +110,8 @@ export function fetchRuns(api, submission, selectedRun) {
 // -- Submit run --------------------------------------------------------------
 
 export function submitRun(api, submission, data) {
+    console.log('Submit run')
+    console.log(data)
     return postRequest(
         api.urls.submitRun(submission.id),
         data,

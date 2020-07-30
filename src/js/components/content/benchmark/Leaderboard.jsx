@@ -177,24 +177,26 @@ function Leaderboard(props) {
                 const plots = [];
                 for (let i = 0; i < outputs.length; i++) {
                     const res = outputs[i];
-                    const bId = selectedBenchmark.id;
-                    const fId = postProcRun.files.find((r) => (r.name === res.id)).id;
-                    const url = api.urls.getBenchmarkResource(bId, fId);
-                    plots.push(
-                        <div key={res.id} className={classes.plots}>
-                            <Typography variant='h6' >
-                                {res.title}
-                            </Typography>
-                            <div align='center'>
-                                <div>
-                                    <img src={url} alt={res.name} />
-                                </div>
-                                <Typography variant='caption' >
-                                    {res.caption}
+                    const fh = postProcRun.files.find((r) => (r.name === res.id));
+                    if (fh.name.endsWith('.png')) {
+                        const bId = selectedBenchmark.id;
+                        const url = api.urls.getBenchmarkResource(bId, fh.id);
+                        plots.push(
+                            <div key={res.id} className={classes.plots}>
+                                <Typography variant='h6' >
+                                    {res.title}
                                 </Typography>
+                                <div align='center'>
+                                    <div>
+                                        <img src={url} alt={res.name} />
+                                    </div>
+                                    <Typography variant='caption' >
+                                        {res.caption}
+                                    </Typography>
+                                </div>
                             </div>
-                        </div>
-                    );
+                        );
+                    }
                 }
                 plotListing = plots;
             }
