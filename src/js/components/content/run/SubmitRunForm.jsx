@@ -23,6 +23,7 @@ import ErrorMessage from '../../util/ErrorMessage';
 import FileInput from './FileInput';
 import ScalarInput from './ScalarInput';
 import Spinner from '../../util/Spinner';
+import Typography from '@material-ui/core/Typography';
 import { selectDialog } from '../../../actions/Benchmark';
 import { dismissSubmitRunError, submitRun } from '../../../actions/Run';
 import { SHOW_RUNS } from '../../../resources/Dialog';
@@ -46,6 +47,12 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: '#f0f0f0',
         borderColor: '#a0a0a0',
         borderRadius: 4
+    },
+    module: {
+        backgroundColor: '#fcfcfc',
+        borderRadius: 4,
+        padding: theme.spacing(1),
+        marginBottom: theme.spacing(2)
     }
 }));
 
@@ -60,6 +67,7 @@ const useStyles = makeStyles(theme => ({
 const mapStateToProps = state => {
     return {
         app: state.app,
+        benchmark: state.benchmark,
         fileUploads: state.fileUploads,
         submitRunForm: state.submitRunForm,
         submission: state.submission
@@ -84,6 +92,7 @@ function mapDispatchToProps(dispatch) {
 
 function SubmitRunForm(props) {
     const classes = useStyles();
+    const benchmark = props.benchmark.selectedBenchmark;
     const submission = props.submission.selectedSubmission;
     const files = props.fileUploads.files;
     const { isSubmitting, submitError } = props.submitRunForm;
@@ -99,7 +108,7 @@ function SubmitRunForm(props) {
     parameters.forEach((p) => {
         let val = null;
         if (p.defaultValue != null) {
-            if (p.type === 'file') {
+            if (p.dtype === 'file') {
                 val = {file: '', target: p.target};
             } else {
                 val = p.defaultValue;
@@ -139,11 +148,13 @@ function SubmitRunForm(props) {
             const val = args[p.id];
             if ((val != null) && (val !== '')) {
                 const arg = {id: p.id};
-                if (p.type === 'int') {
+                if ((val === '-inf') || (val === 'inf')) {
+                    arg['value'] = val;
+                } else if (p.dtype === 'int') {
                     arg['value'] = parseInt(val, 10);
-                } else if (p.type === 'decimal') {
+                } else if (p.dtype === 'decimal') {
                     arg['value'] = parseFloat(val);
-                } else if (p.type === 'file') {
+                } else if (p.dtype === 'file') {
                     const fileRef = {fileId: val.file};
                     if ((val.target != null) && (val.target !== '')) {
                         fileRef['targetPath'] = val.target
@@ -179,9 +190,18 @@ function SubmitRunForm(props) {
     }
     // Render controls for workflow template parameters.
     const controls = [];
+    let modules = null;
+    if (benchmark.modules != null) {
+        benchmark.modules.sort((m1, m2) => (m1.index - m2.index));
+        modules = {};
+        for (let i = 0; i < benchmark.modules.length; i++) {
+            modules[benchmark.modules[i].id] = [];
+        }
+    }
     parameters.forEach((p) => {
-        if (p.type === 'file') {
-            controls.push(
+        let cntrl = null;
+        if (p.dtype === 'file') {
+            cntrl = (
                 <FileInput
                     key={p.id}
                     files={files}
@@ -191,7 +211,7 @@ function SubmitRunForm(props) {
                 />
             );
         } else {
-            controls.push(
+            cntrl = (
                 <ScalarInput
                     key={p.id}
                     onChange={handleControlChange}
@@ -200,15 +220,42 @@ function SubmitRunForm(props) {
                 />
             );
         }
+        if (p.module != null) {
+            modules[p.module].push(cntrl);
+        } else {
+            controls.push(cntrl);
+        }
     });
+    const controlPanels = [];
+    if (benchmark.modules != null) {
+        for (let i = 0; i < benchmark.modules.length; i++) {
+            const module = benchmark.modules[i];
+            const moduleCntrls = modules[module.id];
+            if (moduleCntrls.length > 0) {
+                controlPanels.push(
+                    <Box key={module.id} className={classes.module}>
+                        <Typography variant='subtitle1'>
+                            {module.name}
+                        </Typography>
+                        { moduleCntrls }
+                    </Box>
+                );
+            }
+        }
+    }
+    if (controls.length > 0) {
+        controlPanels.push(
+            <Box key={'_controls'} className={classes.form} noValidate>
+                { controls }
+            </Box>
+        );
+    }
     const dialogTitle = submission.name + ' - Submit New Run';
     return (
         <Box border={1} className={classes.paperForm}>
             <div>
                 <DialogHeader title={dialogTitle} onClose={handleCancel} />
-                <div className={classes.form} noValidate>
-                    { controls }
-                </div>
+                { controlPanels }
                 <Button
                     className={classes.button}
                     variant="contained"

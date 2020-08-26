@@ -131,6 +131,13 @@ export class Urls {
         return this.get('runs:cancel').replace('{runId}', runId);
     }
     /*
+     * Url to download all run result files in a single archive.
+     */
+    downloadRunArchive(runId) {
+        return this.get('runs:archive')
+            .replace('{runId}', runId);
+    }
+    /*
      * Url to download a given run file
      */
     downloadRunFile(runId, fileId) {

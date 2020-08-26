@@ -15,6 +15,7 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import ErrorMessage from '../../util/ErrorMessage';
 import DescriptionOutlined from '@material-ui/icons/DescriptionOutlined';
+import Folder from '@material-ui/icons/Folder';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -97,7 +98,12 @@ function Run(props) {
     }
     const handleDownload = (fileId) => {
         const urls = props.app.urls;
-        const url = urls.downloadRunFile(selectedRun.id, fileId);
+        let url = null;
+        if (fileId != null) {
+            url = urls.downloadRunFile(selectedRun.id, fileId);
+        } else {
+            url = urls.downloadRunArchive(selectedRun.id);
+        }
         window.location.href = url;
     }
     // -- Render --------------------------------------------------------------
@@ -143,8 +149,10 @@ function Run(props) {
             const argId = arg.id;
             const para = selectedRun.parameters.find((p) => (p.id === argId));
             let argValue = arg.value;
-            if (para.type === 'file') {
-                argValue = argValue.value.targetPath;
+            if (para.dtype === 'file') {
+                const fileId = argValue.value.fileId;
+                const uploadedFiles = props.submission.selectedSubmission.files;
+                argValue = uploadedFiles.find((f) => (f.id === fileId)).name;
             }
             inputList.push(
                 <Typography key={argId}>
@@ -197,6 +205,22 @@ function Run(props) {
                         </ListItemIcon>
                         <ListItemText
                             primary={fh.name}
+                        />
+                    </ListItem>
+                );
+            }
+            if (selectedRun.files.length > 1) {
+                items.push(
+                    <ListItem
+                        key='archive'
+                        button
+                        onClick={() => (handleDownload())}
+                    >
+                        <ListItemIcon>
+                            <Folder />
+                        </ListItemIcon>
+                        <ListItemText
+                            primary='Download all result files'
                         />
                     </ListItem>
                 );

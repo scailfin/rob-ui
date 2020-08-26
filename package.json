@@ -2,7 +2,7 @@
   "name": "rob-ui",
   "version": "0.1.0",
   "private": true,
-  "homepage": ".",
+  "homepage": "/rob-ui",
   "dependencies": {
     "@material-ui/core": "^4.5.2",
     "@material-ui/icons": "^4.5.1",

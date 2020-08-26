@@ -13,13 +13,13 @@ import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import ErrorMessage from '../../util/ErrorMessage';
+import Plot from '../plot/Plot';
 import Spinner from '../../util/Spinner';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Typography from '@material-ui/core/Typography';
 import { fetchLeaderboard } from '../../../actions/Benchmark';
 
 
@@ -82,7 +82,6 @@ function Leaderboard(props) {
     const {
         fetchError,
         isFetching,
-        outputs,
         pollInterval,
         postProcRun,
         schema,
@@ -123,7 +122,7 @@ function Leaderboard(props) {
     for (let i = 0; i < schema.length; i++) {
         const col = schema[i];
         let align = 'right';
-        if (col.type === 'string') {
+        if (col.dtype === 'string') {
             align = 'left'
         }
         headline.push(
@@ -144,11 +143,11 @@ function Leaderboard(props) {
         for (let j = 0; j < schema.length; j++) {
             const col = schema[j];
             let align = 'right';
-            if (col.type === 'string') {
+            if (col.dtype === 'string') {
                 align = 'left'
             }
             let val = run.results[j].value;
-            if (col.type === 'decimal') {
+            if (col.dtype === 'decimal') {
                 try{
                     val = val.toFixed(6);
                 } catch (err) {}
@@ -173,32 +172,16 @@ function Leaderboard(props) {
                 </div>
             );
         } else if (postProcRun.state === 'SUCCESS') {
-            if (outputs != null) {
-                const plots = [];
-                for (let i = 0; i < outputs.length; i++) {
-                    const res = outputs[i];
-                    const fh = postProcRun.files.find((r) => (r.name === res.id));
-                    if (fh.name.endsWith('.png')) {
-                        const bId = selectedBenchmark.id;
-                        const url = api.urls.getBenchmarkResource(bId, fh.id);
-                        plots.push(
-                            <div key={res.id} className={classes.plots}>
-                                <Typography variant='h6' >
-                                    {res.title}
-                                </Typography>
-                                <div align='center'>
-                                    <div>
-                                        <img src={url} alt={res.name} />
-                                    </div>
-                                    <Typography variant='caption' >
-                                        {res.caption}
-                                    </Typography>
-                                </div>
-                            </div>
-                        );
-                    }
+            const bId = selectedBenchmark.id;
+            plotListing = [];
+            for (let i = 0; i < postProcRun.files.length; i++) {
+                const resource = postProcRun.files[i];
+                if (resource.format == null) {
+                    continue;
                 }
-                plotListing = plots;
+                const url = api.urls.getBenchmarkResource(bId, resource.id);
+                const key = resource.id;
+                plotListing.push(<Plot key={key} resource={resource} url={url} />);
             }
         } else {
             plotListing = (<Spinner  message='Processing ...' showLogo={false}/>);
