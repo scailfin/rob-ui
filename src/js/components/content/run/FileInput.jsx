@@ -45,7 +45,7 @@ function FileInput(props) {
         const { name, value } = event.target;
         const modValue = {...selectedValue};
         modValue[name] = value;
-        onChange(para.id, modValue);
+        onChange(para.name, modValue);
     }
     // Create list of select items from file list
     const listItems = [];
@@ -61,7 +61,7 @@ function FileInput(props) {
                 margin="normal"
                 required={para.defaultValue != null}
                 fullWidth
-                id={para.id + '-target'}
+                id={para.name + '-target'}
                 label={'Upload as ...'}
                 name={'target'}
                 value={selectedValue.target}
@@ -72,12 +72,12 @@ function FileInput(props) {
     return (
         <div>
             <FormControl className={classes.formControl}>
-                <InputLabel id={para.id + '-label'}>
+                <InputLabel id={para.name + '-label'}>
                     {para.name}
                 </InputLabel>
                 <Select
-                    labelId={para.id + '-label'}
-                    id={para.id}
+                    labelId={para.name + '-label'}
+                    id={para.name}
                     name={'file'}
                     value={selectedValue.file}
                     onChange={handleChange}

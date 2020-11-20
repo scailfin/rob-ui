@@ -19,7 +19,7 @@ function ScalarInput(props) {
      * Change handler for text field.
      */
     const handleChange = (event) => {
-        onChange(para.id, event.target.value);
+        onChange(para.name, event.target.value);
     }
     return (
         <TextField
@@ -27,9 +27,9 @@ function ScalarInput(props) {
             margin="normal"
             required={para.required}
             fullWidth
-            id={para.id}
+            id={para.name}
             label={para.name}
-            name={para.id}
+            name={para.name}
             value={value}
             onChange={handleChange}
         />
