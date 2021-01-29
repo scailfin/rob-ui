@@ -114,7 +114,7 @@ function SubmitRunForm(props) {
                 val = p.defaultValue;
             }
         }
-        defaultArgs[p.id] = val;
+        defaultArgs[p.name] = val;
     });
     const [args, setArgs] = useState(defaultArgs);
     // Event handlers ---------------------------------------------------------
@@ -145,9 +145,9 @@ function SubmitRunForm(props) {
         // Convert argument list to (key, value) pair list.
         const runArgs = [];
         submission.parameters.forEach((p) => {
-            const val = args[p.id];
+            const val = args[p.name];
             if ((val != null) && (val !== '')) {
-                const arg = {id: p.id};
+                const arg = {name: p.name};
                 if ((val === '-inf') || (val === 'inf')) {
                     arg['value'] = val;
                 } else if (p.dtype === 'int') {
@@ -203,20 +203,20 @@ function SubmitRunForm(props) {
         if (p.dtype === 'file') {
             cntrl = (
                 <FileInput
-                    key={p.id}
+                    key={p.name}
                     files={files}
                     onChange={handleControlChange}
                     para={p}
-                    value={args[p.id]}
+                    value={args[p.name]}
                 />
             );
         } else {
             cntrl = (
                 <ScalarInput
-                    key={p.id}
+                    key={p.name}
                     onChange={handleControlChange}
                     para={p}
-                    value={args[p.id]}
+                    value={args[p.name]}
                 />
             );
         }

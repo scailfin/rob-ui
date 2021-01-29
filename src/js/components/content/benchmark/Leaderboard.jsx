@@ -20,10 +20,15 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import Typography from '@material-ui/core/Typography';
 import { fetchLeaderboard } from '../../../actions/Benchmark';
 
 
 const useStyles = makeStyles(theme => ({
+    critical: {
+        color: theme.palette.secondary.main,
+        marginTop: theme.spacing(8)
+    },
     root: {
       width: '100%',
       marginTop: theme.spacing(0),
@@ -114,7 +119,17 @@ function Leaderboard(props) {
     } else if (fetchError != null) {
         return (<ErrorMessage error={fetchError} isCritical={true} />);
     } else if ((ranking == null) || (schema == null)) {
-        return null;
+        return (
+            <Typography variant='h6' align='center' className={classes.critical}>
+                { 'Not a benchmark' }
+            </Typography>
+        );
+    } else if (schema.length === 0) {
+        return (
+            <Typography variant='h6' align='center' className={classes.critical}>
+                { 'Not a benchmark' }
+            </Typography>
+        );
     }
     // -- Result table
     const headline = [];
@@ -126,8 +141,8 @@ function Leaderboard(props) {
             align = 'left'
         }
         headline.push(
-            <TableCell key={'col-' + col.id} align={align}>
-                {col.name}
+            <TableCell key={'col-' + col.name} align={align}>
+                {col.label}
             </TableCell>
         );
     }
@@ -137,7 +152,7 @@ function Leaderboard(props) {
         const cells = [];
         cells.push(
             <TableCell key={'col'} align='left'>
-                {run.submission.name}
+                {run.group.name}
             </TableCell>
         );
         for (let j = 0; j < schema.length; j++) {
@@ -153,7 +168,7 @@ function Leaderboard(props) {
                 } catch (err) {}
             }
             cells.push(
-                <TableCell key={'col-' + col.id} align={align}>
+                <TableCell key={'col-' + col.name} align={align}>
                     {val}
                 </TableCell>
             );

@@ -19,7 +19,8 @@
  * in the pattern with given argument values.
  */
 export class Urls {
-    constructor(links) {
+    constructor(url, links) {
+        this.url = url;
         this.links = links;
     }
     /*
@@ -28,10 +29,11 @@ export class Urls {
      * exists.
      */
     get(key) {
-        const ref = this.links.find((ref) => (ref.action === key));
+        const ref = this.links.find((ref) => (ref.id === key));
         if (ref != null) {
-            return ref.pattern;
+            return this.url + '/' + ref.pattern;
         } else {
+            console.log('not found: ' + key);
             return null;
         }
     }
@@ -39,33 +41,34 @@ export class Urls {
      * Get listing of all benchmarks.
      */
     getBenchmark(benchmarkId) {
-        return this.get('benchmarks:get').replace('{benchmarkId}', benchmarkId);
+        return this.get('workflows:get').replace('{workflowId}', benchmarkId);
     }
     /*
      * Get listing of all benchmarks.
      */
-    getBenchmarkResource(benchmarkId, resourceId) {
-        return this.get('benchmarks:resource')
-            .replace('{benchmarkId}', benchmarkId)
-            .replace('{resourceId}', resourceId);
+    getBenchmarkResource(benchmarkId, fileId) {
+        return this.get('workflows:download:file')
+            .replace('{workflowId}', benchmarkId)
+            .replace('{fileId}', fileId);
     }
     /*
      * Get listing of all benchmarks.
      */
     listBenchmarks() {
-        return this.get('benchmarks:list');
+        return this.get('workflows:list');
     }
     /*
      * Shortcut to get link to the API service descriptor.
      */
     home() {
-        return this.get('home');
+        return this.get('service');
     }
     /*
      * Get current leader board ranking for the given benchmark.
      */
     getLeaderboard(benchmarkId) {
-        return this.get('benchmarks:ranking').replace('{benchmarkId}', benchmarkId);
+        let pattern = this.get('leaderboard').replace('{workflowId}', benchmarkId);
+        return pattern.substring(0, pattern.indexOf('?'));
     }
     /*
      * Send user login credentials.
@@ -83,46 +86,46 @@ export class Urls {
      * Get Url to POST a create submission request
      */
     createSubmission(benchmarkId) {
-        return this.get('submissions:create').replace('{benchmarkId}', benchmarkId);
+        return this.get('groups:create').replace('{workflowId}', benchmarkId);
     }
     /*
      * Get Url to DELETE a submission
      */
     deleteSubmission(submissionId) {
-        return this.get('submissions:delete').replace('{submissionId}', submissionId);
+        return this.get('groups:delete').replace('{userGroupId}', submissionId);
     }
     /*
      * Get listing of user submissions
      */
     getSubmission(submissionId) {
-        return this.get('submissions:get').replace('{submissionId}', submissionId);
+        return this.get('groups:get').replace('{userGroupId}', submissionId);
     }
     /*
      * Get listing of user submissions
      */
     listSubmissions(benchmarkId) {
-        return this.get('benchmarks:submissions').replace('{benchmarkId}', benchmarkId);
+        return this.get('workflows:submissions').replace('{workflowId}', benchmarkId);
     }
     /*
      * Get list of handles for all files that have previously been uploaded for
      * a submission.
      */
     getSubmissionFiles(submissionId) {
-        return this.get('uploads:list').replace('{submissionId}', submissionId);
+        return this.get('files:list').replace('{userGroupId}', submissionId);
     }
     /*
      * Url to download a given submission file
      */
     downloadSubmissionFile(submissionId, fileId) {
-        return this.get('uploads:download')
-            .replace('{submissionId}', submissionId)
+        return this.get('files:download')
+            .replace('{userGroupId}', submissionId)
             .replace('{fileId}', fileId);
     }
     /*
      * Url for submission file uploads
      */
     uploadSubmissionFile(submissionId) {
-        return this.get('uploads:upload').replace('{submissionId}', submissionId);
+        return this.get('files:upload').replace('{userGroupId}', submissionId);
     }
     /*
      * Post cancel request for active run
@@ -134,16 +137,16 @@ export class Urls {
      * Url to download all run result files in a single archive.
      */
     downloadRunArchive(runId) {
-        return this.get('runs:archive')
+        return this.get('runs:download:archive')
             .replace('{runId}', runId);
     }
     /*
      * Url to download a given run file
      */
     downloadRunFile(runId, fileId) {
-        return this.get('runs:resource')
+        return this.get('runs:download:file')
             .replace('{runId}', runId)
-            .replace('{resourceId}', fileId);
+            .replace('{fileId}', fileId);
     }
     /*
      * Url to fetch run handle.
@@ -155,18 +158,18 @@ export class Urls {
      * Get listing of all runs for a submission.
      */
     listRuns(submissionId) {
-        return this.get('submissions:runs').replace('{submissionId}', submissionId);
+        return this.get('groups:runs').replace('{userGroupId}', submissionId);
     }
     /*
      * Get list of active runs.
      */
     pollRuns(submissionId) {
-        return this.get('runs:poll').replace('{submissionId}', submissionId);
+        return this.get('runs:poll').replace('{userGroupId}', submissionId);
     }
     /*
      * Url to submit a new ron for the given submission
      */
     submitRun(submissionId) {
-        return this.get('submissions:submit').replace('{submissionId}', submissionId);
+        return this.get('runs:start').replace('{userGroupId}', submissionId);
     }
 }

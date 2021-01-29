@@ -55,18 +55,18 @@ export function fetchApi() {
 }
 
 function fetchApiSuccess(response) {
-    const {name, version, routes, validToken, username} = response;
+    const {name, version, routes, url, username} = response;
     const api = {
         name,
         version,
-        urls: new Urls(routes)
+        urls: new Urls(url, routes)
     };
     // The server response indicates in element 'validToken' whether the access
     // token that (potentially) is stored in the local store is still valid or
     // not. If it is valid we fetch the benchmark and submission listing for
     // the user. Otherwise, we clear the information from the local store.
     return dispatch => {
-        if (validToken) {
+        if (username) {
             const accessToken = localStorage.getItem('accessToken');
             dispatch(submitLoginSuccess(api, {username, token: accessToken}));
         } else {
