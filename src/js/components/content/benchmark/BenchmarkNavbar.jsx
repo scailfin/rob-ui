@@ -125,7 +125,7 @@ function BenchmarkNavbar(props) {
     if ((selectedDialog === SHOW_RUNS) && (selectedSubmission != null)) {
         selectedItem = selectedSubmission.id;
     }
-    const submissions = selectedBenchmark.submissions;
+    const submissions = selectedBenchmark.groups;
     submissions.sort((a, b) => ((a.name).localeCompare(b.name)));
     for (let i = 0; i < submissions.length; i++) {
         const s = submissions[i];

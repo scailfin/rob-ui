@@ -33,7 +33,7 @@ const benchmarkListing = (state = INITIAL_STATE, action) => {
             return {...state, isFetching: true};
         case FETCH_BENCHMARKS_SUCCESS:
             return {
-                ...state, benchmarks: action.payload.benchmarks,
+                ...state, benchmarks: action.payload.workflows,
                 isFetching: false
             };
         case LOGOUT_SUCCESS:

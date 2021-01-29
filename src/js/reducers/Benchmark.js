@@ -37,7 +37,8 @@ const benchmark = (state = INITIAL_STATE, action) => {
             return {...state, isFetching: true, selectedBenchmark: action.payload};
         case FETCH_BENCHMARK_SUCCESS:
             return {
-                ...state, benchmarks: action.payload.benchmarks,
+                ...state,
+                benchmarks: action.payload.workflows,
                 isFetching: false
             };
         case LOGOUT_SUCCESS:

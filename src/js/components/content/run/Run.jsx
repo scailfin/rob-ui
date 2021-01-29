@@ -149,6 +149,7 @@ function Run(props) {
             const argId = arg.name;
             const para = selectedRun.parameters.find((p) => (p.name === argId));
             let argValue = arg.value;
+            console.log(props.submission)
             if (para.dtype === 'file') {
                 const fileId = argValue.value.fileId;
                 const uploadedFiles = props.submission.selectedSubmission.files;

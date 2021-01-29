@@ -152,7 +152,7 @@ function Leaderboard(props) {
         const cells = [];
         cells.push(
             <TableCell key={'col'} align='left'>
-                {run.submission.name}
+                {run.group.name}
             </TableCell>
         );
         for (let j = 0; j < schema.length; j++) {

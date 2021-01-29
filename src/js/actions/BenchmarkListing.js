@@ -13,7 +13,7 @@ import { fetchApiResource } from './Requests';
 /*
  * Action types
  */
- 
+
 export const FETCH_BENCHMARKS_ERROR = 'FETCH_BENCHMARKS_ERROR';
 export const FETCH_BENCHMARKS_START = 'FETCH_BENCHMARKS_START';
 export const FETCH_BENCHMARKS_SUCCESS = 'FETCH_BENCHMARKS_SUCCESS';
